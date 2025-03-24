@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Forms / Event - My Event</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="assets/css/style.css" rel="stylesheet">
+
+</head>
+<!-- Popup Modal (BỎ VÀO ĐÂY) -->
+<div class="modal fade" id="eventTypeModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-center w-100">Thêm Loại Sự Kiện</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <label for="newEventTypeInput">Nhập loại sự kiện:</label>
+        <input type="text" id="newEventTypeInput" class="form-control">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
+        <button type="button" id="saveEventType" class="btn btn-success">Lưu</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bỏ JS Bootstrap ở cuối để đảm bảo popup hoạt động -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var addEventTypeBtn = document.querySelector("#addEventType");
+    var modalElement = document.getElementById("eventTypeModal");
+
+    if (!addEventTypeBtn || !modalElement) {
+      console.error("Lỗi: Không tìm thấy nút hoặc modal.");
+      return;
+    }
+
+    var modal = new bootstrap.Modal(modalElement);
+
+    addEventTypeBtn.addEventListener("click", function () {
+      modal.show();
+    });
+  });
+</script>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <div id="header"></div>
+  <script src="assets/js/header.js"></script><!-- End Header -->
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="index.html">
+          <i class="bi bi-grid"></i>
+          <span>Dashboard</span>
+        </a>
+      </li><!-- End Dashboard Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="charts-chartjs.html">
+          <i class="bi bi-menu-button-wide"></i><span>Thống kê</span>
+        </a>
+      </li><!-- End Components Nav -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-journal-text"></i><span>Biểu Mẫu</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="form-event.html">
+              <i class="bi bi-circle"></i><span>Sự kiện</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Forms Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-layout-text-window-reverse"></i><span>Bảng</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="table-uses.html">
+              <i class="bi bi-circle"></i><span>Bảng người dùng</span>
+            </a>
+          </li>
+          <li>
+            <a href="table-device.html">
+              <i class="bi bi-circle"></i><span>Bảng thiết bị</span><!-- Done -->
+            </a>
+          </li>
+          <li>
+            <a href="table-place.html">
+              <i class="bi bi-circle"></i><span>Bảng địa điểm</span>
+            </a>
+          </li>
+          <li>
+            <a href="table-contact.html">
+              <i class="bi bi-circle"></i><span>Bảng hợp đồng</span><!-- Done -->
+            </a>
+          </li>
+          <li>
+            <a href="table-service.html">
+              <i class="bi bi-circle"></i><span>Bảng dịch vụ</span><!-- Done -->
+            </a>
+          </li>
+          <li>
+            <a href="table-event.html">
+              <i class="bi bi-circle"></i><span>Bảng sự kiện</span> <!-- Done -->
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Tables Nav -->
+
+      <li class="nav-heading">Pages</li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="users-profile.html">
+          <i class="bi bi-person"></i>
+          <span>Thông tin cá nhân</span>
+        </a>
+      </li><!-- End Profile Page Nav -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="pages-contact.html">
+          <i class="bi bi-envelope"></i>
+          <span>Liên hệ</span>
+        </a>
+      </li><!-- End Contact Page Nav -->
+    </ul>
+
+  </aside><!-- End Sidebar-->
+
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Biểu mẫu sự kiện</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Trang chủ</a></li>
+          <li class="breadcrumb-item">Biểu mẫu</li>
+          <li class="breadcrumb-item active">Sự kiện</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div>
+
+          <div class="card">
+            <div class="card-body">
+              <div style="display: flex; align-items: center;">
+                <h5 class="card-title">Biểu mẫu sự kiện</h5>
+                <button class="btn btn-outline-danger btn-sm w-auto ms-auto" id="DeleteForm">🗑</button>
+              </div>
+              <!-- Biểu mẫu sự kiện -->
+              <form>
+                <div class="row mb-3">
+                  <label for="inputImage" class="col-sm-2 col-form-label">Chọn hình ảnh</label>
+                  <div class="col-sm-10">
+                    <input type="file" class="form-control" name="picture" id="inputImage" accept="image/*"
+                      class="d-none">
+                    <img src="assets/img/card.jpg" id="image" style="height: 400px; width: 500px; padding-top: 10px;">
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label for="selectEventTypes" class="col-sm-2 col-form-label">Loại sự kiện</label>
+                  <div class="col-sm-10" style="display: flex; gap: 8px; " aria-label="Default select example">
+                    <select class="form-select w-auto" name="eventype" id="selectEventTypes">
+                      <option value="">Chọn một tùy chọn</option>
+                    </select>
+                    <button type="button" class="btn btn-primary" id="addEventType">+</button>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label for="inputName" class="col-sm-2 col-form-label">Tên sự kiện</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" name="name" id="inputName">
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label for="inputDescription" class="col-sm-2 col-form-label">Mô tả ngắn gọn</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" name="description" id="inputDescription">
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label for="inputDetail" class="col-sm-2 col-form-label">Nội dung chi tiết</label>
+                  <div class="col-sm-10">
+                    <textarea class="form-control" style="height: 100px" name="detail" id="inputDetail"></textarea>
+                  </div>
+                </div>
+                <!-- chọn thiết bị -->
+                <div class="row mb-3">
+                  <label for="deviceType" class="col-sm-2 col-form-label mb-2">Thiết bị</label>
+                  <div class="col-sm-10">
+                    <table id="deviceTable">
+                      <thead class="table-light">
+                        <tr class="text-center">
+                          <th>Loại thiết bị</th>
+                          <th>Tên thiết bị</th>
+                          <th>Nhà cung cấp</th>
+                          <th>Đơn giá/ngày</th>
+                          <th>Số lượng</th>
+                          <th>Thành tiền</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <select class="form-select w-auto " name="devicetype" style="width: 100px;"id="deviceType">
+                              <option value="">Chọn thiết bị</option>
+                            </select>
+                          </td>
+                          <td><select class="form-select " style="width: 150px;" name="devicename">
+                              <option value="">Chọn thiết bị</option>
+                            </select></td>
+                          <td><select class="form-select " style="width: 170px;" name="namesuplier">
+                              <option value="">Chọn tên</option>
+                            </select></td>
+                          <td><input type="text" class="form-control " name="pricedevice"></td>
+                          <td><input type="number" class="form-control " value="1" min="1" name="quantitydevice"></td>
+                          <td><input type="text" class="form-control " readonly name="totalmoneydevice"></td>
+                          <td class="text-center">
+                            <button type="button" class="btn btn-outline-danger">🗑</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <button type="button" class="btn btn-primary mt-1 " id="buttonAddDevice">Thêm thiết bị</button>
+                  </div>
+                </div>
+                <!-- end chọn thiết bị -->
+                <!-- chọn dịch vụ -->
+                <div class="row mb-3">
+                  <label for="serviceType" class="col-sm-2 col-form-label mb-2">Dịch vụ</label>
+                  <div class="col-sm-10">
+                    <table id="serviceTable">
+                      <thead class="table-light">
+                        <tr class="text-center">
+                          <th>Chọn dịch vụ</th>
+                          <th>Nhà cung cấp</th>
+                          <th>Đơn giá/ngày</th>
+                          <th>Số lượng</th>
+                          <th>Thành tiền</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <select class="form-select w-auto" name="servicetype" id="serviceType">
+                              <option value="">Chọn dịch vụ</option>
+                            </select>
+                          </td>
+                          <td><select class="form-select w-auto" name="namesuplier">
+                            <option value="">Chọn tên</option>
+                          </select></td>
+                          <td><input type="text" class="form-control w-auto" name="price"></td>
+                          <td><input type="number" class="form-control " value="1" min="1" name="quantity"></td>
+                          <td><input type="text" class="form-control " readonly name="totalmoney"></td>
+                          <td class="text-center">
+                            <button type="button" class="btn btn-outline-danger">🗑</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <button type="button" class="btn btn-primary mt-1 " id="buttonAddService">Thêm dịch vụ</button>
+                  </div>
+                </div>
+                <!-- end chọn dịch vụ -->
+                <!-- chọn timeline -->
+                <div class="row mb-3">
+                  <label for="timeline" class="col-sm-2 col-form-label mb-2">Timeline</label>
+                  <div class="col-sm-10">
+                    <table id="timeTable">
+                      <thead class="table-light">
+                        <tr class="text-center">
+                          <th>Chọn ngày</th>
+                          <th colspan="2">Mô tả</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><input type="datetime-local" class="form-control w-auto " name="timeline"
+                              placeholder="Chọn ngày" id="timeline">
+                          </td>
+                          <td> <textarea class="form-control " name="descriptiontime"
+                              style="min-width: 400px"></textarea></td>
+                          <td class="text-center">
+                            <button type="button" class="btn btn-outline-danger">🗑</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <button type="button" class="btn btn-primary mt-1 " id="buttonAddTime">Thêm timeline</button>
+                  </div>
+                </div>
+                <!-- end chọn timeline -->
+                <div class="row mb-3">
+                  <button type="button" class="btn btn-primary w-auto mx-auto fw-bold shadow" id="create">Lưu</button>
+                </div>
+
+              </form><!-- End General Form Elements -->
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer" class="footer">
+    <div class="copyright">
+      &copy; <strong><span>My Event</span></strong>. Tôn trọng bản quyền
+    </div>
+    <div class="credits">
+      <h6>Liên hệ :Nhóm 58 để biết thêm chi tiết nhá🌟</h6>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/chart.js/chart.umd.js"></script>
+  <script src="assets/vendor/echarts/echarts.min.js"></script>
+  <script src="assets/vendor/quill/quill.js"></script>
+  <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="assets/js/main.js"></script>
+  <!--Hành dộng API data cho table event-->
+  <script src="assets/js/event.js"></script>
+
+
+</body>
+
+</html>

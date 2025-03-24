@@ -1,0 +1,1158 @@
+{
+  "event": [
+    {
+      "id": "1",
+      "img": "assets/img/slides-3.jpg",
+      "name": "Sự kiện A b",
+      "description": "FULL THÔNG BÁO PHẢN BÁC 10 NGHÌN CHỮ CỦA PHÍA KIM SOO HYUN VỀ CHUYỆN HẸN HÒ VỚI KIM SAE RON, VIẾT THƯ “NHỚ EM” CHỈ LÀ TÌNH BẠN, LÀM RÕ KHOẢN NỢ 700 TRIỆU WON, GỌI GARO SERO LÀ “WY? DỮ”",
+      "event_type_id": "101",
+      "detail": "Chi tiết sự kiện A",
+      "created_at": "12/03/2025",
+      "updated_at": "2025-03-19"
+    },
+    {
+      "id": "0dda",
+      "img": "assets/img/news-1.jpg",
+      "name": "Khai trương xe",
+      "description": "xe đẹp lắm",
+      "event_type_id": "435a",
+      "detail": "hihi",
+      "created_at": "2025-03-19",
+      "updated_at": "2025-03-19"
+    },
+    {
+      "id": "246c",
+      "img": "assets/img/news-2.jpg",
+      "name": "Baby",
+      "description": "Baby",
+      "event_type_id": "4282",
+      "detail": "Baby",
+      "created_at": "2025-03-19",
+      "updated_at": "2025-03-19"
+    },
+    {
+      "id": "f414",
+      "img": "assets/img/slides-1.jpg",
+      "name": "Vocab Reading w1",
+      "description": "Level C2 đạt năng lực từ IELTS 8.0 9.0",
+      "event_type_id": "101",
+      "detail": "ggggg",
+      "created_at": "2025-03-19",
+      "updated_at": "2025-03-19"
+    },
+    {
+      "id": "f12c",
+      "img": "assets/img/news-4.jpg",
+      "name": "Test thiết bị",
+      "description": "Level C2 đạt năng lực từ IELTS 6.5 8.0",
+      "event_type_id": "101",
+      "detail": "ddđ",
+      "created_at": "2025-03-20",
+      "updated_at": "2025-03-20"
+    },
+    {
+      "id": "8e70",
+      "img": "assets/img/news-5.jpg",
+      "name": "test handlecreateform sau fix",
+      "description": "Level C2 đạt năng lực từ IELTS 8.0 9.0",
+      "event_type_id": "102",
+      "detail": "sss",
+      "created_at": "2025-03-20",
+      "updated_at": "2025-03-20"
+    },
+    {
+      "name": "test cập nhật",
+      "description": "Level C2 đạt năng lực từ IELTS 8.0 9.0",
+      "event_type_id": "101",
+      "detail": "ddd",
+      "updated_at": "2025-03-24",
+      "id": "076f"
+    },
+    {
+      "id": "506f",
+      "img": "assets/img/messages-2.jpg",
+      "name": "1",
+      "description": "1",
+      "event_type_id": "101",
+      "detail": "1",
+      "created_at": "2025-03-21",
+      "updated_at": "2025-03-21"
+    },
+    {
+      "id": "4c4f",
+      "img": "assets/img/avatar-img.jpg",
+      "name": "shin cậu bé bút chì",
+      "description": "shin cậu bé bút chì",
+      "event_type_id": "101",
+      "detail": "shin cậu bé bút chì",
+      "created_at": "2025-03-24",
+      "updated_at": "2025-03-24"
+    },
+    {
+      "name": "vui vẻ ko quạo",
+      "description": "Level C1 đạt năng lực từ IELTS 6.5 8.0",
+      "event_type_id": "102",
+      "detail": "vui vẻ ko quạo",
+      "updated_at": "2025-03-24",
+      "id": "bd90"
+    },
+    {
+      "name": "Tương ớt Chínu",
+      "description": "Tương ớt Chínu",
+      "event_type_id": "d8ba",
+      "detail": "Tương ớt Chínu",
+      "updated_at": "2025-03-24",
+      "id": "0542"
+    },
+    {
+      "name": "gấu bắc cực",
+      "description": "gấu bắc cực",
+      "event_type_id": "d8ba",
+      "detail": "gấu bắc cực",
+      "updated_at": "2025-03-24",
+      "id": "2ec6"
+    },
+    {
+      "name": "ko bấm sl",
+      "description": "Level C1 đạt năng lực từ IELTS 6.5 8.0",
+      "event_type_id": "101",
+      "detail": "ko bấm sl",
+      "updated_at": "2025-03-24",
+      "id": "f09d"
+    },
+    {
+      "name": "hoe",
+      "description": "hoe",
+      "event_type_id": "102",
+      "detail": "hoe",
+      "updated_at": "2025-03-24",
+      "id": "fc93"
+    },
+    {
+      "id": "924b",
+      "img": "anhdn.jpg",
+      "name": "sự kiện mơi snef",
+      "description": "sự kiện mơi snef",
+      "event_type_id": "102",
+      "detail": "sự kiện mơi snef",
+      "created_at": "2025-03-24",
+      "updated_at": "2025-03-24"
+    },
+    {
+      "id": "cd46",
+      "img": "1022.png",
+      "name": "người nhện",
+      "description": "người nhện",
+      "event_type_id": "d8ba",
+      "detail": "người nhện",
+      "created_at": "2025-03-24",
+      "updated_at": "2025-03-24"
+    },
+    {
+      "id": "0f9b",
+      "img": "1002new.png",
+      "name": "bônghoa",
+      "description": "bônghoa",
+      "event_type_id": "102",
+      "detail": "bônghoa",
+      "created_at": "2025-03-24",
+      "updated_at": "2025-03-24"
+    },
+    {
+      "id": "17b1",
+      "img": "anhdn.jpg",
+      "name": "Trinh lee",
+      "description": "trinhlee",
+      "event_type_id": "fec3",
+      "detail": "trinhlee",
+      "created_at": "2025-03-24",
+      "updated_at": "2025-03-24"
+    },
+    {
+      "id": "d14d",
+      "img": "dragon.jpg",
+      "name": "hạnh gia",
+      "description": "hạnh gia",
+      "event_type_id": "d8ba",
+      "detail": "hạnh gia",
+      "created_at": "2025-03-24",
+      "updated_at": "2025-03-24"
+    }
+  ],
+  "event_type": [
+    {
+      "id": "101",
+      "name": "Hội thảo",
+      "created_at": "12/03/2025",
+      "updated_at": "16/03/2025"
+    },
+    {
+      "id": "102",
+      "name": "Hội nghị",
+      "created_at": "12/03/2025",
+      "updated_at": "20/03/2025"
+    },
+    {
+      "id": "103",
+      "name": "Đám cưới",
+      "created_at": "12/03/2025",
+      "updated_at": "21/03/2025"
+    },
+    {
+      "id": "435a",
+      "name": "Khai trương",
+      "created_at": "2025-03-18",
+      "updated_at": "2025-03-18"
+    },
+    {
+      "id": "4282",
+      "name": "Thôi nôi",
+      "created_at": "2025-03-18",
+      "updated_at": "2025-03-18"
+    },
+    {
+      "id": "dda8",
+      "name": "Gặp nhau cuối năm",
+      "created_at": "2025-03-18",
+      "updated_at": "2025-03-18"
+    },
+    {
+      "id": "fec3",
+      "name": "Gặp nhau cuối tuần",
+      "created_at": "2025-03-18",
+      "updated_at": "2025-03-18"
+    },
+    {
+      "id": "d8ba",
+      "name": "Loại sự kiện",
+      "created_at": "2025-03-24",
+      "updated_at": "2025-03-24"
+    },
+    {
+      "id": "1b93",
+      "name": "lưu",
+      "created_at": "2025-03-24",
+      "updated_at": "2025-03-24"
+    },
+    {
+      "id": "5f7b",
+      "name": "loại ms",
+      "created_at": "2025-03-24",
+      "updated_at": "2025-03-24"
+    },
+    {
+      "id": "301b",
+      "name": "sự kiên",
+      "created_at": "2025-03-24",
+      "updated_at": "2025-03-24"
+    }
+  ],
+  "device": [
+    {
+      "id": "1",
+      "name": "Thiết bị Âm thanh",
+      "img": "device_a.jpg",
+      "hourly_rental_fee": 100.5,
+      "quantity": 10,
+      "created_at": "12/03/2025",
+      "updated_at": "15/03/2025",
+      "description": "Thiết bị A chuyên dùng cho sự kiện lớn",
+      "device_types_id": "1",
+      "user_id": "user1"
+    },
+    {
+      "id": "2",
+      "name": "Thiết bị Ánh sáng",
+      "img": "device_b.jpg",
+      "hourly_rental_fee": 150,
+      "quantity": 5,
+      "created_at": "14/03/2025",
+      "updated_at": "16/03/2025",
+      "description": "Thiết bị B phục vụ sân khấu ngoài trời",
+      "device_types_id": "2",
+      "user_id": "user2"
+    },
+    {
+      "id": "3",
+      "name": "TiVi",
+      "img": "device_b.jpg",
+      "hourly_rental_fee": 15000,
+      "quantity": 5,
+      "created_at": "14/03/2025",
+      "updated_at": "16/03/2025",
+      "description": "Thiết bị C phục vụ sân khấu ngoài trời",
+      "device_types_id": "3",
+      "user_id": "user2"
+    },
+    {
+      "id": "4",
+      "name": "TiVi",
+      "img": "device_b.jpg",
+      "hourly_rental_fee": 25000,
+      "quantity": 5,
+      "created_at": "14/03/2025",
+      "updated_at": "16/03/2025",
+      "description": "Thiết bị C phục vụ sân khấu ngoài trời",
+      "device_types_id": "3",
+      "user_id": "user1"
+    }
+  ],
+  "device_type": [
+    {
+      "id": "1",
+      "name": "Âm thanh",
+      "created_at": "2025-03-17",
+      "updated_at": "2025-03-17"
+    },
+    {
+      "id": "2",
+      "name": "Ánh sáng",
+      "created_at": "2025-03-17",
+      "updated_at": "2025-03-17"
+    },
+    {
+      "id": "3",
+      "name": "Màn hình LED",
+      "created_at": "2025-03-17",
+      "updated_at": "2025-03-17"
+    }
+  ],
+  "service": [
+    {
+      "id": "1",
+      "name": "Ca sĩ",
+      "description": "Dịch vụ hỗ trợ âm thanh ánh sáng",
+      "img": "service_a.jpg",
+      "hourly_salary": 50,
+      "quantity": 3,
+      "created_at": "12/03/2025",
+      "updated_at": "15/03/2025",
+      "user_id": "user1"
+    },
+    {
+      "id": "2",
+      "name": "Xiếc thú",
+      "description": "Dịch vụ biểu diễn xuất sắc",
+      "img": "service_b.jpg",
+      "hourly_salary": 75,
+      "quantity": 2,
+      "created_at": "14/03/2025",
+      "updated_at": "16/03/2025",
+      "user_id": "user1"
+    },
+    {
+      "id": "3",
+      "name": "Múa bale",
+      "description": "Dịch vụ biểu diễn xuất sắc",
+      "img": "service_c.jpg",
+      "hourly_salary": 1000,
+      "quantity": 2,
+      "created_at": "14/03/2025",
+      "updated_at": "16/03/2025",
+      "user_id": "user1"
+    },
+    {
+      "id": "4",
+      "name": "MC",
+      "description": "Dịch vụ biểu diễn xuất sắc",
+      "img": "service_d.jpg",
+      "hourly_salary": 1000,
+      "quantity": 2,
+      "created_at": "14/03/2025",
+      "updated_at": "16/03/2025",
+      "user_id": "user1"
+    },
+    {
+      "id": "5",
+      "name": "Nhảy hiphop h",
+      "description": "Dịch vụ biểu diễn xuất sắc",
+      "img": "service_f.jpg",
+      "hourly_salary": 10090,
+      "quantity": 2,
+      "created_at": "14/03/2025",
+      "updated_at": "16/03/2025",
+      "user_id": "user1"
+    },
+    {
+      "id": "6",
+      "name": "Văn nghệ dân vũ",
+      "description": "Dịch vụ biểu diễn xuất sắc",
+      "img": "service_g.jpg",
+      "hourly_salary": 20000,
+      "quantity": 2,
+      "created_at": "14/03/2025",
+      "updated_at": "16/03/2025",
+      "user_id": "user1"
+    }
+  ],
+  "rental": [
+    {
+      "id": "uuid-2",
+      "custom_location": "Huỳnh Ngọc Huệ",
+      "rental_end_time": "2025-03-15",
+      "rental_start_time": "2025-03-12",
+      "total_price": 500000,
+      "event_id": "1",
+      "user_id": "user1",
+      "updated_at": "2025-03-12"
+    },
+    {
+      "id": "uuid-4",
+      "custom_location": "Huỳnh Ngọc Huệ",
+      "rental_end_time": "2025-03-15",
+      "rental_start_time": "2025-03-12",
+      "total_price": 800000,
+      "event_id": "1",
+      "user_id": "user1",
+      "updated_at": "2025-05-12"
+    },
+    {
+      "id": "aae8",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-22T15:58:21.343Z",
+      "rental_end_time": "2025-03-23T15:58:21.343Z",
+      "total_price": 1055,
+      "event_id": "1",
+      "user_id": "user1",
+      "updated_at": "2025-04-22T15:58:21.343Z"
+    },
+    {
+      "id": "a542",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-22T16:01:38.009Z",
+      "rental_end_time": "2025-03-23T16:01:38.009Z",
+      "total_price": 0,
+      "event_id": "1",
+      "user_id": "user1",
+      "updated_at": "2025-06-22T16:01:38.009Z"
+    },
+    {
+      "id": "09ea",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-22T16:02:24.870Z",
+      "rental_end_time": "2025-03-23T16:02:24.870Z",
+      "total_price": 0,
+      "event_id": "1",
+      "user_id": "user1",
+      "updated_at": "2025-09-22T16:02:24.870Z"
+    },
+    {
+      "id": "1a77",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-23T14:43:18.275Z",
+      "rental_end_time": "2025-03-24T14:43:18.275Z",
+      "total_price": 3200,
+      "event_id": "2",
+      "user_id": "user1",
+      "updated_at": "2025-06-23T14:43:18.275Z"
+    },
+    {
+      "id": "6148",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-23T15:08:16.050Z",
+      "rental_end_time": "2025-03-24T15:08:16.050Z",
+      "total_price": 3065,
+      "event_id": "606d",
+      "user_id": "user1",
+      "updated_at": "2025-03-23T15:08:16.050Z"
+    },
+    {
+      "id": "27c0",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-23T16:13:57.844Z",
+      "rental_end_time": "2025-03-24T16:13:57.844Z",
+      "total_price": 1015.09,
+      "event_id": "f087",
+      "user_id": "user1",
+      "updated_at": "2025-03-23T16:13:57.844Z"
+    },
+    {
+      "id": "ebc0",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-23T16:55:29.802Z",
+      "rental_end_time": "2025-03-24T16:55:29.802Z",
+      "total_price": 0,
+      "event_id": "f061",
+      "user_id": "user1",
+      "updated_at": "2025-03-23T16:55:29.802Z"
+    },
+    {
+      "id": "a1eb",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-24T04:40:23.063Z",
+      "rental_end_time": "2025-03-25T04:40:23.063Z",
+      "total_price": 1015.09,
+      "event_id": "4c4f",
+      "user_id": "user1",
+      "updated_at": "2025-03-24T04:40:23.063Z"
+    },
+    {
+      "id": "875a",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-24T05:19:56.291Z",
+      "rental_end_time": "2025-03-25T05:19:56.291Z",
+      "total_price": 0,
+      "event_id": "d792",
+      "user_id": "user1",
+      "created_at": "2025-03-24T05:19:56.291Z",
+      "updated_at": "2025-03-24T05:19:56.291Z"
+    },
+    {
+      "id": "79df",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-24T05:19:56.293Z",
+      "rental_end_time": "2025-03-25T05:19:56.293Z",
+      "total_price": 0,
+      "event_id": "d792",
+      "user_id": "user1",
+      "created_at": "2025-03-24T05:19:56.293Z",
+      "updated_at": "2025-03-24T05:19:56.293Z"
+    },
+    {
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-24T09:23:40.979Z",
+      "rental_end_time": "2025-03-25T09:23:40.979Z",
+      "total_price": 220,
+      "event_id": "bd90",
+      "user_id": "user1",
+      "updated_at": "2025-03-24T09:23:40.979Z",
+      "id": "876d"
+    },
+    {
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-24T10:18:55.618Z",
+      "rental_end_time": "2025-03-25T10:18:55.618Z",
+      "total_price": 166,
+      "event_id": "0542",
+      "user_id": "user1",
+      "updated_at": "2025-03-24T10:18:55.618Z",
+      "id": "9c0a"
+    },
+    {
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-24T10:01:09.869Z",
+      "rental_end_time": "2025-03-25T10:01:09.869Z",
+      "total_price": 185,
+      "event_id": "2ec6",
+      "user_id": "user1",
+      "updated_at": "2025-03-24T10:01:09.869Z",
+      "id": "424a"
+    },
+    {
+      "id": "14c3",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-24T10:10:22.634Z",
+      "rental_end_time": "2025-03-25T10:10:22.634Z",
+      "total_price": 225,
+      "event_id": "1c9a",
+      "user_id": "user1",
+      "updated_at": "2025-03-24T10:10:22.634Z"
+    },
+    {
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-24T14:48:25.988Z",
+      "rental_end_time": "2025-03-25T14:48:25.988Z",
+      "total_price": 401,
+      "event_id": "f09d",
+      "user_id": "user2",
+      "updated_at": "2025-03-24T14:48:25.988Z",
+      "id": "3d4c"
+    },
+    {
+      "id": "f600",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-24T10:39:49.292Z",
+      "rental_end_time": "2025-03-25T10:39:49.292Z",
+      "total_price": 25.09,
+      "event_id": "fc93",
+      "user_id": "user1",
+      "updated_at": "2025-03-24T10:39:49.292Z"
+    },
+    {
+      "id": "a79d",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-24T15:10:52.954Z",
+      "rental_end_time": "2025-03-25T15:10:52.954Z",
+      "total_price": 1006,
+      "event_id": "924b",
+      "user_id": "user2",
+      "updated_at": "2025-03-24T15:10:52.954Z"
+    },
+    {
+      "id": "23e8",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-24T15:12:24.246Z",
+      "rental_end_time": "2025-03-25T15:12:24.246Z",
+      "total_price": 1006,
+      "event_id": "cd46",
+      "user_id": "user2",
+      "updated_at": "2025-03-24T15:12:24.246Z"
+    },
+    {
+      "id": "eb15",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-24T15:13:10.018Z",
+      "rental_end_time": "2025-03-25T15:13:10.018Z",
+      "total_price": 1015.09,
+      "event_id": "0f9b",
+      "user_id": "user2",
+      "updated_at": "2025-03-24T15:13:10.018Z"
+    },
+    {
+      "id": "726f",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-24T15:13:52.977Z",
+      "rental_end_time": "2025-03-25T15:13:52.977Z",
+      "total_price": 1006,
+      "event_id": "91d7",
+      "user_id": "user2",
+      "updated_at": "2025-03-24T15:13:52.977Z"
+    },
+    {
+      "id": "fc23",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-24T15:14:44.305Z",
+      "rental_end_time": "2025-03-25T15:14:44.305Z",
+      "total_price": 1015.09,
+      "event_id": "17b1",
+      "user_id": "user2",
+      "updated_at": "2025-03-24T15:14:44.305Z"
+    },
+    {
+      "id": "f9ab",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-03-24T15:17:49.981Z",
+      "rental_end_time": "2025-03-25T15:17:49.981Z",
+      "total_price": 900,
+      "event_id": "d14d",
+      "user_id": "user2",
+      "updated_at": "2025-03-24T15:17:49.981Z"
+    }
+  ],
+  "device_rental": [
+    {
+      "id": "dr1",
+      "rental_id": "r1",
+      "device_id": "1",
+      "quantity": 2,
+      "created_at": "2025-03-12",
+      "updated_at": "2025-03-13"
+    },
+    {
+      "id": "dr2",
+      "rental_id": "r2",
+      "device_id": "2",
+      "quantity": 1,
+      "created_at": "2025-03-18",
+      "updated_at": "2025-03-18"
+    },
+    {
+      "id": "9147",
+      "rental_id": "aae8",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-03-22T15:58:21.359Z",
+      "updated_at": "2025-03-22T15:58:21.359Z"
+    },
+    {
+      "id": "ee00",
+      "rental_id": "1a77",
+      "device_id": "1",
+      "quantity": "3",
+      "created_at": "2025-03-23T14:43:18.305Z",
+      "updated_at": "2025-03-23T14:43:18.305Z"
+    },
+    {
+      "id": "9872",
+      "rental_id": "1a77",
+      "device_id": "3",
+      "quantity": "3",
+      "created_at": "2025-03-23T14:43:18.306Z",
+      "updated_at": "2025-03-23T14:43:18.306Z"
+    },
+    {
+      "id": "7afb",
+      "rental_id": "6148",
+      "device_id": "1",
+      "quantity": "3",
+      "created_at": "2025-03-23T15:08:16.069Z",
+      "updated_at": "2025-03-23T15:08:16.069Z"
+    },
+    {
+      "id": "51f9",
+      "rental_id": "27c0",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-03-23T16:13:57.919Z",
+      "updated_at": "2025-03-23T16:13:57.919Z"
+    },
+    {
+      "id": "35c0",
+      "rental_id": "a1eb",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-03-24T04:40:23.072Z",
+      "updated_at": "2025-03-24T04:40:23.072Z"
+    },
+    {
+      "id": "ffbe",
+      "rental_id": "9c0a",
+      "device_id": "2",
+      "quantity": "1",
+      "created_at": "2025-03-24T09:38:08.674Z",
+      "updated_at": "2025-03-24T09:38:08.674Z"
+    },
+    {
+      "id": "d010",
+      "rental_id": "424a",
+      "device_id": "2",
+      "quantity": "1",
+      "created_at": "2025-03-24T10:00:53.220Z",
+      "updated_at": "2025-03-24T10:00:53.220Z"
+    },
+    {
+      "id": "f0f0",
+      "rental_id": "424a",
+      "device_id": "3",
+      "quantity": "1",
+      "created_at": "2025-03-24T10:01:09.871Z",
+      "updated_at": "2025-03-24T10:01:09.871Z"
+    },
+    {
+      "id": "916d",
+      "rental_id": "14c3",
+      "device_id": "2",
+      "quantity": "1",
+      "created_at": "2025-03-24T10:10:22.640Z",
+      "updated_at": "2025-03-24T10:10:22.640Z"
+    },
+    {
+      "id": "0133",
+      "rental_id": "3d4c",
+      "device_id": "2",
+      "quantity": "1",
+      "created_at": "2025-03-24T10:11:19.776Z",
+      "updated_at": "2025-03-24T10:11:19.776Z"
+    },
+    {
+      "id": "e084",
+      "rental_id": "9c0a",
+      "device_id": "3",
+      "quantity": "1",
+      "created_at": "2025-03-24T10:18:55.619Z",
+      "updated_at": "2025-03-24T10:18:55.619Z"
+    },
+    {
+      "id": "1106",
+      "rental_id": "f600",
+      "device_id": "3",
+      "quantity": "1",
+      "created_at": "2025-03-24T10:39:49.299Z",
+      "updated_at": "2025-03-24T10:39:49.299Z"
+    },
+    {
+      "id": "21b8",
+      "rental_id": "3d4c",
+      "device_id": "1",
+      "quantity": "2",
+      "created_at": "2025-03-24T10:40:37.219Z",
+      "updated_at": "2025-03-24T10:40:37.219Z"
+    },
+    {
+      "id": "bc62",
+      "rental_id": "a79d",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-03-24T15:10:53.068Z",
+      "updated_at": "2025-03-24T15:10:53.068Z"
+    },
+    {
+      "id": "536d",
+      "rental_id": "eb15",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-03-24T15:13:10.139Z",
+      "updated_at": "2025-03-24T15:13:10.139Z"
+    }
+  ],
+  "service_rental": [
+    {
+      "id": "sr1",
+      "rental_id": "r1",
+      "service_id": "1",
+      "quantity": 1,
+      "created_at": "2025-03-12",
+      "updated_at": "2025-03-13"
+    },
+    {
+      "id": "sr2",
+      "rental_id": "r2",
+      "service_id": "2",
+      "quantity": 2,
+      "created_at": "2025-03-18",
+      "updated_at": "2025-03-18"
+    },
+    {
+      "id": "7ed2",
+      "rental_id": "aae8",
+      "service_id": "1",
+      "quantity": "1",
+      "created_at": "2025-03-22T15:58:21.360Z",
+      "updated_at": "2025-03-22T15:58:21.360Z"
+    },
+    {
+      "id": "82e7",
+      "rental_id": "1a77",
+      "service_id": "1",
+      "quantity": "2",
+      "created_at": "2025-03-23T14:43:18.307Z",
+      "updated_at": "2025-03-23T14:43:18.307Z"
+    },
+    {
+      "id": "32e8",
+      "rental_id": "1a77",
+      "service_id": "6",
+      "quantity": "2",
+      "created_at": "2025-03-23T14:43:18.307Z",
+      "updated_at": "2025-03-23T14:43:18.307Z"
+    },
+    {
+      "id": "1a88",
+      "rental_id": "6148",
+      "service_id": "1",
+      "quantity": "1",
+      "created_at": "2025-03-23T15:08:16.069Z",
+      "updated_at": "2025-03-23T15:08:16.069Z"
+    },
+    {
+      "id": "5416",
+      "rental_id": "27c0",
+      "service_id": "5",
+      "quantity": "1",
+      "created_at": "2025-03-23T16:13:57.920Z",
+      "updated_at": "2025-03-23T16:13:57.920Z"
+    },
+    {
+      "id": "ba3a",
+      "rental_id": "a1eb",
+      "service_id": "5",
+      "quantity": "1",
+      "created_at": "2025-03-24T04:40:23.073Z",
+      "updated_at": "2025-03-24T04:40:23.073Z"
+    },
+    {
+      "id": "9525",
+      "rental_id": "876d",
+      "service_id": "6",
+      "quantity": "1",
+      "created_at": "2025-03-24T09:23:40.983Z",
+      "updated_at": "2025-03-24T09:23:40.983Z"
+    },
+    {
+      "id": "5bb2",
+      "rental_id": "9c0a",
+      "service_id": "3",
+      "quantity": "1",
+      "created_at": "2025-03-24T09:38:08.675Z",
+      "updated_at": "2025-03-24T09:38:08.675Z"
+    },
+    {
+      "id": "84d1",
+      "rental_id": "424a",
+      "service_id": "6",
+      "quantity": "1",
+      "created_at": "2025-03-24T10:00:53.221Z",
+      "updated_at": "2025-03-24T10:00:53.221Z"
+    },
+    {
+      "id": "71a8",
+      "rental_id": "14c3",
+      "service_id": "2",
+      "quantity": "1",
+      "created_at": "2025-03-24T10:10:22.640Z",
+      "updated_at": "2025-03-24T10:10:22.640Z"
+    },
+    {
+      "id": "4302",
+      "rental_id": "3d4c",
+      "service_id": "1",
+      "quantity": "1",
+      "created_at": "2025-03-24T10:11:19.776Z",
+      "updated_at": "2025-03-24T10:11:19.776Z"
+    },
+    {
+      "id": "062f",
+      "rental_id": "f600",
+      "service_id": "5",
+      "quantity": "1",
+      "created_at": "2025-03-24T10:39:49.300Z",
+      "updated_at": "2025-03-24T10:39:49.300Z"
+    },
+    {
+      "id": "1037",
+      "rental_id": "a79d",
+      "service_id": "3",
+      "quantity": "1",
+      "created_at": "2025-03-24T15:10:53.069Z",
+      "updated_at": "2025-03-24T15:10:53.069Z"
+    },
+    {
+      "id": "3a22",
+      "rental_id": "eb15",
+      "service_id": "5",
+      "quantity": "1",
+      "created_at": "2025-03-24T15:13:10.140Z",
+      "updated_at": "2025-03-24T15:13:10.140Z"
+    }
+  ],
+  "timeline": [
+    {
+      "id": "t1",
+      "rental_id": "r1",
+      "description": "Chuẩn bị sự kiện A",
+      "created_at": "2025-03-12",
+      "updated_at": "2025-03-13",
+      "time_start": "2025-03-14T10:00:00Z"
+    },
+    {
+      "id": "t2",
+      "rental_id": "r2",
+      "description": "Lắp đặt thiết bị cho họp bàn update",
+      "time_start": "2025-03-19T09:30:00Z",
+      "created_at": "2025-03-18",
+      "updated_at": "2025-03-18"
+    },
+    {
+      "id": "347b",
+      "rental_id": "aae8",
+      "time_start": "2025-03-22T22:58",
+      "description": "sssss",
+      "created_at": "2025-03-22T15:58:21.361Z",
+      "updated_at": "2025-03-22T15:58:21.361Z"
+    },
+    {
+      "id": "6df0",
+      "rental_id": "1a77",
+      "time_start": "2025-06-20T21:42",
+      "description": "cập nhật rental timeline ned",
+      "created_at": "2025-03-23T14:43:18.308Z",
+      "updated_at": "2025-03-23T14:43:18.308Z"
+    },
+    {
+      "id": "ae0f",
+      "rental_id": "6148",
+      "time_start": "2025-03-23T22:08",
+      "description": "Kiểm tra API",
+      "created_at": "2025-03-23T15:08:16.070Z",
+      "updated_at": "2025-03-23T15:08:16.070Z"
+    },
+    {
+      "id": "840d",
+      "rental_id": "27c0",
+      "time_start": "2025-03-23T23:13",
+      "description": "thấy rất mệt mỏi",
+      "created_at": "2025-03-23T16:13:57.922Z",
+      "updated_at": "2025-03-23T16:13:57.922Z"
+    },
+    {
+      "id": "6f50",
+      "rental_id": "a1eb",
+      "time_start": "2025-03-24T11:40",
+      "description": "shin cậu bé bút chì",
+      "created_at": "2025-03-24T04:40:23.075Z",
+      "updated_at": "2025-03-24T04:40:23.075Z"
+    },
+    {
+      "id": "a12c",
+      "rental_id": "876d",
+      "time_start": "2025-03-24T12:27",
+      "description": "vui vẻ ko quạo",
+      "created_at": "2025-03-24T05:27:13.676Z",
+      "updated_at": "2025-03-24T05:27:13.676Z"
+    },
+    {
+      "id": "52f8",
+      "rental_id": "9c0a",
+      "time_start": "2025-03-24T16:43",
+      "description": "Tương ớt Chínu",
+      "created_at": "2025-03-24T09:38:08.676Z",
+      "updated_at": "2025-03-24T09:38:08.676Z"
+    },
+    {
+      "id": "df59",
+      "rental_id": "424a",
+      "time_start": "2025-03-30T17:00",
+      "description": "gấu bắc cực",
+      "created_at": "2025-03-24T10:00:53.222Z",
+      "updated_at": "2025-03-24T10:00:53.222Z"
+    },
+    {
+      "id": "d893",
+      "rental_id": "f600",
+      "time_start": "2025-03-08T17:39",
+      "description": "hoe",
+      "created_at": "2025-03-24T10:39:49.301Z",
+      "updated_at": "2025-03-24T10:39:49.301Z"
+    },
+    {
+      "id": "aa0c",
+      "rental_id": "3d4c",
+      "time_start": "2025-03-24T21:48",
+      "description": "ko bấm sl",
+      "created_at": "2025-03-24T14:48:25.989Z",
+      "updated_at": "2025-03-24T14:48:25.989Z"
+    },
+    {
+      "id": "6eec",
+      "rental_id": "a79d",
+      "time_start": "2025-03-24T22:10",
+      "description": "sự kiện mơi snef",
+      "created_at": "2025-03-24T15:10:53.069Z",
+      "updated_at": "2025-03-24T15:10:53.070Z"
+    },
+    {
+      "id": "a424",
+      "rental_id": "eb15",
+      "time_start": "2025-03-24T22:13",
+      "description": "bônghoa",
+      "created_at": "2025-03-24T15:13:10.141Z",
+      "updated_at": "2025-03-24T15:13:10.141Z"
+    }
+  ],
+  "user": [
+    {
+      "id": "user1",
+      "role_id": "role1",
+      "email": "nguyenhongminh013@gmail.com",
+      "password": "123456",
+      "first_name": "Trinh",
+      "last_name": "Lee",
+      "avatar": "assets/img/messages-1.jpg",
+      "phone_number": "0986754369",
+      "created_at": "2024-03-19T12:00:00Z",
+      "updated_at": "2024-03-19T12:00:00Z"
+    },
+    {
+      "id": "user2",
+      "role_id": "role2",
+      "email": "nguyenhongminh4@gmail.com",
+      "password": "123456",
+      "first_name": "Hồng Minh",
+      "last_name": "Nguyễn",
+      "avatar": "assets/img/messages-2.jpg",
+      "phone_number": "0989410614",
+      "created_at": "2024-03-19T12:00:00Z",
+      "updated_at": "2024-03-19T12:00:00Z"
+    },
+    {
+      "id": "user3",
+      "role_id": "role2",
+      "email": "hello@gmail.com",
+      "password": "123",
+      "first_name": "Ngân",
+      "last_name": "Kim",
+      "avatar": "assets/img/messages-3.jpg",
+      "phone_number": "0989410614",
+      "created_at": "2024-04-19T12:00:00Z",
+      "updated_at": "2024-04-19T12:00:00Z"
+    },
+    {
+      "id": "user4",
+      "role_id": "role2",
+      "email": "tuan@gmail.com",
+      "password": "123",
+      "first_name": "Tuấn",
+      "last_name": "Anh",
+      "avatar": "assets/img/avatar-img.jpg",
+      "phone_number": "0989410614",
+      "created_at": "2024-05-19T12:00:00Z",
+      "updated_at": "2024-05-19T12:00:00Z"
+    }
+  ],
+  "role": [
+    {
+      "id": "role1",
+      "name": "NhaCungCap",
+      "created_at": "2024-03-19T12:00:00Z",
+      "updated_at": "2024-03-19T12:00:00Z"
+    },
+    {
+      "id": "role2",
+      "name": "Admin",
+      "created_at": "2024-03-19T12:00:00Z",
+      "updated_at": "2024-03-19T12:00:00Z"
+    }
+  ],
+  "contract": [
+    {
+      "id": "uuid-1",
+      "rental_id": "uuid-4",
+      "created_at": "2024-02-19T12:00:00Z",
+      "updated_at": "2024-02-19T12:00:00Z",
+      "status": 1,
+      "name": "Hợp đồng thuê sự kiện",
+      "payment_intent_id": "pi_123456",
+      "customer_id": "uuid-3"
+    },
+    {
+      "id": "uuid-2",
+      "rental_id": "uuid-2",
+      "created_at": "2024-03-19T12:00:00Z",
+      "updated_at": "2024-03-19T12:00:00Z",
+      "status": 1,
+      "name": "Hợp đồng thuê sự kiện",
+      "payment_intent_id": "pi_123456",
+      "customer_id": "uuid-2"
+    },
+    {
+      "id": "uuid-3",
+      "rental_id": "uuid-2",
+      "created_at": "2024-03-19T12:00:00Z",
+      "updated_at": "2024-03-19T12:00:00Z",
+      "status": 1,
+      "name": "Hợp đồng thuê sự kiện",
+      "payment_intent_id": "pi_123456",
+      "customer_id": "uuid-2"
+    },
+    {
+      "id": "uuid-4",
+      "rental_id": "uuid-4",
+      "created_at": "2024-04-19T12:00:00Z",
+      "updated_at": "2024-04-19T12:00:00Z",
+      "status": 1,
+      "name": "Hợp đồng thuê sự kiện",
+      "payment_intent_id": "pi_123456",
+      "customer_id": "uuid-2"
+    }
+  ],
+  "customer": [
+    {
+      "id": "uuid-3",
+      "name": "Nguyễn Văn A",
+      "phone_number": "0987654321",
+      "address": "123 Đường ABC, Quận 1, TP.HCM",
+      "created_at": "2024-03-19T12:00:00Z",
+      "updated_at": "2024-03-19T12:00:00Z"
+    },
+    {
+      "id": "uuid-2",
+      "name": "Nguyễn Văn B",
+      "phone_number": "0987654321",
+      "address": "123 Đường ABC, Quận 1, TP.HCM",
+      "created_at": "2024-03-19T12:00:00Z",
+      "updated_at": "2024-03-19T12:00:00Z"
+    }
+  ],
+  "location": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "name": "Sân khấu A",
+      "description": "Địa điểm chuyên tổ chức sự kiện ngoài trời.",
+      "img": "location_a.jpg",
+      "hourly_rental_fee": 500,
+      "created_at": "2025-03-19 10:00:00",
+      "updated_at": "2025-03-19 12:00:00",
+      "user_id": "user1"
+    }
+  ]
+}
