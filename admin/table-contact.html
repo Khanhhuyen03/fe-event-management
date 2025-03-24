@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Tables / Contact - My Event</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+        rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="assets/css/style.css" rel="stylesheet">
+    <!---->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+
+</head>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <div id="header"></div>
+    <script src="assets/js/header.js"></script><!-- End Header -->
+
+    <!-- ======= Sidebar ======= -->
+    <aside id="sidebar" class="sidebar">
+
+        <ul class="sidebar-nav" id="sidebar-nav">
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="index.html">
+                    <i class="bi bi-grid"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li><!-- End Dashboard Nav -->
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="charts-chartjs.html">
+                    <i class="bi bi-menu-button-wide"></i><span>Thống kê</span>
+                </a>
+            </li><!-- End Components Nav -->
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-journal-text"></i><span>Biểu Mẫu</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="form-event.html">
+                            <i class="bi bi-circle"></i><span>Sự kiện</span>
+                        </a>
+                    </li>
+                </ul>
+            </li><!-- End Forms Nav -->
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-layout-text-window-reverse"></i><span>Bảng</span><i
+                        class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="table-uses.html">
+                            <i class="bi bi-circle"></i><span>Bảng người dùng</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="table-device.html">
+                            <i class="bi bi-circle"></i><span>Bảng thiết bị</span><!-- Done -->
+                        </a>
+                    </li>
+                    <li>
+                        <a href="table-place.html">
+                            <i class="bi bi-circle"></i><span>Bảng địa điểm</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="table-contact.html">
+                            <i class="bi bi-circle"></i><span>Bảng hợp đồng</span><!-- Done -->
+                        </a>
+                    </li>
+                    <li>
+                        <a href="table-service.html">
+                            <i class="bi bi-circle"></i><span>Bảng dịch vụ</span><!-- Done -->
+                        </a>
+                    </li>
+                    <li>
+                        <a href="table-event.html">
+                            <i class="bi bi-circle"></i><span>Bảng sự kiện</span> <!-- Done -->
+                        </a>
+                    </li>
+                </ul>
+            </li><!-- End Tables Nav -->
+
+            <li class="nav-heading">Pages</li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="users-profile.html">
+                    <i class="bi bi-person"></i>
+                    <span>Thông tin cá nhân</span>
+                </a>
+            </li><!-- End Profile Page Nav -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="pages-contact.html">
+                    <i class="bi bi-envelope"></i>
+                    <span>Liên hệ</span>
+                </a>
+            </li><!-- End Contact Page Nav -->
+        </ul>
+
+    </aside><!-- End Sidebar-->
+
+    <main id="main" class="main">
+
+        <div class="pagetitle">
+            <h1>Bảng Hợp Đồng</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.html">Trang chủ</a></li>
+                    <li class="breadcrumb-item">Bảng</li>
+                    <li class="breadcrumb-item active">Bẳng hợp đồng</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-12">
+
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Bảng Hợp đồng</h5>
+                            <!-- Table with stripped rows -->
+                            <table id="list-contact">
+                                <thead>
+                                    <tr>
+                                        <th>Tên hợp đồng</th>
+                                        <th>Người tạo</th>
+                                        <th>Giá trị hợp đồng</th>
+                                        <th>Trạng thái</th>
+                                        <th data-type="date" data-format="MM/DD/YYYY">Ngày thuê</th>
+                                        <th data-type="date" data-format="MM/DD/YYYY">Ngày trả</th>
+                                        <th data-type="date" data-format="MM/DD/YYYY">Ngày tạo</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>ĐÁM CƯỚI</td>
+                                        <td>Unity Pugh</td>
+                                        <td>9000000</td>
+                                        <td>Đặt cọc</td>
+                                        <td>12/10/2025</td>
+                                        <td>12/10/2025</td>
+                                        <td>12/10/2025</td>
+                                        <td>...</td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+                            <!-- End Table with stripped rows -->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main><!-- End #main -->
+
+    <!-- ======= Footer ======= -->
+    <footer id="footer" class="footer">
+        <div class="copyright">
+            &copy; <strong><span>My Event</span></strong>. Tôn trọng bản quyền
+        </div>
+        <div class="credits">
+            <h6>Liên hệ :Nhóm 58 để biết thêm chi tiết nhá🌟</h6>
+        </div>
+    </footer><!-- End Footer -->
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="assets/vendor/echarts/echarts.min.js"></script>
+    <script src="assets/vendor/quill/quill.js"></script>
+    <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="assets/js/main.js"></script>
+    <!--Hành dộng API data cho table contact-->
+    <script src="assets/js/contract.js"></script>
+
+
+</body>
+
+</html>
