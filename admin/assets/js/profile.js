@@ -76,14 +76,14 @@ function renderBigAvatarProfile(users) {
     }
     console.log("Dữ liệu user:", users); // Kiểm tra dữ liệu đầu vào
 
-    const user = JSON.parse(getData.userId || "{}");
+    //const user = JSON.parse(getData.userId || "{}");
 
 
     // Hiển thị thông tin user với vai trò mặc định là "Admin"
     listBigProfile.innerHTML = `
 
-        <img src="${user.avatar}" alt="Profile" class="rounded-circle">
-        <h2>${user.last_name} ${user.first_name}</h2>
+        <img src="${users.avatar}" alt="Profile" class="rounded-circle">
+        <h2>${users.last_name} ${users.first_name}</h2>
         <h3>Admin</h3>
         <div class="social-links mt-2">
             <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
@@ -94,13 +94,11 @@ function renderBigAvatarProfile(users) {
     `;
 }
 function handleInfo() {
-    var storedUser = localStorage.getItem("user");
-    if (!storedUser) {
+    var user = JSON.parse(localStorage.getItem("user"));
+    if (!user) {
         console.error("Không tìm thấy thông tin người dùng!");
         return;
     }
-
-    var user = JSON.parse(storedUser);
 
     // Gán thông tin vào các phần tử có ID tương ứng
     document.getElementById("nameinfo").textContent = `${user.last_name} ${user.first_name}`;
