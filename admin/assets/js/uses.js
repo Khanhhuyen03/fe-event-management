@@ -1,27 +1,57 @@
-var UserAPI = 'http://localhost:3000/user';
-var RoleAPI ='http://localhost:3000/role';
-var RentalAPI = 'http://localhost:3000/rental';
-function start(){
-    getData((uses, role, rental) => {
-        renderUsers(uses, role, rental)
-        
+var UserAPI = 'http://localhost:8080/event-management/users';
+// var RoleAPI = 'http://localhost:3000/role';
+// var RentalAPI = 'http://localhost:3000/rental';
+function start() {
+    getData((uses) => {
+        renderUsers(uses)
+
     });
-    
+
 }
 start();
+// function getData(callback) {
+//     Promise.all([
+//         fetch(UserAPI).then(res => res.json()),
+//         fetch(RoleAPI).then(res => res.json()),
+//         // fetch(RentalAPI).then(res => res.json()),
+//     ])
+//         .then(([uses, role]) => {
+//             callback(uses, role);
+//         })
+//         .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
+// }
+
 function getData(callback) {
+    let token = localStorage.getItem("token"); // Lấy token từ localStorage
+
+    if (!token) {
+        console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+        return;
+    }
+
     Promise.all([
-        fetch(UserAPI).then(res => res.json()),
-        fetch(RoleAPI).then(res => res.json()),
-        fetch(RentalAPI).then(res => res.json()),
-    ])
-        .then(([uses, role, rental]) => {
-            callback(uses, role, rental);
-        })
+        fetch(UserAPI, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json()),
+
+        // fetch(RoleAPI, {
+        //     headers: {
+        //         "Authorization": `Bearer ${token}`,
+        //         "Content-Type": "application/json"
+        //     }
+        // }).then(res => res.json())
+
+    ]).then(([uses]) => {
+        callback(uses);
+    })
         .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
 }
+
 //render table data
-function renderUsers(users, roles) {
+function renderUsers(users) {
     var listUsersBlock = document.querySelector('#list-user tbody');
     if (!listUsersBlock) return;
 
@@ -37,9 +67,9 @@ function renderUsers(users, roles) {
     }
 
     var htmls = users.map(function (user) {
-        var role = roles.find(r => r.id === user.role_id);
-        var roleName = role ? role.name : "Không xác định";
-        var createdDate = new Date(user.created_at).toLocaleDateString();
+        //var role = roles.find(r => r.id === user.role_id);
+        //var roleName = role ? role.name : "Không xác định";
+        // var createdDate = new Date(user.created_at).toLocaleDateString();
         var status = user.status === 1 ? "Hoạt động" : "Bị khóa";
 
         return `
@@ -47,9 +77,9 @@ function renderUsers(users, roles) {
                 <td>${user.email}</td>
                 <td>${user.last_name}</td>
                 <td>${user.first_name}</td>
-                <td>${roleName}</td>
+                <td>Minh</td>
                 <td>${user.phone_number}</td>
-                <td>${createdDate}</td>
+                <td>${user.created_at}</td>
                 <td class="text-center">
                     <div class="action-dropdown">
                         <button class="btn btn-light action-btn">...</button>
