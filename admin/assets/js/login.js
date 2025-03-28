@@ -127,11 +127,12 @@ function handleLogin(data) {
     };
 
     if (data.code === 1000 && data.result) {
-        const user = data.result;
+        const body = data.result;
 
         // Lưu token
-        localStorage.setItem("token", user.token);
-        console.log("Token: ", user.token);
+        localStorage.setItem("token", body.token);
+        console.log("Token: ", body.token);
+        //console.log("User: ", user.user.id, user.user.email, user.user.last_name, user.user.first_name, user.user.avatar, user.user.phone_number);
 
         // // Lưu thông tin user vào localStorage
         // localStorage.setItem(
@@ -146,20 +147,20 @@ function handleLogin(data) {
         //     })
         // );
 
-        // Lưu thông tin user vào localStorage
-        if (user) {
+        //Lưu thông tin user vào localStorage
+        if (body) {
             localStorage.setItem(
                 "user",
                 JSON.stringify({
-                    id: user.id,
-                    email: user.email,
-                    last_name: user.last_name,
-                    first_name: user.first_name,
-                    avatar: user.avatar,
-                    phone_number: user.phone_number,
+                    id: body.user?.id,
+                    email: body.user?.email,
+                    last_name: body.user?.last_name,
+                    first_name: body.user?.first_name,
+                    avatar: body.user?.avatar,
+                    phone_number: body.user?.phone_number,
                 })
             );
-            console.log("User info saved to localStorage:", user);
+            console.log("User info saved to localStorage:", body.user);
         } else {
             console.error("No user data in response");
         }
@@ -190,7 +191,7 @@ function handleLogin(data) {
         // Chuyển hướng sau 2 giây
         setTimeout(() => {
             window.location.href = "index.html";
-        }, 1000);
+        }, 2000);
     } else {
         toastr.error("Sai tài khoản hoặc mật khẩu!", "Lỗi");
     }
