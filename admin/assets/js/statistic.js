@@ -8,7 +8,19 @@ document.addEventListener("DOMContentLoaded", () => {
 let contractChartInstance = null;
 
 function fetchContractsAndRenderChart() {
-    fetch(ContractAPI)
+    let token = localStorage.getItem("token"); // Lấy token từ localStorage
+
+    if (!token) {
+        console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+        return;
+    }
+
+    fetch(ContractAPI, {
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+        }
+    })
         .then(response => response.json())
         .then(contracts => {
             const monthlyData = countContractsByMonth(contracts);
@@ -165,8 +177,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
 let revenueChartInstance = null;
 
+// function fetchRentalsAndRenderChart() {
+//     fetch(RentalAPI)
+//         .then(response => response.json())
+//         .then(rentals => {
+//             const monthlyRevenueData = calculateMonthlyRevenue(rentals);
+//             renderLineChart(monthlyRevenueData);
+//         })
+//         .catch(error => console.error("Lỗi khi lấy dữ liệu rental:", error));
+// }
 function fetchRentalsAndRenderChart() {
-    fetch(RentalAPI)
+    let token = localStorage.getItem("token"); // Lấy token từ localStorage
+
+    // if (!token) {
+    //     console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+    //     return;
+    // }
+
+    fetch(RentalAPI, {
+        headers: {
+           // "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+        }
+    })
         .then(response => response.json())
         .then(rentals => {
             const monthlyRevenueData = calculateMonthlyRevenue(rentals);
@@ -174,7 +207,6 @@ function fetchRentalsAndRenderChart() {
         })
         .catch(error => console.error("Lỗi khi lấy dữ liệu rental:", error));
 }
-
 function calculateMonthlyRevenue(rentals) {
     const monthlyRevenue = Array(12).fill(0); // Mảng 12 tháng, khởi tạo 0
 

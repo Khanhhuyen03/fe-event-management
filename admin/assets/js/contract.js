@@ -10,10 +10,34 @@ function start(){
 }
 start();
 function getData(callback) {
+    let token = localStorage.getItem("token"); // Lấy token từ localStorage
+
+    if (!token) {
+        console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+        return;
+    }
+
     Promise.all([
-        fetch(ContractAPI).then(res => res.json()),
-        fetch(CustomerAPI).then(res => res.json()),
-        fetch(RentalAPI).then(res => res.json()),
+        fetch(ContractAPI, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json()),
+
+        fetch(CustomerAPI, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json()),
+
+        fetch(RentalAPI, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json()),
     ])
         .then(([contract, customer, rental]) => {
             callback(contract, customer, rental);

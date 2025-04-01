@@ -1,26 +1,13 @@
-var UserAPI = 'http://localhost:8080/event-management/users';
-// var RoleAPI = 'http://localhost:3000/role';
-// var RentalAPI = 'http://localhost:3000/rental';
+var UserAPI = 'http://localhost:3000/user';//'http://localhost:8080/event-management/users';
+var RoleAPI = 'http://localhost:3000/role';
 function start() {
-    getData((uses) => {
-        renderUsers(uses)
+    getData((uses, role) => {
+        renderUsers(uses, role)
 
     });
 
 }
 start();
-// function getData(callback) {
-//     Promise.all([
-//         fetch(UserAPI).then(res => res.json()),
-//         fetch(RoleAPI).then(res => res.json()),
-//         // fetch(RentalAPI).then(res => res.json()),
-//     ])
-//         .then(([uses, role]) => {
-//             callback(uses, role);
-//         })
-//         .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
-// }
-
 function getData(callback) {
     let token = localStorage.getItem("token"); // Lấy token từ localStorage
 
@@ -32,26 +19,26 @@ function getData(callback) {
     Promise.all([
         fetch(UserAPI, {
             headers: {
-                "Authorization": `Bearer ${token}`,
+               "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json"
             }
         }).then(res => res.json()),
 
-        // fetch(RoleAPI, {
-        //     headers: {
-        //         "Authorization": `Bearer ${token}`,
-        //         "Content-Type": "application/json"
-        //     }
-        // }).then(res => res.json())
+        fetch(RoleAPI, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json())
 
-    ]).then(([uses]) => {
-        callback(uses);
+    ]).then(([uses, role]) => {
+        callback(uses, role);
     })
         .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
 }
 
 //render table data
-function renderUsers(users) {
+function renderUsers(users, roles) {
     var listUsersBlock = document.querySelector('#list-user tbody');
     if (!listUsersBlock) return;
 
@@ -66,10 +53,9 @@ function renderUsers(users) {
         $('#list-user').DataTable().destroy();
     }
 
-    var htmls = users.map(function (user) {
-        //var role = roles.find(r => r.id === user.role_id);
-        //var roleName = role ? role.name : "Không xác định";
-        // var createdDate = new Date(user.created_at).toLocaleDateString();
+    var htmls = users.map(function (user ) {
+        var role = roles.find(r => r.id === user.role_id);
+        var roleName = role ? role.name : "Không xác định";
         var status = user.status === 1 ? "Hoạt động" : "Bị khóa";
 
         return `
@@ -77,7 +63,7 @@ function renderUsers(users) {
                 <td>${user.email}</td>
                 <td>${user.last_name}</td>
                 <td>${user.first_name}</td>
-                <td>Minh</td>
+                <td>${roleName}</td>
                 <td>${user.phone_number}</td>
                 <td>${user.created_at}</td>
                 <td class="text-center">
@@ -85,6 +71,7 @@ function renderUsers(users) {
                         <button class="btn btn-light action-btn">...</button>
                         <div class="dropdown-content">
                             <button class="dropdown-item delete-btn" data-id="${user.id}">Xoá</button>
+                            <button class="dropdown-item update-btn" data-id="${user.id}">Nâng cấp</button>
                         </div>
                     </div>
                 </td>
@@ -130,6 +117,11 @@ function renderUsers(users) {
         let userId = $(this).data('id');
         handleDeleteUser(userId);
     });
+     // Xử lý sự kiện nâng cấp 
+     $('#list-user tbody').on('click', '.update-btn', function () {
+        let userId = $(this).data('id');
+        updateUserRole(userId);
+    });
 
     // Đóng dropdown khi bấm ra ngoài
     $(document).off('click').on('click', function () {
@@ -162,3 +154,55 @@ function handleDeleteUser(id) {
         });
 
 }
+function updateUserRole(userId) {
+    const modalElement = document.getElementById("upgradeRoleModal");
+    const modal = new bootstrap.Modal(modalElement);
+    const roleSelect = document.getElementById("roleSelect");
+
+    // Hiển thị modal ngay lập tức
+    modal.show();
+
+    // Lấy danh sách roles
+    fetch(RoleAPI, {
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json"
+        }
+    })
+    .then(res => res.json())
+    .then(roles => {
+        roleSelect.innerHTML = roles.map(role => 
+            `<option value="${role.id}">${role.name}</option>`
+        ).join('');
+    })
+    .catch(error => console.error("Lỗi khi lấy roles:", error));
+
+    // Xử lý nút Lưu
+    document.getElementById("saveRole").onclick = function() {
+        const newRoleId = roleSelect.value;
+        fetch(`${UserAPI}/${userId}`, {
+            method: "PATCH",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ role_id: newRoleId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Cập nhật thành công", data);
+            modal.hide();
+            start();
+        })
+        .catch(error => console.error("Lỗi cập nhật quyền:", error));
+    };
+}
+
+// Khởi tạo sự kiện
+document.addEventListener("DOMContentLoaded", function() {
+    // Chỉ gắn sự kiện update-btn một lần
+    $('#list-user tbody').off('click', '.update-btn').on('click', '.update-btn', function() {
+        const userId = $(this).data('id');
+        updateUserRole(userId);
+    });
+});
