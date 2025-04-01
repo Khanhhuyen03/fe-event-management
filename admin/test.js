@@ -1,4 +1,3 @@
-
 var EventAPI = 'http://localhost:3000/event';
 var EventTypeAPI = 'http://localhost:3000/event_type';
 var DeviceAPI = 'http://localhost:3000/device';
@@ -28,7 +27,7 @@ function start() {
             populateEventTypes(eventTypes);
         }
     });
-    handleCreateForm();
+  //  handleCreateForm();
     //handleCreateDeviceRentalForm();
     if (document.querySelector("#saveEventType")) {
         handleCreateEventType();
@@ -36,18 +35,15 @@ function start() {
     handleAddEventType(); // Thêm xử lý cho nút "+"
     setupDeviceTable();
     setupTimelineTable();
-    var editEventId = localStorage.getItem("editEventId");
-
-
 }
 start();
 function getData(callback) {
     let token = localStorage.getItem("token"); // Lấy token từ localStorage
 
-    if (!token) {
-        console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
-        return;
-    }
+    // if (!token) {
+    //     console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+    //     return;
+    // }
 
     Promise.all([
         fetch(EventAPI, {
@@ -127,8 +123,8 @@ function getData(callback) {
 }
 
 //_____________________________Event____________________________________//
-//Tạo sự kiện mới
-function  createEventType(data, callback) {
+//Tạo loại sự kiện mới
+function createEventType(data, callback) {
     var options = {
         method: 'POST',
         headers: {
@@ -172,7 +168,7 @@ function handleUpdateEvent(eventId) {
     localStorage.setItem("editEventId", eventId); // Lưu ID vào localStorage
     window.location.href = "form-event.html"; // Chuyển đến form cập nhật
 }
-//Tạo  sự kiện
+//Tạo sự kiện
 function createEvent(data, callback) {
     var options = {
         method: 'POST',
@@ -182,16 +178,18 @@ function createEvent(data, callback) {
         body: JSON.stringify(data)
     };
     fetch(EventAPI, options)
-        .then(function (response) {
-            return response.json(); // Trả về dữ liệu JSON từ server
+        .then(function(response) {
+            return response.json();
         })
-        .then(function (eventResponse) {
-            callback(eventResponse); // Truyền dữ liệu (bao gồm event_id) vào callback
+        .then(function(data) {
+            callback(data);
         })
-        .catch(function (error) {
-            console.error("Lỗi khi tạo sự kiện:", error);
+        .catch(function(error) {
+            console.error("Error creating event:", error);
+            toastr.error("Lỗi khi tạo sự kiện", "Lỗi");
         });
 }
+
 //Render cho table-event
 function renderEvents(events, eventTypes) {
     var listEvenstBlock = document.querySelector('#list-event tbody');
@@ -270,163 +268,8 @@ function renderEvents(events, eventTypes) {
     });
 }
 
-//Tạo mới form event
-function handleCreateForm() {
-    var createBtn = document.querySelector('#create');
-    var editEventId = localStorage.getItem("editEventId");
 
-    if (editEventId) return; // Nếu có ID thì chỉ cập nhật, không tạo mới
-
-    createBtn.onclick = function () {
-        var pictureInput = document.querySelector('input[name="picture"]');
-        var img = pictureInput.files.length > 0 ? pictureInput.files[0].name : null;
-        var name = document.querySelector('input[name="name"]').value;
-        var description = document.querySelector('input[name="description"]').value;
-        var eventTypeID = document.querySelector('select[name="eventype"]').value;
-        var detail = document.querySelector('textarea[name="detail"]').value;
-
-        var eventData = {
-            img: img,
-            name: name,
-            description: description,
-            event_type_id: eventTypeID,
-            detail: detail,
-            created_at: new Date().toISOString().split('T')[0], // YYYY-MM-DD
-            updated_at: new Date().toISOString().split('T')[0]
-        };
-
-        // Tạo sự kiện
-        createEvent(eventData, function (eventResponse) {
-            var eventId = eventResponse.id; // Lấy event_id từ phản hồi
-            console.log("Event vừa tạo có ID:", eventId);
-
-            // Gọi hàm tạo rental với eventId vừa nhận được
-            createRentalWithEventId(eventId);
-
-            // Chuyển hướng sau khi hoàn tất
-            // window.location.href = "table-event.html"; // Tạm comment để debug
-        });
-    };
-}
-// // Hàm xử lý cập nhật sự kiện
-// function loadEditForm(editEventId) {
-//     if (!editEventId) return;
-
-//     console.log("Chỉnh sửa sự kiện ID:", editEventId);
-
-//     // Bước 1: Lấy danh sách loại sự kiện
-//     fetch(EventTypeAPI)
-//         .then(response => response.json())
-//         .then(eventTypes => {
-//             var selectEventType = document.querySelector('select[name="eventype"]');
-//             selectEventType.innerHTML = "";
-
-//             // Thêm option vào select
-//             eventTypes.forEach(type => {
-//                 var option = document.createElement("option");
-//                 option.value = type.id;  // Giá trị là ID
-//                 option.textContent = type.name;  // Hiển thị tên loại sự kiện
-//                 selectEventType.appendChild(option);
-//             });
-
-//             // Bước 2: Lấy thông tin sự kiện cần chỉnh sửa
-//             return fetch(`${EventAPI}/${editEventId}`);
-//         })
-//         .then(response => response.json())
-//         .then(event => {
-//             document.querySelector('input[name="name"]').value = event.name || "";
-//             document.querySelector('input[name="description"]').value = event.description || "";
-//             document.querySelector('textarea[name="detail"]').value = event.detail || "";
-
-//             var selectEventType = document.querySelector('select[name="eventype"]');
-//             selectEventType.value = event.event_type_id;
-
-//             var inputPicture = document.querySelector('input[name="picture"]');
-//             var imagePreview = document.getElementById("image"); // Ảnh hiển thị
-
-//             //  Load ảnh cũ khi chỉnh sửa
-//             imagePreview.src = event.img || "assets/img/card.jpg";
-
-//             // Sự kiện chọn ảnh mới
-//             inputPicture.addEventListener("change", function (event) {
-//                 const file = event.target.files[0];
-//                 if (file) {
-//                     const reader = new FileReader();
-//                     reader.onload = function (e) {
-//                         imagePreview.src = e.target.result;
-//                     };
-//                     reader.readAsDataURL(file);
-//                 }
-//             });
-//             // Bước 3: Tải rental, devicerental, servicerental và timeline
-//             return Promise.all([
-//                 fetch(`${RentalAPI}?event_id=${editEventId}`).then(res => res.json()),
-//                 fetch(`${DeviceRental}?rental_id=${event.rental_id}`).then(res => res.json()),
-//                 fetch(`${ServiceRental}?rental_id=${event.rental_id}`).then(res => res.json()),
-//                 fetch(`${Timeline}?rental_id=${event.rental_id}`).then(res => res.json())
-//             ]);
-//         })
-//         .then(([rentals, deviceRentals, serviceRentals, timelines]) => {
-//             // Cập nhật rental
-//             if (rentals.length > 0) {
-//                 rentalId = rentals[0].id; // Gán rentalId toàn cục
-//                 console.log("Rental ID:", rentalId);
-//             } else {
-//                 console.warn("Không tìm thấy rental cho event_id:", editEventId);
-//             }
-//             // Cập nhật devicerental
-//             deviceRentals.forEach(deviceRental => {
-//                 addDeviceRow(deviceRental.device_id, deviceRental.quantity);
-//             });
-//             serviceRentals.forEach(serviceRental => {
-//                 addServiceRow(serviceRental.service_id, serviceRental.quantity);
-//             });
-//             timelines.forEach(timeline => {
-//                 addTimelineRow(timeline.time_start, timeline.description);
-//             });
-//             // Cập nhật nút "Cập nhật"
-//             document.querySelector("#create").textContent = "Cập nhật";
-//             document.querySelector("#create").onclick = function () {
-//                 var inputName = document.querySelector('input[name="name"]').value;
-//                 var inputDescription = document.querySelector('input[name="description"]').value;
-//                 var inputEventTypeID = document.querySelector('select[name="eventype"]').value;
-//                 var inputDetail = document.querySelector('textarea[name="detail"]').value;
-
-//                 var img = inputPicture.files.length > 0 ? imagePreview.src : event.img;
-
-//                 var updatedEvent = {
-//                     img: img,
-//                     name: inputName,
-//                     description: inputDescription,
-//                     event_type_id: inputEventTypeID,
-//                     detail: inputDetail,
-//                     created_at: event.created_at,
-//                     updated_at: new Date().toISOString().split('T')[0]
-//                 };
-
-//                 fetch(`${EventAPI}/${editEventId}`, {
-//                     method: 'PUT',
-//                     headers: { "Content-Type": "application/json" },
-//                     body: JSON.stringify(updatedEvent)
-//                 })
-//                     .then(response => response.json())
-//                     .then(() => {
-//                         // Cập nhật rental
-//                         updateRental(rentalId, editEventId);
-
-//                         // Cập nhật device_rental, service_rental, timeline
-//                         updateDeviceRentals(rentalId, deviceRentals);
-//                         updateServiceRentals(rentalId, serviceRentals);
-//                         updateTimelines(rentalId, timelines);
-
-//                         console.log("Cập nhật thành công!");
-//                         window.location.href = "table-event.html";
-//                     })
-//                     .catch(error => console.error("Lỗi khi cập nhật sự kiện:", error));
-//             };
-//         })
-//         .catch(error => console.error("Lỗi khi lấy dữ liệu sự kiện:", error));
-// }
+// Hàm xử lý cập nhật sự kiện
 function loadEditForm(editEventId) {
     if (!editEventId) return;
 
@@ -447,37 +290,41 @@ function loadEditForm(editEventId) {
                 selectEventType.appendChild(option);
             });
 
+            // Lấy danh sách loại thiết bị (device types)
             return Promise.all([
-                fetch(`${EventAPI}/${editEventId}`).then(res => res.json()), // Lấy thông tin sự kiện
+                fetch(`${EventAPI}/${editEventId}`), // Lấy thông tin sự kiện
                 fetch(DeviceTypeAPI).then(res => res.json()) // Lấy danh sách loại thiết bị
             ]);
         })
-        .then(([event, deviceTypes]) => {
-            window.deviceTypes = deviceTypes;
+        .then(([eventResponse, deviceTypes]) => {
+            const event = eventResponse.json();
+            window.deviceTypes = deviceTypes; // Gán dữ liệu loại thiết bị vào window.deviceTypes
 
-            document.querySelector('input[name="name"]').value = event.name || "";
-            document.querySelector('input[name="description"]').value = event.description || "";
-            document.querySelector('textarea[name="detail"]').value = event.detail || "";
-            document.querySelector('select[name="eventype"]').value = event.event_type_id;
-            imagePreview.src = event.img || "assets/img/card.jpg";
+            return event.then(event => {
+                document.querySelector('input[name="name"]').value = event.name || "";
+                document.querySelector('input[name="description"]').value = event.description || "";
+                document.querySelector('textarea[name="detail"]').value = event.detail || "";
+                document.querySelector('select[name="eventype"]').value = event.event_type_id;
+                imagePreview.src = event.img || "assets/img/card.jpg";
 
-            inputPicture.addEventListener("change", function (event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        imagePreview.src = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                }
+                inputPicture.addEventListener("change", function (event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            imagePreview.src = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                return Promise.all([
+                    fetch(`${RentalAPI}?event_id=${editEventId}`).then(res => res.json()),
+                    fetch(`${DeviceAPI}`).then(res => res.json()),
+                    fetch(`${ServiceAPI}`).then(res => res.json()),
+                    fetch(`${UsersAPI}`).then(res => res.json())
+                ]);
             });
-
-            return Promise.all([
-                fetch(`${RentalAPI}?event_id=${editEventId}`).then(res => res.json()),
-                fetch(`${DeviceAPI}`).then(res => res.json()),
-                fetch(`${ServiceAPI}`).then(res => res.json()),
-                fetch(`${UsersAPI}`).then(res => res.json())
-            ]);
         })
         .then(([rentals, devices, services, users]) => {
             if (rentals.length > 0) {
@@ -502,33 +349,27 @@ function loadEditForm(editEventId) {
             ]);
         })
         .then(([rentals, deviceRentals, serviceRentals, timelines, devices, services, users]) => {
-            // Hàm làm mới giao diện
-            function refreshInterface(deviceRentals, serviceRentals, timelines) {
-                document.querySelector("#deviceTable tbody").innerHTML = "";
-                document.querySelector("#serviceTable tbody").innerHTML = "";
-                document.querySelector("#timeTable tbody").innerHTML = "";
+            document.querySelector("#deviceTable tbody").innerHTML = "";
+            document.querySelector("#serviceTable tbody").innerHTML = "";
+            document.querySelector("#timeTable tbody").innerHTML = "";
 
-                deviceRentals.forEach(deviceRental => {
-                    const device = devices.find(d => d.id === deviceRental.device_id);
-                    if (device) {
-                        addDeviceRow(deviceRental.device_id, deviceRental.quantity, device.device_types_id, device.hourly_rental_fee, device.user_id);
-                    }
-                });
+            deviceRentals.forEach(deviceRental => {
+                const device = devices.find(d => d.id === deviceRental.device_id);
+                if (device) {
+                    addDeviceRow(deviceRental.device_id, deviceRental.quantity, device.device_types_id, device.hourly_rental_fee, device.user_id);
+                }
+            });
 
-                serviceRentals.forEach(serviceRental => {
-                    const service = services.find(s => s.id === serviceRental.service_id);
-                    if (service) {
-                        addServiceRow(serviceRental.service_id, serviceRental.quantity, service.hourly_salary, service.user_id);
-                    }
-                });
+            serviceRentals.forEach(serviceRental => {
+                const service = services.find(s => s.id === serviceRental.service_id);
+                if (service) {
+                    addServiceRow(serviceRental.service_id, serviceRental.quantity, service.hourly_salary, service.user_id);
+                }
+            });
 
-                timelines.forEach(timeline => {
-                    addTimelineRow(timeline.time_start, timeline.description);
-                });
-            }
-
-            // Hiển thị dữ liệu ban đầu
-            refreshInterface(deviceRentals, serviceRentals, timelines);
+            timelines.forEach(timeline => {
+                addTimelineRow(timeline.time_start, timeline.description);
+            });
 
             document.querySelector("#create").textContent = "Cập nhật";
             document.querySelector("#create").onclick = function () {
@@ -545,42 +386,31 @@ function loadEditForm(editEventId) {
                     description: inputDescription,
                     event_type_id: inputEventTypeID,
                     detail: inputDetail,
-                    updated_at: new Date().toISOString().split('T')[0] // Không cần created_at khi cập nhật
+                    created_at: event.created_at,
+                    updated_at: new Date().toISOString().split('T')[0]
                 };
 
                 fetch(`${EventAPI}/${editEventId}`, {
-                    method: 'PATCH',
+                    method: 'PUT',
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(updatedEvent)
                 })
                     .then(response => response.json())
                     .then(() => {
-                        // Cập nhật rental và các mục liên quan
                         updateRental(rentalId, editEventId);
                         updateDeviceRentals(rentalId, deviceRentals);
                         updateServiceRentals(rentalId, serviceRentals);
                         updateTimelines(rentalId, timelines);
-
-                        // Lấy lại dữ liệu mới từ API sau khi cập nhật
-                        return Promise.all([
-                            fetch(`${DeviceRental}?rental_id=${rentalId}`).then(res => res.json()),
-                            fetch(`${ServiceRental}?rental_id=${rentalId}`).then(res => res.json()),
-                            fetch(`${Timeline}?rental_id=${rentalId}`).then(res => res.json())
-                        ]);
-                    })
-                    .then(([newDeviceRentals, newServiceRentals, newTimelines]) => {
-                        // Làm mới giao diện với dữ liệu mới
-                        refreshInterface(newDeviceRentals, newServiceRentals, newTimelines);
-                        toastr.success("Cập nhật thành công!", "Thành công");
-                        setTimeout(() => {
-                            window.location.href = "table-event.html";
-                        }, 1000); // Chuyển trang sau 1 giây để người dùng thấy thông báo
+                        console.log("Cập nhật thành công!");
+                        window.location.href = "table-event.html";
                     })
                     .catch(error => console.error("Lỗi khi cập nhật sự kiện:", error));
             };
         })
         .catch(error => console.error("Lỗi khi lấy dữ liệu sự kiện:", error));
 }
+
+
 //_________________Updated device, service, timelien_______//
 // Hàm cập nhật rental
 function updateRental(rentalId, eventId) {
@@ -604,7 +434,7 @@ function updateRental(rentalId, eventId) {
     };
 
     fetch(`${RentalAPI}/${rentalId}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedRental)
     })
@@ -637,7 +467,7 @@ function updateDeviceRentals(rentalId, oldDeviceRentals) {
         if (oldRecord) {
             if (oldRecord.quantity !== current.quantity) {
                 fetch(`${DeviceRental}/${oldRecord.id}`, {
-                    method: 'PATCH',
+                    method: 'PUT',
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         rental_id: rentalId,
@@ -685,7 +515,7 @@ function updateServiceRentals(rentalId, oldServiceRentals) {
         if (oldRecord) {
             if (oldRecord.quantity !== current.quantity) {
                 fetch(`${ServiceRental}/${oldRecord.id}`, {
-                    method: 'PATCH',
+                    method: 'PUT',
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         rental_id: rentalId,
@@ -764,8 +594,7 @@ function addDeviceRow(deviceId, quantity, deviceTypeId, price, userId) {
         </td>
     `;
     tbody.appendChild(newRow);
-    // Cập nhật giá và tổng tiền
-    //updateDeviceOptions(newRow.querySelector('select[name="devicetype"]').value, newRow);
+
     // Populate danh sách loại thiết bị và chọn giá trị hiện tại
     populateDeviceTypes(window.deviceTypes, newRow);
     const deviceTypeSelect = newRow.querySelector('select[name="devicetype"]');
@@ -811,7 +640,7 @@ function addServiceRow(serviceId, quantity, price, userId) {
         </td>
     `;
     tbody.appendChild(newRow);
-    // Cập nhật giá và tổng tiền
+
     // Populate danh sách dịch vụ và chọn giá trị hiện tại
     populateService(window.services, newRow);
     newRow.querySelector('select[name="servicetype"]').value = serviceId;
@@ -838,7 +667,6 @@ function addServiceRow(serviceId, quantity, price, userId) {
     });
     newRow.querySelector('input[name="quantity"]').addEventListener("input", () => updateServiceTotal(newRow));
 }
-
 // Hàm thêm dòng timeline
 function addTimelineRow(timeStart, description) {
     const tbody = document.querySelector("#timeTable tbody");
@@ -1314,47 +1142,17 @@ function setupTimelineTable() {
 //___________________________________End Timeline_______________________________________//
 //_______xử lý rental, devicerental, servicerental, timeline_____________//
 // Hàm xử lý khi nhấn nút "Lưu"
-// function createRentalWithEventId(eventId) {
-//     const totalPrice = calculateTotalPrice();
-//     const user = JSON.parse(localStorage.getItem("user"));
-//     const userId = user ? user.user_id : null; //const userId = user ? user.id : null;  (nếu dùng token login kh connect be)
-
-//     if (!userId) {
-//         toastr.error("Bạn cần đăng nhập để thực hiện hành động này!", "Lỗi");
-//         return;
-//     }
-
-//     console.log("ID sự kiện đang sử dụng:", eventId);
-
-//     const rentalData = {
-//         custom_location: "Địa điểm tùy chỉnh",
-//         rental_start_time: new Date().toISOString(),
-//         rental_end_time: new Date(Date.now() + 86400000).toISOString(),
-//         total_price: totalPrice,
-//         event_id: eventId,
-//         user_id: userId,
-//         updated_at: new Date().toISOString()
-//     };
-
-//     createRental(rentalData, function (rentalResponse) {
-//         const newRentalId = rentalResponse.id;
-//         handleDeviceRentals(newRentalId);
-//         handleServiceRentals(newRentalId);
-//         handleTimelines(newRentalId);
-//         window.location.href = "table-event.html";
-//     });
-// }
 function createRentalWithEventId(eventId) {
     const totalPrice = calculateTotalPrice();
     const user = JSON.parse(localStorage.getItem("user"));
-    const userId = user ? user.user_id : null;
+    const userId = user ? user.user_id : null; //const userId = user ? user.id : null;  (nếu dùng token login kh connect be)
 
     if (!userId) {
         toastr.error("Bạn cần đăng nhập để thực hiện hành động này!", "Lỗi");
         return;
     }
 
-    console.log("ID sự kiện đang sử dụng:", eventId);
+    console.log("Using event ID for rental:", eventId);
 
     const rentalData = {
         custom_location: "Địa điểm tùy chỉnh",
@@ -1366,44 +1164,65 @@ function createRentalWithEventId(eventId) {
         updated_at: new Date().toISOString()
     };
 
-    // Tạo rental trước
-    createRental(rentalData, function (rentalResponse) {
-        const newRentalId = rentalResponse.id;
-        console.log("Rental ID vừa tạo:", newRentalId);
+    createRental(rentalData, function (rental) {
+        if (rental) {
+            console.log("Rental created with ID:", rental.id);
 
-        // Log dữ liệu từ các bảng để kiểm tra
-        console.log("Device Rows:", document.querySelectorAll("#deviceTable tbody tr").length);
-        console.log("Service Rows:", document.querySelectorAll("#serviceTable tbody tr").length);
-        console.log("Timeline Rows:", document.querySelectorAll("#timeTable tbody tr").length);
+            // 3. Tạo các bản ghi liên quan
+            handleDeviceRentals(rental.id);
+            handleServiceRentals(rental.id);
+            handleTimelines(rental.id);
 
-        // Tạo tất cả bản ghi bất đồng bộ và chờ hoàn tất
-        Promise.all([
-            handleDeviceRentals(newRentalId),
-            handleServiceRentals(newRentalId),
-            handleTimelines(newRentalId)
-        ])
-            .then(() => {
-                console.log("Tất cả bản ghi đã được tạo thành công!");
-                window.location.href = "table-event.html";
-            })
-            .catch(error => {
-                console.error("Lỗi khi tạo bản ghi:", error);
-                toastr.error("Có lỗi xảy ra khi lưu dữ liệu!", "Lỗi");
-            });
+            // Chuyển trang sau khi hoàn thành
+            window.location.href = "table-event.html";
+        } else {
+            console.error("Failed to create rental");
+            toastr.error("Có lỗi khi tạo hợp đồng thuê", "Lỗi");
+        }
     });
 }
-// Gán sự kiện cho nút "Lưu"
+//Gán sự kiện cho nút "Lưu"
+//Xóa event listener cũ
+document.getElementById("create").replaceWith(document.getElementById("create").cloneNode(true));
+
+// Hàm chính để xử lý tạo sự kiện
 document.getElementById("create").addEventListener("click", function () {
     var editEventId = localStorage.getItem("editEventId");
 
     if (editEventId) {
-        // Trường hợp cập nhật: Gọi loadEditForm hoặc xử lý trực tiếp trong onclick
-        loadEditForm(editEventId); // Gọi lại để đảm bảo logic cập nhật chạy
-    } else {
-        // Trường hợp tạo mới: Logic đã được xử lý trong handleCreateForm
+        loadEditForm(editEventId);
+        return;
     }
+
+    // Lấy dữ liệu từ form
+    var pictureInput = document.querySelector('input[name="picture"]');
+    var img = pictureInput.files.length > 0 ? pictureInput.files[0].name : null;
+    var name = document.querySelector('input[name="name"]').value;
+    var description = document.querySelector('input[name="description"]').value;
+    var eventTypeID = document.querySelector('select[name="eventype"]').value;
+    var detail = document.querySelector('textarea[name="detail"]').value;
+
+    // Tạo event data
+    var eventData = {
+        img: img,
+        name: name,
+        description: description,
+        event_type_id: eventTypeID,
+        detail: detail,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+    };
+
+    // 1. Tạo event trước
+    createEvent(eventData, function (eventResponse) {
+        var eventId = eventResponse.id;
+        console.log("Event created with ID:", eventId);
+
+        // 2. Sau khi có eventId, tạo rental
+        createRentalWithEventId(eventId);
+    });
 });
-// //cập nhật sự kiện trong form-event
+//cập nhật sự kiện trong form-event
 document.addEventListener("DOMContentLoaded", function () {
     var editEventId = localStorage.getItem("editEventId");
 
@@ -1446,42 +1265,26 @@ function createRental(data, callback) {
         body: JSON.stringify(data)
     };
     fetch(RentalAPI, options)
-        .then(response => response.json())
-        .then(callback)
-        .catch(error => console.error("Lỗi khi tạo rental:", error));
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            callback(data);
+        })
+        .catch(function (error) {
+            console.error("Error creating rental:", error);
+            toastr.error("Lỗi khi tạo hợp đồng thuê", "Lỗi");
+        });
 }
 
-// Hàm xử lý tạo device rental
-// function handleDeviceRentals(rentalId) {
-//     const deviceRows = document.querySelectorAll("#deviceTable tbody tr");
-//     deviceRows.forEach(row => {
-//         const deviceId = row.querySelector('select[name="devicename"]').value;
-//         const quantity = row.querySelector('input[name="quantitydevice"]').value;
-
-//         if (deviceId && quantity) {
-//             const deviceRentalData = {
-//                 rental_id: rentalId,
-//                 device_id: deviceId,
-//                 quantity: quantity,
-//                 created_at: new Date().toISOString(),
-//                 updated_at: new Date().toISOString()
-//             };
-
-//             createDeviceRental(deviceRentalData, function () {
-//                 console.log("Device rental created successfully");
-//             });
-//         }
-//     });
-// }
+//Hàm xử lý tạo device rental
 function handleDeviceRentals(rentalId) {
+    console.log("Handling Device Rentals for Rental ID:", rentalId);
     const deviceRows = document.querySelectorAll("#deviceTable tbody tr");
-    const promises = [];
 
-    deviceRows.forEach(row => {
+    for (const row of deviceRows) {
         const deviceId = row.querySelector('select[name="devicename"]').value;
         const quantity = row.querySelector('input[name="quantitydevice"]').value;
-
-        console.log("Device Data:", { deviceId, quantity }); // Log để kiểm tra
 
         if (deviceId && quantity) {
             const deviceRentalData = {
@@ -1492,49 +1295,24 @@ function handleDeviceRentals(rentalId) {
                 updated_at: new Date().toISOString()
             };
 
-            promises.push(
-                new Promise((resolve, reject) => {
-                    createDeviceRental(deviceRentalData, resolve);
-                })
-            );
+            createDeviceRental(deviceRentalData, function (result) {
+                if (result) {
+                    console.log("Device rental created successfully:", result);
+                } else {
+                    console.error("Failed to create device rental");
+                }
+            });
         }
-    });
-
-    return Promise.all(promises);
+    }
 }
 // Hàm xử lý tạo service rental
-// function handleServiceRentals(rentalId) {
-//     const serviceRows = document.querySelectorAll("#serviceTable tbody tr");
-//     serviceRows.forEach(row => {
-//         const serviceId = row.querySelector('select[name="servicetype"]').value; // Tên trường đúng
-//         const quantity = row.querySelector('input[name="quantity"]').value; // Tên trường đúng
-
-//         if (serviceId && quantity) {
-//             const serviceRentalData = {
-//                 rental_id: rentalId,
-//                 service_id: serviceId,
-//                 quantity: quantity,
-//                 created_at: new Date().toISOString(),
-//                 updated_at: new Date().toISOString()
-//             };
-
-//             createServiceRental(serviceRentalData, function () {
-//                 console.log("Service rental created successfully");
-//             });
-//         } else {
-//             console.warn("Service ID hoặc quantity không hợp lệ:", { serviceId, quantity });
-//         }
-//     });
-// }
 function handleServiceRentals(rentalId) {
+    console.log("Handling Service Rentals for Rental ID:", rentalId);
     const serviceRows = document.querySelectorAll("#serviceTable tbody tr");
-    const promises = [];
 
-    serviceRows.forEach(row => {
+    for (const row of serviceRows) {
         const serviceId = row.querySelector('select[name="servicetype"]').value;
         const quantity = row.querySelector('input[name="quantity"]').value;
-
-        console.log("Service Data:", { serviceId, quantity }); // Log để kiểm tra
 
         if (serviceId && quantity) {
             const serviceRentalData = {
@@ -1545,48 +1323,25 @@ function handleServiceRentals(rentalId) {
                 updated_at: new Date().toISOString()
             };
 
-            promises.push(
-                new Promise((resolve, reject) => {
-                    createServiceRental(serviceRentalData, resolve);
-                })
-            );
+            createServiceRental(serviceRentalData, function (result) {
+                if (result) {
+                    console.log("Service rental created successfully:", result);
+                } else {
+                    console.error("Failed to create service rental");
+                }
+            });
         }
-    });
-
-    return Promise.all(promises);
+    }
 }
 
 // Hàm xử lý tạo timeline
-// function handleTimelines(rentalId) {
-//     const timelineRows = document.querySelectorAll("#timeTable tbody tr");
-//     timelineRows.forEach(row => {
-//         const timeline = row.querySelector('input[name="timeline"]').value;
-//         const description = row.querySelector('textarea[name="descriptiontime"]').value;
-
-//         if (timeline && description) {
-//             const timelineData = {
-//                 rental_id: rentalId,
-//                 time_start: timeline,
-//                 description: description,
-//                 created_at: new Date().toISOString(),
-//                 updated_at: new Date().toISOString()
-//             };
-
-//             createTimeline(timelineData, function () {
-//                 console.log("Timeline created successfully");
-//             });
-//         }
-//     });
-// }
 function handleTimelines(rentalId) {
+    console.log("Handling Timelines for Rental ID:", rentalId);
     const timelineRows = document.querySelectorAll("#timeTable tbody tr");
-    const promises = [];
 
-    timelineRows.forEach(row => {
+    for (const row of timelineRows) {
         const timeline = row.querySelector('input[name="timeline"]').value;
         const description = row.querySelector('textarea[name="descriptiontime"]').value;
-
-        console.log("Timeline Data:", { timeline, description }); // Log để kiểm tra
 
         if (timeline && description) {
             const timelineData = {
@@ -1597,80 +1352,69 @@ function handleTimelines(rentalId) {
                 updated_at: new Date().toISOString()
             };
 
-            promises.push(
-                new Promise((resolve, reject) => {
-                    createTimeline(timelineData, resolve);
-                })
-            );
+            createTimeline(timelineData, function (result) {
+                if (result) {
+                    console.log("Timeline created successfully:", result);
+                } else {
+                    console.error("Failed to create timeline");
+                }
+            });
         }
-    });
-
-    return Promise
+    }
 }
+
 
 // Hàm tạo device rental
 function createDeviceRental(data, callback) {
-    var options = {
+    console.log("Submitting device rental data:", data);
+    fetch(DeviceRental, {
         method: 'POST',
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
-    };
-    fetch(DeviceRental, options)
+    })
         .then(response => {
-            if (!response.ok) {
-                throw new Error("Lỗi khi tạo device rental: " + response.statusText);
-            }
+            if (!response.ok) throw new Error("Network response was not ok");
             return response.json();
         })
-        .then(callback)
-        //.catch(error => console.error(error));
+        .then(data => callback(data))
         .catch(error => {
-            console.error("Lỗi khi tạo device rental:", error);
-            throw error; // Ném lỗi để Promise.reject xử lý
+            console.error("Error creating device rental:", error);
+            callback(null);
         });
 }
 
 function createServiceRental(data, callback) {
-    var options = {
+    console.log("Submitting service rental data:", data);
+    fetch(ServiceRental, {
         method: 'POST',
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
-    };
-    fetch(ServiceRental, options)
+    })
         .then(response => {
-            if (!response.ok) {
-                throw new Error("Lỗi khi tạo service rental: " + response.statusText);
-            }
+            if (!response.ok) throw new Error("Network response was not ok");
             return response.json();
         })
-        .then(callback)
-        //.catch(error => console.error(error));
+        .then(data => callback(data))
         .catch(error => {
-            console.error("Lỗi khi tạo service rental:", error);
-            throw error;
+            console.error("Error creating service rental:", error);
+            callback(null);
         });
 }
 
-
-// Hàm tạo timeline
 function createTimeline(data, callback) {
-    var options = {
+    console.log("Submitting timeline data:", data);
+    fetch(Timeline, {
         method: 'POST',
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
-    };
-    fetch(Timeline, options)
-        .then(response => response.json())
-        .then(callback)
-        //.catch(error => console.error("Lỗi khi tạo timeline:", error));
+    })
+        .then(response => {
+            if (!response.ok) throw new Error("Network response was not ok");
+            return response.json();
+        })
+        .then(data => callback(data))
         .catch(error => {
-            console.error("Lỗi khi tạo timeline:", error);
-            throw error;
+            console.error("Error creating timeline:", error);
+            callback(null);
         });
 }

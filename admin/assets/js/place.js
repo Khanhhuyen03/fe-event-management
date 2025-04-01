@@ -8,9 +8,27 @@ function start(){
 }
 start();
 function getData(callback) {
+    let token = localStorage.getItem("token"); // Lấy token từ localStorage
+
+    if (!token) {
+        console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+        return;
+    }
+
     Promise.all([
-        fetch(LocationsAPI).then(res => res.json()),
-        fetch(UsersAPI).then(res => res.json()),
+        fetch(LocationsAPI, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json()),
+
+        fetch(UsersAPI, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json()),
     ])
         .then(([locations, users]) => {
             callback(locations, users);

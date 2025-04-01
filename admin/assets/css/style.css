@@ -1371,3 +1371,31 @@ body {
   text-align: center; /* Căn giữa */
   margin-bottom: 10px; /* Tạo khoảng cách */
 }
+/*---pop up trong user--*/
+.btn-cancel {
+  background-color: #6c757d;
+  border: none;
+  margin-left: 319px;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  color:#fff;
+}
+
+.btn-cancel:hover {
+  background-color: #5a6268;
+}
+
+/* Nút Lưu */
+#saveRole {
+  background-color: #718355 !important;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  color: white;
+}
+
+#saveRole:hover {
+  background-color: #5c6d45 !important;
+}
