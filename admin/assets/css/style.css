@@ -1399,3 +1399,6 @@ body {
 #saveRole:hover {
   background-color: #5c6d45 !important;
 }
+#toast.success { background-color: #28a745; }
+#toast.error { background-color: #dc3545; }
+#toast.warning { background-color: #ffc107; }
