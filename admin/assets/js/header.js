@@ -5,17 +5,32 @@ document.addEventListener("DOMContentLoaded", function () {
       return response.text();
     })
     .then(data => {
-      document.getElementById("header").innerHTML = data;
-      console.log("Header loaded thành công!");
+      //   document.getElementById("header").innerHTML = data;
+      //   console.log("Header loaded thành công!");
 
-      // Tải lại script chính của trang
-      loadMainScript();
+      //   // Tải lại script chính của trang
+      //   loadMainScript();
 
-      // Chờ header load xong, rồi cập nhật user info
-      setTimeout(() => {
+      //   // Chờ header load xong, rồi cập nhật user info
+      //   setTimeout(() => {
+      //     updateUserInfo();
+      //     initSidebarToggle(); // Khởi động lại toggle sidebar
+      //   }, 200);
+      // })
+      const headerElement = document.getElementById("header");
+      if (headerElement) {
+        headerElement.innerHTML = data;
+        console.log("Header loaded thành công!");
+
+        // Tải lại script chính của trang
+        loadMainScript();
+
+        // Cập nhật user info ngay sau khi header được render
         updateUserInfo();
         initSidebarToggle(); // Khởi động lại toggle sidebar
-      }, 200);
+      } else {
+        console.error("Không tìm thấy phần tử #header trong DOM.");
+      }
     })
     .catch(error => console.error("Lỗi tải header:", error));
 });

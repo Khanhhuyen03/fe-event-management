@@ -716,6 +716,154 @@
       "detail": "2 thiết bị",
       "created_at": "2025-03-31",
       "updated_at": "2025-03-31"
+    },
+    {
+      "id": "efdb",
+      "img": "18.jpg",
+      "name": "ev.js",
+      "description": "ev.js",
+      "event_type_id": "1b93",
+      "detail": "ev.js",
+      "created_at": "2025-04-01",
+      "updated_at": "2025-04-01"
+    },
+    {
+      "id": "51ff",
+      "img": "6.jpg",
+      "name": "comback event 2",
+      "description": "comback event 2",
+      "event_type_id": "101",
+      "detail": "comback event 2",
+      "created_at": "2025-04-01",
+      "updated_at": "2025-04-01"
+    },
+    {
+      "name": "port khác",
+      "description": "port khác",
+      "event_type_id": "101",
+      "detail": "port khác",
+      "updated_at": "2025-04-01",
+      "id": "c7fb"
+    },
+    {
+      "id": "8bba",
+      "img": "IMG_6875.JPG",
+      "name": "1 sự kiện",
+      "description": "1 sự kiện",
+      "event_type_id": "101",
+      "detail": "1 sự kiện",
+      "created_at": "2025-04-01",
+      "updated_at": "2025-04-01"
+    },
+    {
+      "id": "dbf9",
+      "img": "IMG_6861.JPG",
+      "name": "2 sự kiện tb",
+      "description": "2 sự kiện tb",
+      "event_type_id": "d8ba",
+      "detail": "2 sự kiện tb",
+      "created_at": "2025-04-01",
+      "updated_at": "2025-04-01"
+    },
+    {
+      "id": "0239",
+      "img": "IMG_6875.JPG",
+      "name": "Loại bỏ sự kiện click riêng lẻ và gộp vào handleCreateForm để tránh xung đột.",
+      "description": "Loại bỏ sự kiện click riêng lẻ và gộp vào handleCreateForm để tránh xung đột.",
+      "event_type_id": "301b",
+      "detail": "Loại bỏ sự kiện click riêng lẻ và gộp vào handleCreateForm để tránh xung đột.",
+      "created_at": "2025-04-01",
+      "updated_at": "2025-04-01"
+    },
+    {
+      "id": "8171",
+      "img": "IMG_6856.JPG",
+      "name": "Loại bỏ sự kiện click riêng lẻ  2 DV",
+      "description": "Loại bỏ sự kiện click riêng lẻ  2 DV",
+      "event_type_id": "101",
+      "detail": "Loại bỏ sự kiện click riêng lẻ  2 DV",
+      "created_at": "2025-04-01",
+      "updated_at": "2025-04-01"
+    },
+    {
+      "id": "84a5",
+      "img": "IMG_6879.JPG",
+      "name": "Loại bỏ sự kiện click riêng lẻ  6 CÁI",
+      "description": "Loại bỏ sự kiện click riêng lẻ  6 CÁI",
+      "event_type_id": "101",
+      "detail": "Loại bỏ sự kiện click riêng lẻ  6 CÁI",
+      "created_at": "2025-04-01",
+      "updated_at": "2025-04-01"
+    },
+    {
+      "id": "349a",
+      "img": "IMG_6878.JPG",
+      "name": "6 cai",
+      "description": "6 cai",
+      "event_type_id": "102",
+      "detail": "6 cai",
+      "created_at": "2025-04-01",
+      "updated_at": "2025-04-01"
+    },
+    {
+      "id": "803a",
+      "img": "IMG_6854.JPG",
+      "name": "6 sự kiện chuyển trang",
+      "description": "6 sự kiện chuyển trang",
+      "event_type_id": "1b93",
+      "detail": "6 sự kiện chuyển trang",
+      "created_at": "2025-04-01",
+      "updated_at": "2025-04-01"
+    },
+    {
+      "id": "7d24",
+      "img": "IMG_6865.JPG",
+      "name": "2 timiline ctr",
+      "description": "2 timiline ctr",
+      "event_type_id": "101",
+      "detail": "2 timiline ctr",
+      "created_at": "2025-04-01",
+      "updated_at": "2025-04-01"
+    },
+    {
+      "id": "ec70",
+      "img": "IMG_6858.JPG",
+      "name": "window.location.href = \"../table-event.html\";",
+      "description": "window.location.href = \"../table-event.html\";",
+      "event_type_id": "101",
+      "detail": "window.location.href = \"../table-event.html\";",
+      "created_at": "2025-04-01",
+      "updated_at": "2025-04-01"
+    },
+    {
+      "id": "de39",
+      "img": "1022.png",
+      "name": "home",
+      "description": "home",
+      "event_type_id": "101",
+      "detail": "home",
+      "created_at": "2025-04-02",
+      "updated_at": "2025-04-02"
+    },
+    {
+      "id": "0969",
+      "img": "star.png",
+      "name": "toast",
+      "description": "toast",
+      "event_type_id": "101",
+      "detail": "toast",
+      "created_at": "2025-04-02",
+      "updated_at": "2025-04-02"
+    },
+    {
+      "id": "298d",
+      "img": "1002new.png",
+      "name": "final show",
+      "description": "final show",
+      "event_type_id": "301b",
+      "detail": "final show",
+      "created_at": "2025-04-02",
+      "updated_at": "2025-04-02"
     }
   ],
   "event_type": [
@@ -796,6 +944,12 @@
       "name": "bug",
       "created_at": "2025-03-28",
       "updated_at": "2025-03-28"
+    },
+    {
+      "id": "f443",
+      "name": "bỏ trong bòdy",
+      "created_at": "2025-04-01",
+      "updated_at": "2025-04-01"
     }
   ],
   "device": [
@@ -1706,6 +1860,156 @@
       "event_id": "8e85",
       "user_id": "user4",
       "updated_at": "2025-03-31T04:54:21.948Z"
+    },
+    {
+      "id": "8f24",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-04-01T09:13:53.995Z",
+      "rental_end_time": "2025-04-02T09:13:53.995Z",
+      "total_price": 200,
+      "event_id": "efdb",
+      "user_id": "user4",
+      "updated_at": "2025-04-01T09:13:53.995Z"
+    },
+    {
+      "id": "2a02",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-04-01T09:15:54.069Z",
+      "rental_end_time": "2025-04-02T09:15:54.069Z",
+      "total_price": 1055,
+      "event_id": "51ff",
+      "user_id": "user4",
+      "updated_at": "2025-04-01T09:15:54.069Z"
+    },
+    {
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-04-01T09:20:33.855Z",
+      "rental_end_time": "2025-04-02T09:20:33.855Z",
+      "total_price": 235.09,
+      "event_id": "c7fb",
+      "user_id": "user4",
+      "updated_at": "2025-04-01T09:20:33.855Z",
+      "id": "0229"
+    },
+    {
+      "id": "b695",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-04-01T09:36:37.348Z",
+      "rental_end_time": "2025-04-02T09:36:37.348Z",
+      "total_price": 1080,
+      "event_id": "8bba",
+      "user_id": "user4",
+      "updated_at": "2025-04-01T09:36:37.348Z"
+    },
+    {
+      "id": "11d7",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-04-01T09:38:11.106Z",
+      "rental_end_time": "2025-04-02T09:38:11.106Z",
+      "total_price": 1055,
+      "event_id": "dbf9",
+      "user_id": "user4",
+      "updated_at": "2025-04-01T09:38:11.106Z"
+    },
+    {
+      "id": "8b09",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-04-01T09:58:03.484Z",
+      "rental_end_time": "2025-04-02T09:58:03.484Z",
+      "total_price": 1080,
+      "event_id": "0239",
+      "user_id": "user4",
+      "updated_at": "2025-04-01T09:58:03.484Z"
+    },
+    {
+      "id": "4ff0",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-04-01T09:58:55.644Z",
+      "rental_end_time": "2025-04-02T09:58:55.644Z",
+      "total_price": 1070,
+      "event_id": "8171",
+      "user_id": "user4",
+      "updated_at": "2025-04-01T09:58:55.644Z"
+    },
+    {
+      "id": "36c4",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-04-01T09:59:43.823Z",
+      "rental_end_time": "2025-04-02T09:59:43.823Z",
+      "total_price": 290,
+      "event_id": "84a5",
+      "user_id": "user4",
+      "updated_at": "2025-04-01T09:59:43.823Z"
+    },
+    {
+      "id": "d01c",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-04-01T10:05:44.328Z",
+      "rental_end_time": "2025-04-02T10:05:44.328Z",
+      "total_price": 1096,
+      "event_id": "349a",
+      "user_id": "user4",
+      "updated_at": "2025-04-01T10:05:44.328Z"
+    },
+    {
+      "id": "4993",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-04-01T10:12:38.334Z",
+      "rental_end_time": "2025-04-02T10:12:38.334Z",
+      "total_price": 1080.09,
+      "event_id": "803a",
+      "user_id": "user4",
+      "updated_at": "2025-04-01T10:12:38.334Z"
+    },
+    {
+      "id": "8afb",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-04-01T10:15:32.518Z",
+      "rental_end_time": "2025-04-02T10:15:32.518Z",
+      "total_price": 1096,
+      "event_id": "7d24",
+      "user_id": "user4",
+      "updated_at": "2025-04-01T10:15:32.518Z"
+    },
+    {
+      "id": "ad99",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-04-01T10:46:33.262Z",
+      "rental_end_time": "2025-04-02T10:46:33.262Z",
+      "total_price": 200,
+      "event_id": "ec70",
+      "user_id": "user4",
+      "updated_at": "2025-04-01T10:46:33.262Z"
+    },
+    {
+      "id": "5440",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-04-02T10:31:56.046Z",
+      "rental_end_time": "2025-04-03T10:31:56.046Z",
+      "total_price": 1206,
+      "event_id": "de39",
+      "user_id": "user4",
+      "updated_at": "2025-04-02T10:31:56.046Z"
+    },
+    {
+      "id": "a4ed",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-04-02T10:46:23.882Z",
+      "rental_end_time": "2025-04-03T10:46:23.882Z",
+      "total_price": 1071,
+      "event_id": "0969",
+      "user_id": "user4",
+      "updated_at": "2025-04-02T10:46:23.882Z"
+    },
+    {
+      "id": "8a18",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-04-02T10:53:06.592Z",
+      "rental_end_time": "2025-04-03T10:53:06.592Z",
+      "total_price": 1096,
+      "event_id": "298d",
+      "user_id": "user4",
+      "updated_at": "2025-04-02T10:53:06.592Z"
     }
   ],
   "device_rental": [
@@ -2292,6 +2596,190 @@
       "quantity": "1",
       "created_at": "2025-03-31T05:00:58.013Z",
       "updated_at": "2025-03-31T05:00:58.013Z"
+    },
+    {
+      "id": "27f7",
+      "rental_id": "8f24",
+      "device_id": "2",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:13:54.005Z",
+      "updated_at": "2025-04-01T09:13:54.005Z"
+    },
+    {
+      "id": "9554",
+      "rental_id": "2a02",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:15:54.185Z",
+      "updated_at": "2025-04-01T09:15:54.185Z"
+    },
+    {
+      "id": "09d0",
+      "rental_id": "0229",
+      "device_id": "2",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:20:26.018Z",
+      "updated_at": "2025-04-01T09:20:26.018Z"
+    },
+    {
+      "id": "dfe8",
+      "rental_id": "b695",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:36:28.067Z",
+      "updated_at": "2025-04-01T09:36:28.067Z"
+    },
+    {
+      "id": "6900",
+      "rental_id": "11d7",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:38:11.237Z",
+      "updated_at": "2025-04-01T09:38:11.237Z"
+    },
+    {
+      "id": "244f",
+      "rental_id": "8b09",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:58:03.494Z",
+      "updated_at": "2025-04-01T09:58:03.494Z"
+    },
+    {
+      "id": "ebbd",
+      "rental_id": "4ff0",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:58:55.655Z",
+      "updated_at": "2025-04-01T09:58:55.655Z"
+    },
+    {
+      "id": "7765",
+      "rental_id": "4ff0",
+      "device_id": "3",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:58:55.656Z",
+      "updated_at": "2025-04-01T09:58:55.656Z"
+    },
+    {
+      "id": "1590",
+      "rental_id": "36c4",
+      "device_id": "2",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:59:43.834Z",
+      "updated_at": "2025-04-01T09:59:43.834Z"
+    },
+    {
+      "id": "aebd",
+      "rental_id": "36c4",
+      "device_id": "3",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:59:43.835Z",
+      "updated_at": "2025-04-01T09:59:43.835Z"
+    },
+    {
+      "id": "c64f",
+      "rental_id": "d01c",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-01T10:05:44.343Z",
+      "updated_at": "2025-04-01T10:05:44.343Z"
+    },
+    {
+      "id": "aafe",
+      "rental_id": "d01c",
+      "device_id": "3",
+      "quantity": "1",
+      "created_at": "2025-04-01T10:05:44.344Z",
+      "updated_at": "2025-04-01T10:05:44.344Z"
+    },
+    {
+      "id": "3fa4",
+      "rental_id": "4993",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-01T10:12:17.835Z",
+      "updated_at": "2025-04-01T10:12:17.835Z"
+    },
+    {
+      "id": "06e1",
+      "rental_id": "4993",
+      "device_id": "3",
+      "quantity": "1",
+      "created_at": "2025-04-01T10:12:17.835Z",
+      "updated_at": "2025-04-01T10:12:17.835Z"
+    },
+    {
+      "id": "c851",
+      "rental_id": "8afb",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-01T10:15:32.563Z",
+      "updated_at": "2025-04-01T10:15:32.563Z"
+    },
+    {
+      "id": "a310",
+      "rental_id": "8afb",
+      "device_id": "3",
+      "quantity": "1",
+      "created_at": "2025-04-01T10:15:32.563Z",
+      "updated_at": "2025-04-01T10:15:32.563Z"
+    },
+    {
+      "id": "73e3",
+      "rental_id": "ad99",
+      "device_id": "2",
+      "quantity": "1",
+      "created_at": "2025-04-01T10:46:33.272Z",
+      "updated_at": "2025-04-01T10:46:33.272Z"
+    },
+    {
+      "id": "dea2",
+      "rental_id": "5440",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-02T10:31:56.056Z",
+      "updated_at": "2025-04-02T10:31:56.056Z"
+    },
+    {
+      "id": "72cf",
+      "rental_id": "5440",
+      "device_id": "2",
+      "quantity": "1",
+      "created_at": "2025-04-02T10:31:56.056Z",
+      "updated_at": "2025-04-02T10:31:56.056Z"
+    },
+    {
+      "id": "c773",
+      "rental_id": "a4ed",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-02T10:46:23.892Z",
+      "updated_at": "2025-04-02T10:46:23.892Z"
+    },
+    {
+      "id": "06d5",
+      "rental_id": "a4ed",
+      "device_id": "3",
+      "quantity": "1",
+      "created_at": "2025-04-02T10:46:23.893Z",
+      "updated_at": "2025-04-02T10:46:23.893Z"
+    },
+    {
+      "id": "f313",
+      "rental_id": "8a18",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-02T10:53:06.603Z",
+      "updated_at": "2025-04-02T10:53:06.603Z"
+    },
+    {
+      "id": "4a8c",
+      "rental_id": "8a18",
+      "device_id": "3",
+      "quantity": "1",
+      "created_at": "2025-04-02T10:53:06.603Z",
+      "updated_at": "2025-04-02T10:53:06.603Z"
     }
   ],
   "service_rental": [
@@ -2870,6 +3358,190 @@
       "quantity": "1",
       "created_at": "2025-03-31T05:01:59.526Z",
       "updated_at": "2025-03-31T05:01:59.526Z"
+    },
+    {
+      "id": "aa77",
+      "rental_id": "8f24",
+      "service_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:13:54.006Z",
+      "updated_at": "2025-04-01T09:13:54.006Z"
+    },
+    {
+      "id": "21a7",
+      "rental_id": "2a02",
+      "service_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:15:54.185Z",
+      "updated_at": "2025-04-01T09:15:54.185Z"
+    },
+    {
+      "id": "07b1",
+      "rental_id": "0229",
+      "service_id": "5",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:20:26.018Z",
+      "updated_at": "2025-04-01T09:20:26.019Z"
+    },
+    {
+      "id": "bbef",
+      "rental_id": "0229",
+      "service_id": "2",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:20:33.856Z",
+      "updated_at": "2025-04-01T09:20:33.856Z"
+    },
+    {
+      "id": "4b88",
+      "rental_id": "b695",
+      "service_id": "2",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:36:28.067Z",
+      "updated_at": "2025-04-01T09:36:28.067Z"
+    },
+    {
+      "id": "715b",
+      "rental_id": "11d7",
+      "service_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:38:11.237Z",
+      "updated_at": "2025-04-01T09:38:11.237Z"
+    },
+    {
+      "id": "fcd9",
+      "rental_id": "8b09",
+      "service_id": "2",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:58:03.495Z",
+      "updated_at": "2025-04-01T09:58:03.495Z"
+    },
+    {
+      "id": "85ee",
+      "rental_id": "4ff0",
+      "service_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:58:55.657Z",
+      "updated_at": "2025-04-01T09:58:55.657Z"
+    },
+    {
+      "id": "952d",
+      "rental_id": "36c4",
+      "service_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:59:43.836Z",
+      "updated_at": "2025-04-01T09:59:43.836Z"
+    },
+    {
+      "id": "822d",
+      "rental_id": "36c4",
+      "service_id": "2",
+      "quantity": "1",
+      "created_at": "2025-04-01T09:59:43.837Z",
+      "updated_at": "2025-04-01T09:59:43.837Z"
+    },
+    {
+      "id": "437f",
+      "rental_id": "d01c",
+      "service_id": "4",
+      "quantity": "1",
+      "created_at": "2025-04-01T10:05:44.344Z",
+      "updated_at": "2025-04-01T10:05:44.345Z"
+    },
+    {
+      "id": "240a",
+      "rental_id": "d01c",
+      "service_id": "2",
+      "quantity": "1",
+      "created_at": "2025-04-01T10:05:44.345Z",
+      "updated_at": "2025-04-01T10:05:44.345Z"
+    },
+    {
+      "id": "71ea",
+      "rental_id": "4993",
+      "service_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-01T10:12:17.836Z",
+      "updated_at": "2025-04-01T10:12:17.836Z"
+    },
+    {
+      "id": "8e5a",
+      "rental_id": "4993",
+      "service_id": "5",
+      "quantity": "1",
+      "created_at": "2025-04-01T10:12:17.837Z",
+      "updated_at": "2025-04-01T10:12:17.837Z"
+    },
+    {
+      "id": "6d66",
+      "rental_id": "8afb",
+      "service_id": "3",
+      "quantity": "1",
+      "created_at": "2025-04-01T10:15:32.564Z",
+      "updated_at": "2025-04-01T10:15:32.564Z"
+    },
+    {
+      "id": "3c60",
+      "rental_id": "8afb",
+      "service_id": "2",
+      "quantity": "1",
+      "created_at": "2025-04-01T10:15:32.564Z",
+      "updated_at": "2025-04-01T10:15:32.564Z"
+    },
+    {
+      "id": "347b",
+      "rental_id": "ad99",
+      "service_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-01T10:46:33.273Z",
+      "updated_at": "2025-04-01T10:46:33.273Z"
+    },
+    {
+      "id": "6cb5",
+      "rental_id": "5440",
+      "service_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-02T10:31:56.057Z",
+      "updated_at": "2025-04-02T10:31:56.058Z"
+    },
+    {
+      "id": "cf37",
+      "rental_id": "5440",
+      "service_id": "4",
+      "quantity": "1",
+      "created_at": "2025-04-02T10:31:56.058Z",
+      "updated_at": "2025-04-02T10:31:56.058Z"
+    },
+    {
+      "id": "f4c2",
+      "rental_id": "a4ed",
+      "service_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-02T10:46:23.894Z",
+      "updated_at": "2025-04-02T10:46:23.894Z"
+    },
+    {
+      "id": "a0b6",
+      "rental_id": "a4ed",
+      "service_id": "4",
+      "quantity": "1",
+      "created_at": "2025-04-02T10:46:23.895Z",
+      "updated_at": "2025-04-02T10:46:23.895Z"
+    },
+    {
+      "id": "3afe",
+      "rental_id": "8a18",
+      "service_id": "4",
+      "quantity": "1",
+      "created_at": "2025-04-02T10:53:06.604Z",
+      "updated_at": "2025-04-02T10:53:06.604Z"
+    },
+    {
+      "id": "6664",
+      "rental_id": "8a18",
+      "service_id": "2",
+      "quantity": "1",
+      "created_at": "2025-04-02T10:53:06.604Z",
+      "updated_at": "2025-04-02T10:53:06.604Z"
     }
   ],
   "timeline": [
@@ -3416,6 +4088,190 @@
       "description": "2 thiết bị",
       "created_at": "2025-03-31T04:54:21.962Z",
       "updated_at": "2025-03-31T04:54:21.962Z"
+    },
+    {
+      "id": "31a4",
+      "rental_id": "8f24",
+      "time_start": "2025-04-01T16:13",
+      "description": "ev.js",
+      "created_at": "2025-04-01T09:13:54.006Z",
+      "updated_at": "2025-04-01T09:13:54.006Z"
+    },
+    {
+      "id": "64c1",
+      "rental_id": "2a02",
+      "time_start": "2025-04-01T16:15",
+      "description": "comback event 2",
+      "created_at": "2025-04-01T09:15:54.186Z",
+      "updated_at": "2025-04-01T09:15:54.186Z"
+    },
+    {
+      "id": "80d1",
+      "rental_id": "0229",
+      "time_start": "2025-04-01T16:20",
+      "description": "port khác",
+      "created_at": "2025-04-01T09:20:26.019Z",
+      "updated_at": "2025-04-01T09:20:26.019Z"
+    },
+    {
+      "id": "f6b5",
+      "rental_id": "b695",
+      "time_start": "2025-04-01T16:36",
+      "description": "1 sự kiện",
+      "created_at": "2025-04-01T09:36:28.068Z",
+      "updated_at": "2025-04-01T09:36:28.068Z"
+    },
+    {
+      "id": "4d01",
+      "rental_id": "b695",
+      "time_start": "2025-05-11T16:36",
+      "description": "1 sự kiện",
+      "created_at": "2025-04-01T09:36:37.350Z",
+      "updated_at": "2025-04-01T09:36:37.350Z"
+    },
+    {
+      "id": "f5c8",
+      "rental_id": "11d7",
+      "time_start": "2025-04-01T16:38",
+      "description": "2 sự kiện tb",
+      "created_at": "2025-04-01T09:38:11.238Z",
+      "updated_at": "2025-04-01T09:38:11.238Z"
+    },
+    {
+      "id": "18b3",
+      "rental_id": "8b09",
+      "time_start": "2025-04-01T16:58",
+      "description": "Loại bỏ sự kiện click riêng lẻ và gộp vào handleCreateForm để tránh xung đột.",
+      "created_at": "2025-04-01T09:58:03.496Z",
+      "updated_at": "2025-04-01T09:58:03.496Z"
+    },
+    {
+      "id": "0f0c",
+      "rental_id": "4ff0",
+      "time_start": "2025-04-01T16:58",
+      "description": "Loại bỏ sự kiện click riêng lẻ  2 DV",
+      "created_at": "2025-04-01T09:58:55.658Z",
+      "updated_at": "2025-04-01T09:58:55.658Z"
+    },
+    {
+      "id": "4fb0",
+      "rental_id": "36c4",
+      "time_start": "2025-04-27T16:59",
+      "description": "Loại bỏ sự kiện click riêng lẻ  6 CÁI",
+      "created_at": "2025-04-01T09:59:43.838Z",
+      "updated_at": "2025-04-01T09:59:43.838Z"
+    },
+    {
+      "id": "3148",
+      "rental_id": "36c4",
+      "time_start": "2025-04-27T16:59",
+      "description": "Loại bỏ sự kiện click riêng lẻ  6 CÁI",
+      "created_at": "2025-04-01T09:59:43.839Z",
+      "updated_at": "2025-04-01T09:59:43.839Z"
+    },
+    {
+      "id": "28f2",
+      "rental_id": "d01c",
+      "time_start": "2025-04-01T17:05",
+      "description": "6 cai",
+      "created_at": "2025-04-01T10:05:44.346Z",
+      "updated_at": "2025-04-01T10:05:44.347Z"
+    },
+    {
+      "id": "ac6a",
+      "rental_id": "d01c",
+      "time_start": "2025-04-26T17:05",
+      "description": "6 cai",
+      "created_at": "2025-04-01T10:05:44.347Z",
+      "updated_at": "2025-04-01T10:05:44.347Z"
+    },
+    {
+      "id": "318e",
+      "rental_id": "4993",
+      "time_start": "2025-04-01T17:12",
+      "description": "6 sự kiện chuyển trang",
+      "created_at": "2025-04-01T10:12:17.837Z",
+      "updated_at": "2025-04-01T10:12:17.837Z"
+    },
+    {
+      "id": "c2d7",
+      "rental_id": "4993",
+      "time_start": "2025-05-11T17:12",
+      "description": "6 sự kiện chuyển trang",
+      "created_at": "2025-04-01T10:12:38.335Z",
+      "updated_at": "2025-04-01T10:12:38.335Z"
+    },
+    {
+      "id": "71c0",
+      "rental_id": "8afb",
+      "time_start": "2025-04-01T17:15",
+      "description": "2 timiline ctr",
+      "created_at": "2025-04-01T10:15:32.565Z",
+      "updated_at": "2025-04-01T10:15:32.565Z"
+    },
+    {
+      "id": "e89b",
+      "rental_id": "8afb",
+      "time_start": "2025-04-02T17:15",
+      "description": "2 timiline ctr",
+      "created_at": "2025-04-01T10:15:32.566Z",
+      "updated_at": "2025-04-01T10:15:32.566Z"
+    },
+    {
+      "id": "b9ea",
+      "rental_id": "ad99",
+      "time_start": "2025-04-26T17:46",
+      "description": "window.location.href = \"../table-event.html\";",
+      "created_at": "2025-04-01T10:46:33.274Z",
+      "updated_at": "2025-04-01T10:46:33.274Z"
+    },
+    {
+      "id": "28f7",
+      "rental_id": "5440",
+      "time_start": "2025-04-02T17:31",
+      "description": "home",
+      "created_at": "2025-04-02T10:31:56.060Z",
+      "updated_at": "2025-04-02T10:31:56.060Z"
+    },
+    {
+      "id": "5778",
+      "rental_id": "5440",
+      "time_start": "2025-04-04T17:31",
+      "description": "home",
+      "created_at": "2025-04-02T10:31:56.061Z",
+      "updated_at": "2025-04-02T10:31:56.061Z"
+    },
+    {
+      "id": "faba",
+      "rental_id": "a4ed",
+      "time_start": "2025-04-02T17:46",
+      "description": "toast",
+      "created_at": "2025-04-02T10:46:23.896Z",
+      "updated_at": "2025-04-02T10:46:23.896Z"
+    },
+    {
+      "id": "7312",
+      "rental_id": "a4ed",
+      "time_start": "2025-04-27T17:46",
+      "description": "toast",
+      "created_at": "2025-04-02T10:46:23.897Z",
+      "updated_at": "2025-04-02T10:46:23.897Z"
+    },
+    {
+      "id": "3c34",
+      "rental_id": "8a18",
+      "time_start": "2025-04-02T17:52",
+      "description": "final show",
+      "created_at": "2025-04-02T10:53:06.605Z",
+      "updated_at": "2025-04-02T10:53:06.605Z"
+    },
+    {
+      "id": "8d5b",
+      "rental_id": "8a18",
+      "time_start": "2025-04-11T17:53",
+      "description": "final show",
+      "created_at": "2025-04-02T10:53:06.606Z",
+      "updated_at": "2025-04-02T10:53:06.606Z"
     }
   ],
   "user": [

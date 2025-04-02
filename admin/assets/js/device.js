@@ -12,10 +12,10 @@ start();
 function getData(callback) {
     let token = localStorage.getItem("token"); // Lấy token từ localStorage
 
-    if (!token) {
-        console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
-        return;
-    }
+    // if (!token) {
+    //     console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+    //     return;
+    // }
 
     Promise.all([
         fetch(DeviceAPI, {
