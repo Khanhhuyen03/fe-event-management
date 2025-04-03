@@ -88,40 +88,6 @@ function renderBarChart(monthlyData) {
     });
 }
 //Thông kê người dùng
-// document.addEventListener("DOMContentLoaded", () => {
-//     fetch(UserAPI)
-//         .then(response => response.json())
-//         .then(users => {
-//             const monthlyData = Array(12).fill(0); // Mảng 12 tháng, khởi tạo 0
-
-//             users.forEach(user => {
-//                 const month = new Date(user.created_at).getMonth(); // Lấy tháng từ 0-11
-//                 monthlyData[month]++; // Tăng số lượng user trong tháng tương ứng
-//             });
-
-//             new Chart(document.querySelector('#useChart'), {
-//                 type: 'line',
-//                 data: {
-//                     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-//                     datasets: [{
-//                         label: 'Số lượng người dùng',
-//                         data: monthlyData,
-//                         fill: false,
-//                         borderColor: 'rgb(75, 192, 192)',
-//                         tension: 0.1
-//                     }]
-//                 },
-//                 options: {
-//                     scales: {
-//                         y: {
-//                             beginAtZero: true
-//                         }
-//                     }
-//                 }
-//             });
-//         })
-//         .catch(error => console.error("Lỗi khi lấy dữ liệu người dùng:", error));
-// });
 document.addEventListener("DOMContentLoaded", () => {
     let token = localStorage.getItem("token"); // Lấy token từ localStorage
 
@@ -132,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     fetch(UserAPI, {
         headers: {
-            "Authorization": `Bearer ${token}`,
+            //"Authorization": `Bearer ${token}`,
             "Content-Type": "application/json"
         }
     })
@@ -176,23 +142,13 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 let revenueChartInstance = null;
-
-// function fetchRentalsAndRenderChart() {
-//     fetch(RentalAPI)
-//         .then(response => response.json())
-//         .then(rentals => {
-//             const monthlyRevenueData = calculateMonthlyRevenue(rentals);
-//             renderLineChart(monthlyRevenueData);
-//         })
-//         .catch(error => console.error("Lỗi khi lấy dữ liệu rental:", error));
-// }
 function fetchRentalsAndRenderChart() {
     let token = localStorage.getItem("token"); // Lấy token từ localStorage
 
-    // if (!token) {
-    //     console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
-    //     return;
-    // }
+    if (!token) {
+        console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+        return;
+    }
 
     fetch(RentalAPI, {
         headers: {
