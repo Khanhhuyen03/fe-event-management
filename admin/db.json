@@ -864,6 +864,16 @@
       "detail": "final show",
       "created_at": "2025-04-02",
       "updated_at": "2025-04-02"
+    },
+    {
+      "id": "a031",
+      "img": "avater.jpg",
+      "name": "bỏ token",
+      "description": "bỏ token",
+      "event_type_id": "102",
+      "detail": "bỏ token",
+      "created_at": "2025-04-03",
+      "updated_at": "2025-04-03"
     }
   ],
   "event_type": [
@@ -2010,6 +2020,16 @@
       "event_id": "298d",
       "user_id": "user4",
       "updated_at": "2025-04-02T10:53:06.592Z"
+    },
+    {
+      "id": "aeb3",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-04-03T08:45:56.024Z",
+      "rental_end_time": "2025-04-04T08:45:56.024Z",
+      "total_price": 1080.09,
+      "event_id": "a031",
+      "user_id": "user4",
+      "updated_at": "2025-04-03T08:45:56.024Z"
     }
   ],
   "device_rental": [
@@ -2780,6 +2800,22 @@
       "quantity": "1",
       "created_at": "2025-04-02T10:53:06.603Z",
       "updated_at": "2025-04-02T10:53:06.603Z"
+    },
+    {
+      "id": "6b44",
+      "rental_id": "aeb3",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-03T08:45:56.035Z",
+      "updated_at": "2025-04-03T08:45:56.035Z"
+    },
+    {
+      "id": "0184",
+      "rental_id": "aeb3",
+      "device_id": "3",
+      "quantity": "1",
+      "created_at": "2025-04-03T08:45:56.036Z",
+      "updated_at": "2025-04-03T08:45:56.036Z"
     }
   ],
   "service_rental": [
@@ -3542,6 +3578,22 @@
       "quantity": "1",
       "created_at": "2025-04-02T10:53:06.604Z",
       "updated_at": "2025-04-02T10:53:06.604Z"
+    },
+    {
+      "id": "6a89",
+      "rental_id": "aeb3",
+      "service_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-03T08:45:56.037Z",
+      "updated_at": "2025-04-03T08:45:56.037Z"
+    },
+    {
+      "id": "3b06",
+      "rental_id": "aeb3",
+      "service_id": "5",
+      "quantity": "1",
+      "created_at": "2025-04-03T08:45:56.037Z",
+      "updated_at": "2025-04-03T08:45:56.037Z"
     }
   ],
   "timeline": [
@@ -4272,6 +4324,22 @@
       "description": "final show",
       "created_at": "2025-04-02T10:53:06.606Z",
       "updated_at": "2025-04-02T10:53:06.606Z"
+    },
+    {
+      "id": "2650",
+      "rental_id": "aeb3",
+      "time_start": "2025-04-03T15:45",
+      "description": "bỏ token",
+      "created_at": "2025-04-03T08:45:56.038Z",
+      "updated_at": "2025-04-03T08:45:56.038Z"
+    },
+    {
+      "id": "208f",
+      "rental_id": "aeb3",
+      "time_start": "2025-04-11T15:45",
+      "description": "bỏ token",
+      "created_at": "2025-04-03T08:45:56.039Z",
+      "updated_at": "2025-04-03T08:45:56.039Z"
     }
   ],
   "user": [
@@ -4392,16 +4460,16 @@
       "name": "Nguyễn Văn A",
       "phone_number": "0987654321",
       "address": "123 Đường ABC, Quận 1, TP.HCM",
-      "created_at": "2024-03-19T12:00:00Z",
-      "updated_at": "2024-03-19T12:00:00Z"
+      "created_at": "2025-03-19T12:00:00Z",
+      "updated_at": "2025-03-19T12:00:00Z"
     },
     {
       "id": "uuid-2",
       "name": "Nguyễn Văn B",
       "phone_number": "0987654321",
       "address": "123 Đường ABC, Quận 1, TP.HCM",
-      "created_at": "2024-03-19T12:00:00Z",
-      "updated_at": "2024-03-19T12:00:00Z"
+      "created_at": "2025-03-19T12:00:00Z",
+      "updated_at": "2025-03-19T12:00:00Z"
     }
   ],
   "location": [

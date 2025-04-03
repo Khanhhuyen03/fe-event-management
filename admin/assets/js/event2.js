@@ -42,17 +42,83 @@ function start() {
 }
 start();
 function getData(callback) {
+    let token = localStorage.getItem("token"); // Lấy token từ localStorage
+
+    // if (!token) {
+    //     console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+    //     return;
+    // }
+
     Promise.all([
-        fetch(EventAPI).then(res => res.json()),
-        fetch(EventTypeAPI).then(res => res.json()),
-        fetch(DeviceAPI).then(res => res.json()),
-        fetch(DeviceTypeAPI).then(res => res.json()),
-        fetch(ServiceAPI).then(res => res.json()),
-        fetch(RentalAPI).then(res => res.json()),
-        fetch(DeviceRental).then(res => res.json()),
-        fetch(ServiceRental).then(res => res.json()),
-        fetch(Timeline).then(res => res.json()),
-        fetch(UsersAPI).then(res => res.json()),
+        fetch(EventAPI, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json()),
+
+        fetch(EventTypeAPI, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json()),
+
+        fetch(DeviceAPI, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json()),
+
+        fetch(DeviceTypeAPI, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json()),
+
+        fetch(ServiceAPI, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json()),
+
+        fetch(RentalAPI, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json()),
+
+        fetch(DeviceRental, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json()),
+
+        fetch(ServiceRental, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json()),
+
+        fetch(Timeline, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json()),
+
+        fetch(UsersAPI, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json()),
     ])
         .then(([events, eventTypes, devices, deviceTypes, services, rental, deviceRental, serviceRental, timeline, users]) => {
             callback(events, eventTypes, devices, deviceTypes, services, rental, deviceRental, serviceRental, timeline, users);
