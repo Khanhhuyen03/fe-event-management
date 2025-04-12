@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async function () {
-    const API_URL = "assets/data/eventdetail.json"; // API lấy dữ liệu sự kiện
+    const API_URL = "http://localhost:8080/event-management/event/${eventId}"; // API lấy dữ liệu sự kiện
 
     try {
         const response = await fetch(API_URL);

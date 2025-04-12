@@ -40,17 +40,17 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // Xử lý upload avatar
-document.getElementById('avatarInput').addEventListener('change', function(event) {
+document.getElementById('avatarInput').addEventListener('change', function (event) {
     const file = event.target.files[0];
     if (file) {
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             const avatarImage = document.getElementById('avatarImage');
             avatarImage.src = e.target.result;
             updateAvatarState(e.target.result);
             console.log('Ảnh đã tải lên:', e.target.result);
         };
-        reader.onerror = function(e) {
+        reader.onerror = function (e) {
             console.error('Lỗi khi đọc file ảnh:', e);
             alert('Không thể tải ảnh lên. Vui lòng thử lại.');
         };
@@ -87,7 +87,7 @@ async function saveChanges() {
     console.log("Patch Data gửi đi:", patchData);
 
     try {
-        const response = await fetch(`https://67eabf6734bcedd95f647797.mockapi.io/User/${currentUserId}`, {
+        const response = await fetch(``, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'

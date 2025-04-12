@@ -76,3 +76,17 @@ h2 {
 .auth-form.active {
     display: block;
 }
+
+.verification-inputs {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+.verification-input {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    font-size: 18px;
+    text-transform: uppercase;
+}
