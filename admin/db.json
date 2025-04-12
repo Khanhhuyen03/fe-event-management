@@ -874,6 +874,26 @@
       "detail": "bỏ token",
       "created_at": "2025-04-03",
       "updated_at": "2025-04-03"
+    },
+    {
+      "id": "071e",
+      "img": "12.jpg",
+      "name": "gì doẹ",
+      "description": "gì doẹ",
+      "event_type_id": "101",
+      "detail": "gì doẹ",
+      "created_at": "2025-04-05",
+      "updated_at": "2025-04-05"
+    },
+    {
+      "id": "ea16",
+      "img": "9.jpg",
+      "name": "5/4",
+      "description": "5/4",
+      "event_type_id": "5f7b",
+      "detail": "5/4",
+      "created_at": "2025-04-05",
+      "updated_at": "2025-04-05"
     }
   ],
   "event_type": [
@@ -2030,6 +2050,36 @@
       "event_id": "a031",
       "user_id": "user4",
       "updated_at": "2025-04-03T08:45:56.024Z"
+    },
+    {
+      "id": "c01a",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-04-05T15:53:02.064Z",
+      "rental_end_time": "2025-04-06T15:53:02.064Z",
+      "total_price": 1071,
+      "event_id": "e7f7",
+      "user_id": "user1",
+      "updated_at": "2025-04-05T15:53:02.064Z"
+    },
+    {
+      "id": "e24d",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-04-05T15:54:15.689Z",
+      "rental_end_time": "2025-04-06T15:54:15.689Z",
+      "total_price": 1055,
+      "event_id": "071e",
+      "user_id": "user1",
+      "updated_at": "2025-04-05T15:54:15.689Z"
+    },
+    {
+      "id": "d587",
+      "custom_location": "Địa điểm tùy chỉnh",
+      "rental_start_time": "2025-04-05T15:56:16.362Z",
+      "rental_end_time": "2025-04-06T15:56:16.362Z",
+      "total_price": 2086,
+      "event_id": "ea16",
+      "user_id": "user1",
+      "updated_at": "2025-04-05T15:56:16.362Z"
     }
   ],
   "device_rental": [
@@ -2816,6 +2866,30 @@
       "quantity": "1",
       "created_at": "2025-04-03T08:45:56.036Z",
       "updated_at": "2025-04-03T08:45:56.036Z"
+    },
+    {
+      "id": "01be",
+      "rental_id": "e24d",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-05T15:54:15.699Z",
+      "updated_at": "2025-04-05T15:54:15.699Z"
+    },
+    {
+      "id": "d5a1",
+      "rental_id": "d587",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-05T15:56:16.377Z",
+      "updated_at": "2025-04-05T15:56:16.377Z"
+    },
+    {
+      "id": "f31c",
+      "rental_id": "d587",
+      "device_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-05T15:56:16.379Z",
+      "updated_at": "2025-04-05T15:56:16.379Z"
     }
   ],
   "service_rental": [
@@ -3594,6 +3668,30 @@
       "quantity": "1",
       "created_at": "2025-04-03T08:45:56.037Z",
       "updated_at": "2025-04-03T08:45:56.037Z"
+    },
+    {
+      "id": "c874",
+      "rental_id": "e24d",
+      "service_id": "1",
+      "quantity": "1",
+      "created_at": "2025-04-05T15:54:15.699Z",
+      "updated_at": "2025-04-05T15:54:15.699Z"
+    },
+    {
+      "id": "4199",
+      "rental_id": "d587",
+      "service_id": "4",
+      "quantity": "1",
+      "created_at": "2025-04-05T15:56:16.383Z",
+      "updated_at": "2025-04-05T15:56:16.383Z"
+    },
+    {
+      "id": "b84d",
+      "rental_id": "d587",
+      "service_id": "2",
+      "quantity": "1",
+      "created_at": "2025-04-05T15:56:16.381Z",
+      "updated_at": "2025-04-05T15:56:16.381Z"
     }
   ],
   "timeline": [
@@ -4340,6 +4438,30 @@
       "description": "bỏ token",
       "created_at": "2025-04-03T08:45:56.039Z",
       "updated_at": "2025-04-03T08:45:56.039Z"
+    },
+    {
+      "id": "9ff4",
+      "rental_id": "e24d",
+      "time_start": "2025-04-05T22:54",
+      "description": "gì doẹ",
+      "created_at": "2025-04-05T15:54:15.700Z",
+      "updated_at": "2025-04-05T15:54:15.700Z"
+    },
+    {
+      "id": "f5d0",
+      "rental_id": "d587",
+      "time_start": "2025-04-05T22:55",
+      "description": "5/4",
+      "created_at": "2025-04-05T15:56:16.384Z",
+      "updated_at": "2025-04-05T15:56:16.384Z"
+    },
+    {
+      "id": "e6b9",
+      "rental_id": "d587",
+      "time_start": "2025-04-05T22:55",
+      "description": "5/4",
+      "created_at": "2025-04-05T15:56:16.386Z",
+      "updated_at": "2025-04-05T15:56:16.386Z"
     }
   ],
   "user": [
