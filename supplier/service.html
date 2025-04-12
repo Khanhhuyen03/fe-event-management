@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Danh sách - MyEvent</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link href="assets/css/main.css" rel="stylesheet">
+    <link href="assets/css/service.css" rel="stylesheet">
+    <style>
+        .real-estate .card {
+            background-color: var(--background-color);
+            color: var(--default-color);
+            border: none;
+            position: relative;
+            border-radius: 0px;
+            overflow: hidden;
+            min-height: 350px;
+        }
+
+        .real-estate .card:before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0) 25%, rgba(0, 0, 0, 0.9) 75%);
+            z-index: 2;
+        }
+
+        .real-estate .card img {
+            position: absolute;
+            inset: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        .real-estate .card .card-body {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 3;
+            padding: 30px;
+        }
+
+        .real-estate .card .card-body .sale-rent {
+            display: inline-block;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--contrast-color);
+            padding: 4px 20px;
+            border: 2px solid var(--accent-color);
+            border-radius: 50px;
+            margin-bottom: 10px;
+        }
+
+        .real-estate .card .card-body h3 {
+            font-weight: 700;
+            font-size: 20px;
+            margin-bottom: 0px;
+            padding-left: 10px;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .real-estate .card .card-body h3 a {
+            color: var(--contrast-color);
+        }
+
+        .real-estate .card .card-body .card-content {
+            background-color: var(--accent-color);
+            color: var(--contrast-color);
+            height: 80px;
+            visibility: hidden;
+            opacity: 0;
+            margin-top: 10px;
+            margin-bottom: -80px;
+            margin-left: -30px;
+            margin-right: -30px;
+            transition: 0.3s;
+            padding: 0 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .real-estate .card .card-body .card-content .propery-info {
+            font-weight: 500;
+        }
+
+        .real-estate .card:hover .card-content {
+            margin-bottom: -30px;
+            visibility: visible;
+            opacity: 1;
+        }
+
+
+
+        .filter-section .btn-register {
+            background-color: #718355;
+            color: white;
+            padding: 6px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .filter-section .btn-register:hover {
+            background-color: #e9f5db;
+            color: #718355;
+            font-weight: bold;
+        }
+
+        /* Floating Register Button */
+        .floating-register-btn {
+            position: fixed;
+            bottom: 90px;
+            /* Nằm phía trên nút scroll-top */
+            right: 30px;
+            background-color: #718355;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 8px;
+            cursor: pointer;
+            display: none;
+            /* Ẩn mặc định */
+            z-index: 1000;
+            transition: all 0.3s ease;
+            writing-mode: vertical-rl;
+            /* Chữ nằm dọc */
+        }
+
+        .floating-register-btn:hover {
+            background-color: #e9f5db;
+            color: #718355;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .floating-register-btn i {
+            margin-bottom: 8px;
+            /* Khoảng cách giữa icon và chữ */
+            display: block;
+        }
+
+        /* Điều chỉnh nút scroll-top để không bị che */
+        .scroll-top {
+            bottom: 20px;
+            right: 30px;
+        }
+    </style>
+</head>
+
+<body class="properties-page">
+    <div id="header"></div>
+    <main class="main">
+        <div class="container mt-5 py-4">
+            <div class="filter-section row">
+                <div class="col-8">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Tìm kiếm sự kiện..."
+                        onkeyup="filterEvents()">
+                </div>
+                <div class="col-4">
+                    <select class="form-select" id="eventTypeFilter" onchange="filterEvents()">
+                        <option value="">Tất cả loại sự kiện</option>
+                        <option value="1">Hội nghị doanh nghiệp</option>
+                        <option value="2">Lễ cưới</option>
+                        <option value="3">Lễ hội âm nhạc</option>
+                        <option value="4">Hội chợ triển lãm</option>
+                    </select>
+                </div>
+            </div>
+            <section id="real-estate" class="real-estate section">
+                <div class="container">
+                    <div class="row gy-4" id="item-container"></div>
+                </div>
+            </section>
+        </div>
+        <div id="contractPopup" class="popup">
+            <div id="contractFormContent"></div>
+        </div>
+    </main>
+    <div id="footer"></div>
+    <!-- Modal chứa iframe -->
+    <div class="modal fade" id="iframeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <iframe id="contractIframe" style="width: 100%; height: 600px; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
+    <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
+    <div id="preloader"></div>
+   
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script>
+        let allItems = [];
+
+        document.addEventListener("DOMContentLoaded", async function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const category = urlParams.get("category") || "event";
+            try {
+                const response = await fetch("assets/data/dv.json");
+                const data = await response.json();
+                let items;
+                switch (category) {
+                    case "event": items = data.event; break;
+                    case "device": items = data.devices; break;
+                    case "service": items = data.services; break;
+                    case "location": items = data.locations; break;
+                    default: throw new Error("Danh mục không hợp lệ!");
+                }
+                allItems = items;
+                displayItems(items, category);
+
+                // Kiểm tra nếu quay lại từ đăng nhập và mở modal
+                const token = localStorage.getItem("token");
+                if (localStorage.getItem("openContractAfterLogin") === "true" && token) {
+                    localStorage.removeItem("openContractAfterLogin");
+                    openContractModal();
+                } else if (localStorage.getItem("openContractAfterLogin") === "true" && !token) {
+                    // Nếu chưa đăng nhập, xóa openContractAfterLogin để tránh mở popup
+                    localStorage.removeItem("openContractAfterLogin");
+                }
+            } catch (error) {
+                console.error("Lỗi khi tải dữ liệu:", error);
+                document.getElementById("item-container").innerHTML = "<p class='text-center'>Lỗi tải dữ liệu! Vui lòng thử lại sau.</p>";
+            }
+        });
+
+        function displayItems(items, category) {
+            const itemContainer = document.getElementById("item-container");
+            itemContainer.innerHTML = "";
+            if (!items || items.length === 0) {
+                itemContainer.innerHTML = "<p class='text-center'>Không có dữ liệu để hiển thị!</p>";
+                return;
+            }
+            items.forEach((item, index) => {
+                let detailPage = category === "event" ? "event-detail.html" : "item-detail.html";
+                let buttonText = category === "event" ? "Đăng Ký" : "Xem Chi Tiết";
+                let hoverInfo = category === "event" ? `
+                    <div class="row propery-info"><div class="col">Địa điểm</div></div>
+                    <div class="row"><div class="col">${item.location || "Không xác định"}</div></div>
+                ` : `
+                    <div class="row propery-info"><div class="col">Giá: </div></div>
+                    <div class="row"><div class="col">${item.hourly_rental_fee || item.hourly_salary || "N/A"} VNĐ/ Giờ</div></div>
+                `;
+                const itemCard = `
+                    <div class="col-xl-3 col-md-6" data-aos="fade-up" data-aos-delay="${index * 100}">
+                        <div class="card">
+                            <img src="${item.image}" alt="${item.name}" class="img-fluid">
+                            <div class="card-body">
+                                <span class="sale-rent"><a href="${detailPage}?id=${item.id}&category=${category}">${buttonText}</a></span>
+                                <h3><a href="${detailPage}?id=${item.id}&category=${category}" class="stretched-link">${item.name}</a></h3>
+                                <div class="card-content">${hoverInfo}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                itemContainer.innerHTML += itemCard;
+            });
+        }
+
+        function checkLoginAndOpenContract() {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                // Chưa đăng nhập: Lưu ý định mở contract và chuyển hướng đến login
+                localStorage.setItem("openContractAfterLogin", "true");
+                window.location.href = "login.html";
+            } else {
+                // Đã đăng nhập: Mở modal ngay lập tức
+                openContractModal();
+            }
+        }
+
+        function openContractModal() {
+            const iframe = document.getElementById("contractIframe");
+            iframe.src = "contract.html"; // Trang contract hiển thị trong iframe
+
+            const modal = new bootstrap.Modal(document.getElementById("iframeModal"), {});
+            modal.show(); // Hiển thị modal
+
+            // Lắng nghe tín hiệu từ iframe để đóng modal nếu cần
+            window.addEventListener("message", function closeModal(event) {
+                if (event.data === "closeIframe") {
+                    modal.hide();
+                    window.removeEventListener("message", closeModal);
+                }
+            });
+        }
+
+        function filterEvents() {
+            const searchInput = document.getElementById("searchInput").value.toLowerCase();
+            const eventType = document.getElementById("eventTypeFilter").value;
+            const filteredItems = allItems.filter(item => {
+                const matchesSearch = item.name.toLowerCase().includes(searchInput);
+                const matchesType = eventType ? item.type == eventType : true;
+                return matchesSearch && matchesType;
+            });
+            displayItems(filteredItems, "event");
+        }
+
+        // Hiển thị/ẩn nút đăng ký nổi khi cuộn trang
+        window.addEventListener("scroll", function () {
+            const floatingBtn = document.querySelector(".floating-register-btn");
+            if (window.scrollY > 300) {
+                floatingBtn.style.display = "block";
+            } else {
+                floatingBtn.style.display = "none";
+            }
+        });
+    </script>
+    <script src="assets/js/header.js"></script>
+</body>
+
+</html>
