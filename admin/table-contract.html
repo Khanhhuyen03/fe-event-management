@@ -39,6 +39,38 @@
 </head>
 
 <body>
+    <!-- Popup Modal (Duyệt hợp đồng) -->
+    <div class="modal fade" id="upgradeRoleModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-center w-100">Duyệt hợp đồng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label>Xét duyệt:</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="contractStatus" id="statusInProgress"
+                            value="2" checked>
+                        <label class="form-check-label" for="statusInProgress">
+                            Đang thực hiện
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="contractStatus" id="statusWaitingPaid"
+                            value="3">
+                        <label class="form-check-label" for="statusWaitingPaid">
+                            Chờ thanh toán
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" id="saveRole" class="btn btn-success">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- ======= Header ======= -->
     <div id="header"></div>
@@ -211,6 +243,10 @@
     <script src="assets/js/main.js"></script>
     <!--Hành dộng API data cho table contact-->
     <script src="assets/js/contract.js"></script>
+    <!-- Toast (Tùy chọn, nếu bạn cần hiển thị thông báo) -->
+    <div id="toast"
+        style="display:none; position:fixed; top:10px; right:10px; padding:10px; color:white; border-radius:5px;"></div>
+    <!-- Toast -->
 
 
 </body>

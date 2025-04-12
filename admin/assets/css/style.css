@@ -1402,3 +1402,11 @@ body {
 #toast.success { background-color: #28a745; }
 #toast.error { background-color: #dc3545; }
 #toast.warning { background-color: #ffc107; }
+.status-label {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 15px; /* Bo tròn giống hình */
+  font-size: 14px;
+  text-align: center;
+  min-width: 100px; /* Đảm bảo kích thước tối thiểu để không bị co lại */
+}
