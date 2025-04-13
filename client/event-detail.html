@@ -42,10 +42,12 @@
                     <div class="carousel-inner" id="carouselImages">
                         <div class="carousel-item active"></div>
                     </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#eventCarousel" data-bs-slide="prev">
+                    <button class="carousel-control-prev" type="button" data-bs-target="#eventCarousel"
+                        data-bs-slide="prev">
                         <span class="carousel-control-prev-icon"></span>
                     </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#eventCarousel" data-bs-slide="next">
+                    <button class="carousel-control-next" type="button" data-bs-target="#eventCarousel"
+                        data-bs-slide="next">
                         <span class="carousel-control-next-icon"></span>
                     </button>
                 </div>
@@ -128,7 +130,6 @@
             </div>
 
             <div class="text-end mt-3">
-                <h4 class="fw-bold">Tổng tiền: <span id="totalPrice">0</span> VND</h4>
                 <div class="alert d-flex flex-column flex-md-row align-items-md-center justify-content-between mt-3 p-3"
                     style="background-color: #E9F5DB; border: 1px solid #D4E2C3;">
                     <div class="text-container">
@@ -139,7 +140,8 @@
                         </span>
                     </div>
                     <div>
-                        <button type="button" class="btn fw-bold text-white px-4 py-2" style="background-color: #718355;">
+                        <button type="button" class="btn fw-bold text-white px-4 py-2" id="registerBtn"
+                            style="background-color: #718355;" onclick="checkLoginAndOpenContract()">
                             Đăng ký ngay
                         </button>
                     </div>
@@ -148,7 +150,16 @@
         </section>
     </main>
 
-    <footer id="footer"></footer>
+    <div id="footer"></div>
+
+    <!-- Modal chứa iframe -->
+    <div class="modal fade" id="iframeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <iframe id="contractIframe" style="width: 100%; height: 600px; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
 
     <!-- Scroll Top -->
     <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
@@ -170,26 +181,71 @@
     <script src="assets/js/header.js"></script>
 
     <script>
+        let selectedEvent; // Biến toàn cục để lưu trữ dữ liệu sự kiện
+        let suppliers = []; // Biến lưu danh sách nhà cung cấp
+
+        // Hàm định dạng ngày thành dd/mm/yyyy
+        function formatDateToDDMMYYYY(dateStr) {
+            const date = new Date(dateStr);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        // Hàm lấy tên nhà cung cấp từ supplier_id
+        function getSupplierName(supplierId) {
+            const supplier = suppliers.find(s => s.id === supplierId);
+            return supplier ? `${supplier.first_name} ${supplier.last_name}` : "Không xác định";
+        }
+
         document.addEventListener("DOMContentLoaded", async function () {
+            const preloader = document.getElementById("preloader");
             const urlParams = new URLSearchParams(window.location.search);
             const eventId = urlParams.get("id");
 
             if (!eventId) {
                 document.getElementById("eventName").textContent = "Không tìm thấy sự kiện!";
                 document.getElementById("eventDescription").textContent = "Vui lòng quay lại trang danh sách.";
+                preloader.style.display = "none";
                 return;
             }
 
             try {
-                const response = await fetch("assets/data/dv.json");
-                const data = await response.json();
-                const event = data.event.find(e => e.id == eventId);
+                // Gọi API nhà cung cấp
+                const suppliersResponse = await fetch("https://api.myevent.com/users?role=supplier", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
+                    }
+                });
+                if (!suppliersResponse.ok) {
+                    throw new Error(`Lỗi khi lấy danh sách nhà cung cấp: ${suppliersResponse.statusText}`);
+                }
+                suppliers = await suppliersResponse.json();
+
+                // Gọi API chi tiết sự kiện
+                const eventResponse = await fetch(`https://api.myevent.com/events/${eventId}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
+                    }
+                });
+                if (!eventResponse.ok) {
+                    throw new Error(`Lỗi khi lấy dữ liệu sự kiện: ${eventResponse.statusText}`);
+                }
+                const event = await eventResponse.json();
 
                 if (!event) {
                     document.getElementById("eventName").textContent = "Sự kiện không tồn tại!";
                     document.getElementById("eventDescription").textContent = "Vui lòng kiểm tra lại.";
+                    preloader.style.display = "none";
                     return;
                 }
+
+                selectedEvent = event; // Lưu dữ liệu sự kiện vào biến toàn cục
 
                 // Cập nhật tiêu đề và mô tả
                 document.getElementById("eventName").textContent = event.name;
@@ -198,7 +254,7 @@
                 // Cập nhật carousel hình ảnh
                 const carouselImages = document.getElementById("carouselImages");
                 carouselImages.innerHTML = "";
-                const images = event.images || [event.image];
+                const images = event.images || [event.image] || ["./assets/img/placeholder.jpg"];
                 images.forEach((img, index) => {
                     const activeClass = index === 0 ? "active" : "";
                     carouselImages.innerHTML += `
@@ -219,17 +275,17 @@
                 // Cập nhật danh sách thiết bị
                 const equipmentList = document.getElementById("equipmentList");
                 equipmentList.innerHTML = "";
-                const equipment = event.equipment || [];
-                if (equipment.length === 0) {
+                const devices = event.device || [];
+                if (devices.length === 0) {
                     equipmentList.innerHTML = "<tr><td colspan='7'>Không có thiết bị</td></tr>";
                 } else {
-                    equipment.forEach(item => {
+                    devices.forEach(item => {
                         equipmentList.innerHTML += `
                             <tr>
-                                <td><img src="${item.image}" alt="${item.name}" style="max-width: 50px;"></td>
+                                <td><img src="${item.image || './assets/img/placeholder.jpg'}" alt="${item.name}" style="max-width: 50px;"></td>
                                 <td>${item.name}</td>
                                 <td>${item.description || "Không có mô tả"}</td>
-                                <td>${item.supplier || "Không xác định"}</td>
+                                <td>${getSupplierName(item.supplier_id)}</td>
                                 <td>${item.quantity}</td>
                                 <td>${item.unitPrice.toLocaleString()}</td>
                                 <td>${(item.quantity * item.unitPrice).toLocaleString()}</td>
@@ -241,17 +297,17 @@
                 // Cập nhật danh sách dịch vụ
                 const staffList = document.getElementById("staffList");
                 staffList.innerHTML = "";
-                const staff = event.staff || [];
-                if (staff.length === 0) {
+                const services = event.service || [];
+                if (services.length === 0) {
                     staffList.innerHTML = "<tr><td colspan='7'>Không có dịch vụ</td></tr>";
                 } else {
-                    staff.forEach(item => {
+                    services.forEach(item => {
                         staffList.innerHTML += `
                             <tr>
-                                <td><img src="${item.image}" alt="${item.name}" style="max-width: 50px;"></td>
+                                <td><img src="${item.image || './assets/img/placeholder.jpg'}" alt="${item.name}" style="max-width: 50px;"></td>
                                 <td>${item.name}</td>
                                 <td>${item.description || "Không có mô tả"}</td>
-                                <td>${item.supplier || "Không xác định"}</td>
+                                <td>${getSupplierName(item.supplier_id)}</td>
                                 <td>${item.quantity}</td>
                                 <td>${item.unitPrice.toLocaleString()}</td>
                                 <td>${(item.quantity * item.unitPrice).toLocaleString()}</td>
@@ -263,19 +319,28 @@
                 // Cập nhật danh sách địa điểm
                 const locationList = document.getElementById("locationList");
                 locationList.innerHTML = "";
-                const locations = event.locations || [];
+                const locations = event.location || event.locations || [];
                 if (locations.length === 0) {
                     locationList.innerHTML = "<tr><td colspan='8'>Không có địa điểm</td></tr>";
                 } else {
                     locations.forEach(item => {
-                        const days = Math.ceil((new Date(item.toDate) - new Date(item.fromDate)) / (1000 * 60 * 60 * 24));
+                        // Tính số ngày thuê
+                        const fromDate = new Date(item.fromDate);
+                        const toDate = new Date(item.toDate);
+                        const diffTime = Math.abs(toDate - fromDate);
+                        const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 để tính cả ngày đầu và cuối
+
+                        // Định dạng ngày
+                        const formattedFromDate = formatDateToDDMMYYYY(item.fromDate);
+                        const formattedToDate = formatDateToDDMMYYYY(item.toDate);
+
                         locationList.innerHTML += `
                             <tr>
-                                <td><img src="${item.image}" alt="${item.name}" style="max-width: 50px;"></td>
+                                <td><img src="${item.image || './assets/img/placeholder.jpg'}" alt="${item.name}" style="max-width: 50px;"></td>
                                 <td>${item.name}</td>
-                                <td>${item.supplier || "Không xác định"}</td>
-                                <td>${item.fromDate}</td>
-                                <td>${item.toDate}</td>
+                                <td>${getSupplierName(item.supplier_id)}</td>
+                                <td>${formattedFromDate}</td>
+                                <td>${formattedToDate}</td>
                                 <td>${days}</td>
                                 <td>${item.unitPrice.toLocaleString()}</td>
                                 <td>${(days * item.unitPrice).toLocaleString()}</td>
@@ -284,44 +349,80 @@
                     });
                 }
 
-                // Tính và cập nhật tổng tiền
-                const totalEquipment = equipment.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-                const totalStaff = staff.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-                const totalLocation = locations.reduce((sum, item) => {
-                    const days = Math.ceil((new Date(item.toDate) - new Date(item.fromDate)) / (1000 * 60 * 60 * 24));
-                    return sum + days * item.unitPrice;
-                }, 0);
-                const totalPrice = totalEquipment + totalStaff + totalLocation;
-                document.getElementById("totalPrice").textContent = totalPrice.toLocaleString();
-
-                // Thêm sự kiện cho nút "Đăng ký ngay"
-                document.querySelector(".btn").addEventListener("click", function () {
-                    const iframeModal = new bootstrap.Modal(document.createElement("div"));
-                    iframeModal._element.innerHTML = `
-                        <div class="modal fade" id="iframeModal" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-xl">
-                                <div class="modal-content">
-                                    <iframe src="contract.html" style="width: 100%; height: 600px; border: none;"></iframe>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    document.body.appendChild(iframeModal._element);
-                    iframeModal.show();
-
-                    window.addEventListener("message", function closeModal(event) {
-                        if (event.data === "closeIframe") {
-                            iframeModal.hide();
-                            window.removeEventListener("message", closeModal);
-                        }
-                    });
-                });
+                // Kiểm tra nếu cần mở modal sau khi đăng nhập
+                if (localStorage.getItem("openContractAfterLogin") === "true") {
+                    localStorage.removeItem("openContractAfterLogin");
+                    openContractModal();
+                }
             } catch (error) {
                 console.error("Lỗi khi tải dữ liệu:", error);
                 document.getElementById("eventName").textContent = "Lỗi tải dữ liệu!";
                 document.getElementById("eventDescription").textContent = "Vui lòng thử lại sau.";
+            } finally {
+                preloader.style.display = "none";
             }
         });
+
+        function checkLoginAndOpenContract() {
+            console.log("Nút Đăng ký ngay được nhấn!");
+            const token = localStorage.getItem("token");
+            if (!token) {
+                localStorage.setItem("openContractAfterLogin", "true");
+                const urlParams = new URLSearchParams(window.location.search);
+                const eventId = urlParams.get("id");
+                localStorage.setItem("redirectAfterLogin", `event_detail.html?id=${eventId}`);
+                window.location.href = "login.html";
+            } else {
+                openContractModal();
+            }
+        }
+
+        function openContractModal() {
+            console.log("Mở modal hợp đồng");
+            const iframe = document.getElementById("contractIframe");
+            if (!iframe) {
+                console.error("Không tìm thấy iframe!");
+                return;
+            }
+            iframe.src = "contract.html";
+
+            const modalElement = document.getElementById("iframeModal");
+            if (!modalElement) {
+                console.error("Không tìm thấy modal!");
+                return;
+            }
+            const modal = new bootstrap.Modal(modalElement, {});
+            modal.show();
+
+            iframe.onload = function () {
+                console.log("Iframe loaded, gửi dữ liệu:", selectedEvent);
+                if (selectedEvent) {
+                    const eventData = {
+                        type: "preloadEvent",
+                        event: {
+                            name: selectedEvent.name,
+                            description: selectedEvent.description || "",
+                            device: selectedEvent.device || [],
+                            service: selectedEvent.service || [],
+                            locations: selectedEvent.location || selectedEvent.locations || [],
+                            timeline: selectedEvent.timeline || []
+                        }
+                    };
+                    iframe.contentWindow.postMessage(eventData, "*");
+                } else {
+                    console.error("Không có dữ liệu sự kiện để gửi!");
+                }
+            };
+
+            window.addEventListener("message", function closeModal(event) {
+                if (event.data === "closeIframe") {
+                    console.log("Nhận tín hiệu đóng modal");
+                    modal.hide();
+                    window.removeEventListener("message", closeModal);
+                }
+            }, { once: true });
+        }
     </script>
 </body>
+
 </html>
