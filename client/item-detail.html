@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
+
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -10,7 +11,9 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
     <!-- Vendor CSS Files -->
     <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -23,6 +26,7 @@
     <link href="assets/css/main.css" rel="stylesheet">
     <link href="assets/css/event_detail.css" rel="stylesheet">
 </head>
+
 <body>
     <div id="header"></div>
 
@@ -34,14 +38,18 @@
     <main class="container mt-4">
         <div class="row">
             <div class="col-lg-6">
-                <img id="itemImage" src="" alt="" class="img-fluid" style="max-height: 400px; object-fit: cover;">
+                <img id="itemImage" src="" alt="" class="img-fluid"
+                    style="max-height: 400px; object-fit: cover; display: none;">
             </div>
             <div class="col-lg-6">
-                <ul class="list-group" id="itemDetails">
-                    <li class="list-group-item">Đang tải...</li>
-                </ul>
-                <div class="mt-3">
-                    <button class="btn fw-bold text-white px-4 py-2 m-2" style="background-color: #718355;" onclick="checkLoginAndOpenContract()">
+                <div id="itemDetailsContainer">
+                    <ul class="list-group" id="itemDetails">
+                        <li class="list-group-item">Đang tải...</li>
+                    </ul>
+                </div>
+                <div class="mt-3" id="registerButton" style="display: none;">
+                    <button class="btn fw-bold text-white px-4 py-2 m-2" style="background-color: #718355;"
+                        onclick="checkLoginAndOpenContract()">
                         Đăng ký ngay
                     </button>
                 </div>
@@ -61,7 +69,8 @@
     </div>
 
     <!-- Scroll Top -->
-    <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+    <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
 
     <!-- Preloader -->
     <div id="preloader"></div>
@@ -77,92 +86,192 @@
     <script src="assets/js/header.js"></script>
 
     <script>
+        let suppliers = [];
+        let cities = [];
+        let deviceTypes = [];
+        let serviceTypes = [];
+
+        // Hàm lấy tên nhà cung cấp
+        function getSupplierName(supplierId) {
+            const supplier = suppliers.find(s => s.id === supplierId);
+            return supplier ? `${supplier.first_name} ${supplier.last_name}` : "Không xác định";
+        }
+
+        // Hàm lấy tên thành phố
+        function getCityName(cityId) {
+            const city = cities.find(c => c.id === cityId);
+            return city ? city.name : "Không xác định";
+        }
+
+        // Hàm lấy tên loại
+        function getTypeName(typeId, types) {
+            const type = types.find(t => t.id === typeId);
+            return type ? type.name : "Không xác định";
+        }
+
         document.addEventListener("DOMContentLoaded", async function () {
+            const preloader = document.getElementById("preloader");
+            const itemDetailsContainer = document.getElementById("itemDetailsContainer");
+            const itemImage = document.getElementById("itemImage");
+            const registerButton = document.getElementById("registerButton");
+
             const urlParams = new URLSearchParams(window.location.search);
-            const id = urlParams.get("id");
+            let id = urlParams.get("id");
             const category = urlParams.get("category");
+
+            try {
+                id = decodeURIComponent(id).trim().toLowerCase();
+                console.log("ID sau khi giải mã:", id);
+            } catch (e) {
+                console.error("Lỗi giải mã id:", e);
+            }
 
             if (!id || !category) {
                 document.getElementById("itemName").textContent = "Lỗi: Thiếu thông tin!";
                 document.getElementById("itemDescription").textContent = "Vui lòng quay lại trang danh sách.";
+                itemDetailsContainer.innerHTML = "";
+                preloader.style.display = "none";
                 return;
             }
 
             try {
-                const response = await fetch("assets/data/dv.json");
-                const data = await response.json();
-
-                let item;
-                switch (category) {
-                    case "device": item = data.devices.find(d => d.id == id); break;
-                    case "service": item = data.services.find(s => s.id == id); break;
-                    case "location": item = data.locations.find(l => l.id == id); break;
-                    default: throw new Error("Danh mục không hợp lệ!");
+                // Lấy danh sách tỉnh thành
+                const citiesResponse = await fetch("https://api.myevent.com/cities", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
+                    }
+                });
+                if (!citiesResponse.ok) {
+                    throw new Error(`Lỗi khi lấy danh sách tỉnh thành: ${citiesResponse.statusText}`);
                 }
+                cities = await citiesResponse.json();
+
+                // Lấy danh sách nhà cung cấp
+                const suppliersResponse = await fetch("https://api.myevent.com/users?role=supplier", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
+                    }
+                });
+                if (!suppliersResponse.ok) {
+                    throw new Error(`Lỗi khi lấy danh sách nhà cung cấp: ${suppliersResponse.statusText}`);
+                }
+                suppliers = await suppliersResponse.json();
+
+                // Lấy danh sách loại thiết bị
+                const deviceTypesResponse = await fetch("https://api.myevent.com/device_types", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
+                    }
+                });
+                if (!deviceTypesResponse.ok) {
+                    throw new Error(`Lỗi khi lấy danh sách loại thiết bị: ${deviceTypesResponse.statusText}`);
+                }
+                deviceTypes = await deviceTypesResponse.json();
+
+                // Lấy danh sách loại dịch vụ
+                const serviceTypesResponse = await fetch("https://api.myevent.com/service_types", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
+                    }
+                });
+                if (!serviceTypesResponse.ok) {
+                    throw new Error(`Lỗi khi lấy danh sách loại dịch vụ: ${serviceTypesResponse.statusText}`);
+                }
+                serviceTypes = await serviceTypesResponse.json();
+
+                // Xác định endpoint dựa trên category
+                let endpoint;
+                if (category === "device") {
+                    endpoint = `https://api.myevent.com/devices?name=${encodeURIComponent(id)}`;
+                } else if (category === "service") {
+                    endpoint = `https://api.myevent.com/services?name=${encodeURIComponent(id)}`;
+                } else if (category === "location") {
+                    endpoint = `https://api.myevent.com/locations?name=${encodeURIComponent(id)}`;
+                } else {
+                    throw new Error("Danh mục không hợp lệ");
+                }
+
+                // Lấy chi tiết mục
+                const itemResponse = await fetch(endpoint, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
+                    }
+                });
+                if (!itemResponse.ok) {
+                    throw new Error(`Lỗi khi lấy dữ liệu mục: ${itemResponse.statusText}`);
+                }
+                const item = await itemResponse.json();
 
                 if (!item) {
+                    console.warn(`Không tìm thấy ${category} với name=${id}`);
                     document.getElementById("itemName").textContent = "Không tìm thấy!";
-                    document.getElementById("itemDescription").textContent = "Vui lòng kiểm tra lại.";
-                    return;
-                }
+                    document.getElementById("itemDescription").textContent = `Không có ${category === "device" ? "thiết bị" : category === "service" ? "dịch vụ" : "địa điểm"} với tên ${id}.`;
+                    itemImage.style.display = "none";
+                    registerButton.style.display = "none";
+                    itemDetailsContainer.innerHTML = "";
+                } else {
+                    window.selectedItem = { ...item, category };
+                    document.getElementById("itemName").textContent = item.name || "Không xác định";
+                    document.getElementById("itemDescription").textContent = item.description || "Không có mô tả";
+                    itemImage.src = item.image || "./assets/img/placeholder.jpg";
+                    itemImage.style.display = "block";
 
-                // Lưu thông tin item vào biến toàn cục để sử dụng khi mở modal
-                window.selectedItem = { ...item, category };
-
-                document.getElementById("itemName").textContent = item.name;
-                document.getElementById("itemDescription").textContent = item.description || "Không có mô tả";
-                document.getElementById("itemImage").src = item.image;
-
-                const detailsList = document.getElementById("itemDetails");
-                detailsList.innerHTML = "";
-                if (category === "device") {
-                    detailsList.innerHTML = `
-                        <li class="list-group-item"><strong>Phí thuê/giờ:</strong> ${item.hourly_rental_fee.toLocaleString()} VND</li>
-                        <li class="list-group-item"><strong>Số lượng:</strong> ${item.quantity}</li>
-                        <li class="list-group-item"><strong>Địa điểm:</strong> ${item.place || "Không xác định"}</li>
-                        <li class="list-group-item"><strong>Loại thiết bị:</strong> ${getDeviceTypeName(item.device_type_id, data.device_types)}</li>
-                        <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getUserName(item.user_id, data.users)}</li>
-                        <li class="list-group-item"><strong>Ngày tạo:</strong> ${new Date(item.create_at).toLocaleDateString()}</li>
-                        <li class="list-group-item"><strong>Ngày cập nhật:</strong> ${new Date(item.updated_at).toLocaleDateString()}</li>
-                    `;
-                } else if (category === "service") {
-                    detailsList.innerHTML = `
-                        <li class="list-group-item"><strong>Lương/giờ:</strong> ${item.hourly_salary.toLocaleString()} VND</li>
-                        <li class="list-group-item"><strong>Số lượng:</strong> ${item.quantity}</li>
-                        <li class="list-group-item"><strong>Địa điểm:</strong> ${item.place || "Không xác định"}</li>
-                        <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getUserName(item.user_id, data.users)}</li>
-                        <li class="list-group-item"><strong>Ngày tạo:</strong> ${new Date(item.create_at).toLocaleDateString()}</li>
-                        <li class="list-group-item"><strong>Ngày cập nhật:</strong> ${new Date(item.updated_at).toLocaleDateString()}</li>
-                    `;
-                } else if (category === "location") {
-                    detailsList.innerHTML = `
-                        <li class="list-group-item"><strong>Phí thuê/giờ:</strong> ${item.hourly_rental_fee.toLocaleString()} VND</li>
-                        <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getUserName(item.user_id, data.users)}</li>
-                        <li class="list-group-item"><strong>Ngày tạo:</strong> ${new Date(item.create_at).toLocaleDateString()}</li>
-                        <li class="list-group-item"><strong>Ngày cập nhật:</strong> ${new Date(item.updated_at).toLocaleDateString()}</li>
-                    `;
+                    const detailsList = document.createElement("ul");
+                    detailsList.className = "list-group";
+                    if (category === "device") {
+                        detailsList.innerHTML = `
+                            <li class="list-group-item"><strong>Phí thuê/giờ:</strong> ${(item.unitPrice || 0).toLocaleString()} VND</li>
+                            <li class="list-group-item"><strong>Số lượng:</strong> ${item.quantity || "Không xác định"}</li>
+                            <li class="list-group-item"><strong>Loại thiết bị:</strong> ${getTypeName(item.device_type_id, deviceTypes)}</li>
+                            <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getSupplierName(item.supplier_id)}</li>
+                            <li class="list-group-item"><strong>Thành phố:</strong> ${getCityName(item.city_id)}</li>
+                        `;
+                    } else if (category === "service") {
+                        detailsList.innerHTML = `
+                            <li class="list-group-item"><strong>Lương/giờ:</strong> ${(item.unitPrice || 0).toLocaleString()} VND</li>
+                            <li class="list-group-item"><strong>Số lượng:</strong> ${item.quantity || "Không xác định"}</li>
+                            <li class="list-group-item"><strong>Loại dịch vụ:</strong> ${getTypeName(item.service_type_id, serviceTypes)}</li>
+                            <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getSupplierName(item.supplier_id)}</li>
+                            <li class="list-group-item"><strong>Thành phố:</strong> ${getCityName(item.city_id)}</li>
+                        `;
+                    } else if (category === "location") {
+                        detailsList.innerHTML = `
+                            <li class="list-group-item"><strong>Phí thuê/giờ:</strong> ${(item.unitPrice || 0).toLocaleString()} VND</li>
+                            <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getSupplierName(item.supplier_id)}</li>
+                            <li class="list-group-item"><strong>Thành phố:</strong> ${getCityName(item.city_id)}</li>
+                            <li class="list-group-item"><strong>Thời gian khả dụng:</strong> Từ ${item.fromDate || "Không xác định"} đến ${item.toDate || "Không xác định"}</li>
+                        `;
+                    }
+                    itemDetailsContainer.innerHTML = "";
+                    itemDetailsContainer.appendChild(detailsList);
+                    registerButton.style.display = "block";
                 }
 
                 if (localStorage.getItem("openContractAfterLogin") === "true") {
                     localStorage.removeItem("openContractAfterLogin");
-                    openContractModal();
+                    setTimeout(openContractModal, 0);
                 }
             } catch (error) {
                 console.error("Lỗi khi tải dữ liệu:", error);
                 document.getElementById("itemName").textContent = "Lỗi tải dữ liệu!";
                 document.getElementById("itemDescription").textContent = "Vui lòng thử lại sau.";
+                itemDetailsContainer.innerHTML = "";
+                itemImage.style.display = "none";
+                registerButton.style.display = "none";
+            } finally {
+                preloader.style.display = "none";
             }
         });
-
-        function getDeviceTypeName(deviceTypeId, deviceTypes) {
-            const type = deviceTypes.find(t => t.id === deviceTypeId);
-            return type ? type.name : "Không xác định";
-        }
-
-        function getUserName(userId, users) {
-            const user = users.find(u => u.id === userId && u.role === "Nhà cung cấp");
-            return user ? user.name : "Không xác định";
-        }
 
         function checkLoginAndOpenContract() {
             const token = localStorage.getItem("token");
@@ -171,7 +280,7 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const id = urlParams.get("id");
                 const category = urlParams.get("category");
-                localStorage.setItem("redirectAfterLogin", `item-detail.html?id=${id}&category=${category}`);
+                localStorage.setItem("redirectAfterLogin", `item_detail.html?id=${encodeURIComponent(id)}&category=${category}`);
                 window.location.href = "login.html";
             } else {
                 openContractModal();
@@ -199,8 +308,9 @@
                     modal.hide();
                     window.removeEventListener("message", closeModal);
                 }
-            });
+            }, { once: true });
         }
     </script>
 </body>
+
 </html>

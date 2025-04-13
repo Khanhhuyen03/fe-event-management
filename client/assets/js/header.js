@@ -2,7 +2,7 @@ function loadHeader() {
     const headerContainer = document.getElementById("header");
     if (!headerContainer) return;
 
-    fetch('/client/component/header.html')
+    fetch('/fe-event-management/client/component/header.html')
         .then(response => response.text())
         .then(data => {
             headerContainer.innerHTML = data;
