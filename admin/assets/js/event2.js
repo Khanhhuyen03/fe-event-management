@@ -281,7 +281,7 @@ function handleCreateForm() {
         loadEditForm(editEventId); // Gọi hàm cập nhật nếu đang chỉnh sửa
         return;
     }
-    
+
     createBtn.onclick = function (event) {
         event.preventDefault(); // Ngăn chặn reload trang mặc định của form
 
@@ -311,10 +311,12 @@ function handleCreateForm() {
             var eventId = eventResponse.id;
             console.log("Event vừa tạo có ID:", eventId);
             createRentalWithEventId(eventId);
-            
+
         });
     };
 }
+
+
 function loadEditForm(editEventId) {
     if (!editEventId) return;
 
@@ -436,7 +438,7 @@ function loadEditForm(editEventId) {
                 };
 
                 fetch(`${EventAPI}/${editEventId}`, {
-                    method: 'PATCH',
+                    method: 'PUT',
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(updatedEvent)
                 })
