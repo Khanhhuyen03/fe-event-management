@@ -25,6 +25,23 @@
     <!-- Main CSS File -->
     <link href="assets/css/main.css" rel="stylesheet">
     <link href="assets/css/event_detail.css" rel="stylesheet">
+    <style>
+        .event-image {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            /* Tỷ lệ khung hình, điều chỉnh nếu cần */
+            overflow: hidden;
+            background-color: #f0f0f0;
+            /* Màu nền khi ảnh chưa tải */
+        }
+
+        .event-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Đảm bảo ảnh lấp đầy mà không méo */
+        }
+    </style>
 </head>
 
 <body>
@@ -38,16 +55,8 @@
     <main class="container mt-4">
         <div class="row">
             <div class="col-lg-8">
-                <div id="eventCarousel" class="carousel slide event-carousel" data-bs-ride="carousel">
-                    <div class="carousel-inner" id="carouselImages">
-                        <div class="carousel-item active"></div>
-                    </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#eventCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon"></span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#eventCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon"></span>
-                    </button>
+                <div class="event-image">
+                    <img id="eventImage" src="./assets/img/placeholder.jpg" class="img-fluid" alt="Đang tải...">
                 </div>
             </div>
 
@@ -128,7 +137,6 @@
             </div>
 
             <div class="text-end mt-3">
-                <h4 class="fw-bold">Tổng tiền: <span id="totalPrice">0</span> VND</h4>
                 <div class="alert d-flex flex-column flex-md-row align-items-md-center justify-content-between mt-3 p-3"
                     style="background-color: #E9F5DB; border: 1px solid #D4E2C3;">
                     <div class="text-container">
@@ -139,7 +147,8 @@
                         </span>
                     </div>
                     <div>
-                        <button type="button" class="btn fw-bold text-white px-4 py-2" style="background-color: #718355;">
+                        <button type="button" class="btn fw-bold text-white px-4 py-2" id="registerBtn"
+                            style="background-color: #718355;" onclick="checkLoginAndOpenContract()">
                             Đăng ký ngay
                         </button>
                     </div>
@@ -148,7 +157,16 @@
         </section>
     </main>
 
-    <footer id="footer"></footer>
+    <div id="footer"></div>
+
+    <!-- Modal chứa iframe -->
+    <div class="modal fade" id="iframeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <iframe id="contractIframe" style="width: 100%; height: 600px; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
 
     <!-- Scroll Top -->
     <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
@@ -170,158 +188,326 @@
     <script src="assets/js/header.js"></script>
 
     <script>
+        let selectedEvent; // Biến toàn cục để lưu trữ dữ liệu sự kiện
+        let suppliers = []; // Biến lưu danh sách nhà cung cấp
+
+        // Hàm định dạng ngày thành dd/mm/yyyy
+        function formatDateToDDMMYYYY(dateStr) {
+            if (!dateStr) return "Không xác định";
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return "Không xác định";
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        // Hàm lấy tên nhà cung cấp từ supplier_id
+        // function getSupplierName(supplierId) {
+        //     const supplier = suppliers.find(s => s.id === supplierId);
+        //     return supplier ? `${supplier.first_name} ${supplier.last_name}` : "Không xác định";
+        // }
+
         document.addEventListener("DOMContentLoaded", async function () {
+            const preloader = document.getElementById("preloader");
             const urlParams = new URLSearchParams(window.location.search);
             const eventId = urlParams.get("id");
 
             if (!eventId) {
                 document.getElementById("eventName").textContent = "Không tìm thấy sự kiện!";
                 document.getElementById("eventDescription").textContent = "Vui lòng quay lại trang danh sách.";
+                preloader.style.display = "none";
                 return;
             }
 
+            const baseImageUrl = "http://localhost:8080/event-management/api/v1/FileUpload/files/";
+            const defaultImageUrl = "./assets/img/placeholder.jpg";
+            const token = localStorage.getItem("token") || "";
+
             try {
-                const response = await fetch("assets/data/dv.json");
-                const data = await response.json();
-                const event = data.event.find(e => e.id == eventId);
+                // Gọi API nhà cung cấp
+                const suppliersResponse = await fetch("http://localhost:8080/event-management/suppliers", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+                if (!suppliersResponse.ok) {
+                    console.warn(`Lỗi khi lấy danh sách nhà cung cấp: ${suppliersResponse.statusText}`);
+                    suppliers = [];
+                } else {
+                    suppliers = await suppliersResponse.json();
+                }
+
+                // Gọi API chi tiết sự kiện
+                const eventResponse = await fetch(`http://localhost:8080/event-management/event/${eventId}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+                if (!eventResponse.ok) {
+                    throw new Error(`Lỗi khi lấy dữ liệu sự kiện: ${eventResponse.statusText}`);
+                }
+                const event = await eventResponse.json();
 
                 if (!event) {
                     document.getElementById("eventName").textContent = "Sự kiện không tồn tại!";
                     document.getElementById("eventDescription").textContent = "Vui lòng kiểm tra lại.";
+                    preloader.style.display = "none";
                     return;
                 }
 
+                selectedEvent = event; // Lưu dữ liệu sự kiện vào biến toàn cục
+
                 // Cập nhật tiêu đề và mô tả
-                document.getElementById("eventName").textContent = event.name;
+                document.getElementById("eventName").textContent = event.name || "Không có tiêu đề";
                 document.getElementById("eventDescription").textContent = event.description || "Không có mô tả";
 
-                // Cập nhật carousel hình ảnh
-                const carouselImages = document.getElementById("carouselImages");
-                carouselImages.innerHTML = "";
-                const images = event.images || [event.image];
-                images.forEach((img, index) => {
-                    const activeClass = index === 0 ? "active" : "";
-                    carouselImages.innerHTML += `
-                        <div class="carousel-item ${activeClass}">
-                            <img src="${img}" class="d-block w-100" alt="${event.name}">
-                        </div>
-                    `;
-                });
+                // Cập nhật ảnh sự kiện
+                const eventImage = document.getElementById("eventImage");
+                let imageFileName = event.img || null;
+                if (imageFileName) {
+                    if (imageFileName.includes('/')) {
+                        imageFileName = imageFileName.split('/').pop();
+                    }
+                    imageFileName = imageFileName.replace(/^upload/i, '');
+                }
+                const imageUrl = imageFileName ? `${baseImageUrl}${imageFileName}` : defaultImageUrl;
+                console.log(`Event Image URL: ${imageUrl}`); // Debug URL
+                eventImage.src = imageUrl;
+                eventImage.alt = event.name || "Sự kiện";
+                eventImage.onerror = () => {
+                    eventImage.src = defaultImageUrl;
+                };
+
+                // Gọi API timeline
+                let timelineData = [];
+                try {
+                    const timelineResponse = await fetch(`http://localhost:8080/event-management/event/${eventId}/timeline`, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
+                    if (timelineResponse.ok) {
+                        timelineData = await timelineResponse.json();
+                    }
+                } catch (error) {
+                    console.warn(`Lỗi khi lấy timeline: ${error.message}`);
+                }
 
                 // Cập nhật lịch trình
                 const timeline = document.getElementById("eventTimeline");
                 timeline.innerHTML = "";
-                const timelineData = event.timeline || ["Không có thông tin lịch trình"];
-                timelineData.forEach(item => {
-                    timeline.innerHTML += `<li class="list-group-item">${item}</li>`;
-                });
+                if (!timelineData || timelineData.length === 0) {
+                    timeline.innerHTML = `<li class="list-group-item">Không có thông tin lịch trình</li>`;
+                } else {
+                    timelineData.forEach(item => {
+                        timeline.innerHTML += `<li class="list-group-item">${item.description || "Không có mô tả"} - ${formatDateToDDMMYYYY(item.date)}</li>`;
+                    });
+                }
+
+                // Gọi API thiết bị
+                let devices = [];
+                try {
+                    const devicesResponse = await fetch(`http://localhost:8080/event-management/event/${eventId}/devices`, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
+                    if (devicesResponse.ok) {
+                        devices = await devicesResponse.json();
+                    }
+                } catch (error) {
+                    console.warn(`Lỗi khi lấy thiết bị: ${error.message}`);
+                }
 
                 // Cập nhật danh sách thiết bị
                 const equipmentList = document.getElementById("equipmentList");
                 equipmentList.innerHTML = "";
-                const equipment = event.equipment || [];
-                if (equipment.length === 0) {
+                if (!devices || devices.length === 0) {
                     equipmentList.innerHTML = "<tr><td colspan='7'>Không có thiết bị</td></tr>";
                 } else {
-                    equipment.forEach(item => {
+                    devices.forEach(item => {
+                        const imageSrc = item.image ? `${baseImageUrl}${item.image}` : defaultImageUrl;
                         equipmentList.innerHTML += `
                             <tr>
-                                <td><img src="${item.image}" alt="${item.name}" style="max-width: 50px;"></td>
-                                <td>${item.name}</td>
+                                <td><img src="${imageSrc}" alt="${item.name || 'Thiết bị'}" style="max-width: 50px;" onerror="this.src='${defaultImageUrl}'"></td>
+                                <td>${item.name || "Không có tên"}</td>
                                 <td>${item.description || "Không có mô tả"}</td>
-                                <td>${item.supplier || "Không xác định"}</td>
-                                <td>${item.quantity}</td>
-                                <td>${item.unitPrice.toLocaleString()}</td>
-                                <td>${(item.quantity * item.unitPrice).toLocaleString()}</td>
+                                <td>${getSupplierName(item.supplier_id)}</td>
+                                <td>${item.quantity || 0}</td>
+                                <td>${(item.unitPrice || 0).toLocaleString()}</td>
+                                <td>${((item.quantity || 0) * (item.unitPrice || 0)).toLocaleString()}</td>
                             </tr>
                         `;
                     });
+                }
+
+                // Gọi API dịch vụ
+                let services = [];
+                try {
+                    const servicesResponse = await fetch(`http://localhost:8080/event-management/event/${eventId}/services`, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
+                    if (servicesResponse.ok) {
+                        services = await servicesResponse.json();
+                    }
+                } catch (error) {
+                    console.warn(`Lỗi khi lấy dịch vụ: ${error.message}`);
                 }
 
                 // Cập nhật danh sách dịch vụ
                 const staffList = document.getElementById("staffList");
                 staffList.innerHTML = "";
-                const staff = event.staff || [];
-                if (staff.length === 0) {
+                if (!services || services.length === 0) {
                     staffList.innerHTML = "<tr><td colspan='7'>Không có dịch vụ</td></tr>";
                 } else {
-                    staff.forEach(item => {
+                    services.forEach(item => {
+                        const imageSrc = item.image ? `${baseImageUrl}${item.image}` : defaultImageUrl;
                         staffList.innerHTML += `
                             <tr>
-                                <td><img src="${item.image}" alt="${item.name}" style="max-width: 50px;"></td>
-                                <td>${item.name}</td>
+                                <td><img src="${imageSrc}" alt="${item.name || 'Dịch vụ'}" style="max-width: 50px;" onerror="this.src='${defaultImageUrl}'"></td>
+                                <td>${item.name || "Không có tên"}</td>
                                 <td>${item.description || "Không có mô tả"}</td>
-                                <td>${item.supplier || "Không xác định"}</td>
-                                <td>${item.quantity}</td>
-                                <td>${item.unitPrice.toLocaleString()}</td>
-                                <td>${(item.quantity * item.unitPrice).toLocaleString()}</td>
+                                <td>${getSupplierName(item.supplier_id)}</td>
+                                <td>${item.quantity || 0}</td>
+                                <td>${(item.unitPrice || 0).toLocaleString()}</td>
+                                <td>${((item.quantity || 0) * (item.unitPrice || 0)).toLocaleString()}</td>
                             </tr>
                         `;
                     });
+                }
+
+                // Gọi API địa điểm
+                let locations = [];
+                try {
+                    const locationsResponse = await fetch(`http://localhost:8080/event-management/event/${eventId}/locations`, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
+                    if (locationsResponse.ok) {
+                        locations = await locationsResponse.json();
+                    }
+                } catch (error) {
+                    console.warn(`Lỗi khi lấy địa điểm: ${error.message}`);
                 }
 
                 // Cập nhật danh sách địa điểm
                 const locationList = document.getElementById("locationList");
                 locationList.innerHTML = "";
-                const locations = event.locations || [];
-                if (locations.length === 0) {
+                if (!locations || locations.length === 0) {
                     locationList.innerHTML = "<tr><td colspan='8'>Không có địa điểm</td></tr>";
                 } else {
                     locations.forEach(item => {
-                        const days = Math.ceil((new Date(item.toDate) - new Date(item.fromDate)) / (1000 * 60 * 60 * 24));
+                        const fromDate = formatDateToDDMMYYYY(item.fromDate);
+                        const toDate = formatDateToDDMMYYYY(item.toDate);
+                        const diffTime = Math.abs(new Date(item.toDate) - new Date(item.fromDate));
+                        const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                        const imageSrc = item.image ? `${baseImageUrl}${item.image}` : defaultImageUrl;
                         locationList.innerHTML += `
                             <tr>
-                                <td><img src="${item.image}" alt="${item.name}" style="max-width: 50px;"></td>
-                                <td>${item.name}</td>
-                                <td>${item.supplier || "Không xác định"}</td>
-                                <td>${item.fromDate}</td>
-                                <td>${item.toDate}</td>
+                                <td><img src="${imageSrc}" alt="${item.name || 'Địa điểm'}" style="max-width: 50px;" onerror="this.src='${defaultImageUrl}'"></td>
+                                <td>${item.name || "Không có tên"}</td>
+                                <td>${getSupplierName(item.supplier_id)}</td>
+                                <td>${fromDate}</td>
+                                <td>${toDate}</td>
                                 <td>${days}</td>
-                                <td>${item.unitPrice.toLocaleString()}</td>
-                                <td>${(days * item.unitPrice).toLocaleString()}</td>
+                                <td>${(item.unitPrice || 0).toLocaleString()}</td>
+                                <td>${(days * (item.unitPrice || 0)).toLocaleString()}</td>
                             </tr>
                         `;
                     });
                 }
 
-                // Tính và cập nhật tổng tiền
-                const totalEquipment = equipment.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-                const totalStaff = staff.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-                const totalLocation = locations.reduce((sum, item) => {
-                    const days = Math.ceil((new Date(item.toDate) - new Date(item.fromDate)) / (1000 * 60 * 60 * 24));
-                    return sum + days * item.unitPrice;
-                }, 0);
-                const totalPrice = totalEquipment + totalStaff + totalLocation;
-                document.getElementById("totalPrice").textContent = totalPrice.toLocaleString();
-
-                // Thêm sự kiện cho nút "Đăng ký ngay"
-                document.querySelector(".btn").addEventListener("click", function () {
-                    const iframeModal = new bootstrap.Modal(document.createElement("div"));
-                    iframeModal._element.innerHTML = `
-                        <div class="modal fade" id="iframeModal" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-xl">
-                                <div class="modal-content">
-                                    <iframe src="contract.html" style="width: 100%; height: 600px; border: none;"></iframe>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    document.body.appendChild(iframeModal._element);
-                    iframeModal.show();
-
-                    window.addEventListener("message", function closeModal(event) {
-                        if (event.data === "closeIframe") {
-                            iframeModal.hide();
-                            window.removeEventListener("message", closeModal);
-                        }
-                    });
-                });
+                // Kiểm tra nếu cần mở modal sau khi đăng nhập
+                if (localStorage.getItem("openContractAfterLogin") === "true") {
+                    localStorage.removeItem("openContractAfterLogin");
+                    openContractModal();
+                }
             } catch (error) {
                 console.error("Lỗi khi tải dữ liệu:", error);
                 document.getElementById("eventName").textContent = "Lỗi tải dữ liệu!";
                 document.getElementById("eventDescription").textContent = "Vui lòng thử lại sau.";
+                document.getElementById("eventImage").src = defaultImageUrl;
+            } finally {
+                preloader.style.display = "none";
             }
         });
+
+        function checkLoginAndOpenContract() {
+            console.log("Nút Đăng ký ngay được nhấn!");
+            const token = localStorage.getItem("token");
+            if (!token) {
+                localStorage.setItem("openContractAfterLogin", "true");
+                const urlParams = new URLSearchParams(window.location.search);
+                const eventId = urlParams.get("id");
+                localStorage.setItem("redirectAfterLogin", `event_detail.html?id=${eventId}`);
+                window.location.href = "login.html";
+            } else {
+                openContractModal();
+            }
+        }
+
+        function openContractModal() {
+            console.log("Mở modal hợp đồng");
+            const iframe = document.getElementById("contractIframe");
+            if (!iframe) {
+                console.error("Không tìm thấy iframe!");
+                return;
+            }
+            iframe.src = "contract.html";
+
+            const modalElement = document.getElementById("iframeModal");
+            if (!modalElement) {
+                console.error("Không tìm thấy modal!");
+                return;
+            }
+            const modal = new bootstrap.Modal(modalElement, {});
+            modal.show();
+
+            iframe.onload = function () {
+                console.log("Iframe loaded, gửi dữ liệu:", selectedEvent);
+                if (selectedEvent) {
+                    const eventData = {
+                        type: "preloadEvent",
+                        event: {
+                            name: selectedEvent.name,
+                            description: selectedEvent.description || "",
+                            device: selectedEvent.device || [],
+                            service: selectedEvent.service || [],
+                            locations: selectedEvent.location || selectedEvent.locations || [],
+                            timeline: selectedEvent.timeline || []
+                        }
+                    };
+                    iframe.contentWindow.postMessage(eventData, "*");
+                } else {
+                    console.error("Không có dữ liệu sự kiện để gửi!");
+                }
+            };
+
+            window.addEventListener("message", function closeModal(event) {
+                if (event.data === "closeIframe") {
+                    console.log("Nhận tín hiệu đóng modal");
+                    modal.hide();
+                    window.removeEventListener("message", closeModal);
+                }
+            }, { once: true });
+        }
     </script>
 </body>
+
 </html>

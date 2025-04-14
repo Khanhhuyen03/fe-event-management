@@ -173,7 +173,6 @@ async function handleResetPassword(event) {
             },
             body: JSON.stringify({
                 email,
-                token, // Đây là mã xác thực
                 newPassword,
             }),
         });
@@ -227,7 +226,6 @@ function switchForm(formType) {
         formTitle.textContent = "ĐĂNG NHẬP";
     }
 }
-// Gắn sự kiện khi DOM được tải
 document.addEventListener("DOMContentLoaded", function () {
     const loginForm = document.getElementById("loginForm");
     const forgotPasswordForm = document.getElementById("forgotPasswordForm");
