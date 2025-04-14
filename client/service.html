@@ -12,11 +12,11 @@
         rel="stylesheet">
 
     <!-- Vendor CSS Files -->
-    <link href="/client/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/client/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="/client/assets/vendor/aos/aos.css" rel="stylesheet">
-    <link href="/client/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-    <link href="/client/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link href="../client/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../client/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="../client/assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="../client/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="../client/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
     <link href="assets/css/main.css" rel="stylesheet">
     <link href="assets/css/service.css" rel="stylesheet">
@@ -124,7 +124,6 @@
             font-weight: bold;
         }
 
-        /* Floating Register Button */
         .floating-register-btn {
             position: fixed;
             bottom: 90px;
@@ -135,7 +134,7 @@
             border-radius: 5px;
             padding: 8px 8px;
             cursor: pointer;
-            display: none;
+            display: none; /* Ẩn mặc định, hiển thị khi cuộn */
             z-index: 1000;
             transition: all 0.3s ease;
             writing-mode: vertical-rl;
@@ -152,12 +151,15 @@
             display: block;
         }
 
+        .floating-register-btn.visible {
+            display: block;
+        }
+
         .scroll-top {
             bottom: 20px;
             right: 30px;
         }
 
-        /* Service List Styles */
         .service-details .service-box {
             background-color: var(--surface-color);
             padding: 20px;
@@ -221,8 +223,7 @@
                 <!-- danh mục -->
                 <div class="col-lg-3" data-aos="fade-up" data-aos-delay="100">
                     <div class="filter-section mb-4">
-                        <button class="btn-register w-100" onclick="checkLoginAndOpenContract()">Đăng ký tổ chức sự
-                            kiện</button>
+                        <button class="btn-register w-100" onclick="checkLoginAndOpenContract()">Đăng ký tổ chức sự kiện</button>
                     </div>
                     <div class="service-details">
                         <div class="service-box">
@@ -280,11 +281,11 @@
     <button class="floating-register-btn" onclick="checkLoginAndOpenContract()">
         Đăng Ký Ngay
     </button>
-    <script src="./assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="./assets/vendor/aos/aos.js"></script>
-    <script src="./assets/vendor/swiper/swiper-bundle.min.js"></script>
-    <script src="./assets/vendor/purecounter/purecounter_vanilla.js"></script>
-    <script src="./assets/js/main.js"></script>
+    <script src="../client/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../client/assets/vendor/aos/aos.js"></script>
+    <script src="../client/assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="../client/assets/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="../client/assets/js/main.js"></script>
     <script>
         let allItems = [];
         let allTypes = [];
@@ -295,6 +296,17 @@
 
         document.addEventListener("DOMContentLoaded", async function () {
             const preloader = document.getElementById("preloader");
+            const floatingBtn = document.querySelector(".floating-register-btn");
+
+            // Hiển thị/ẩn nút nổi khi cuộn
+            window.addEventListener("scroll", function () {
+                if (window.scrollY > 100) { // Hiển thị sau khi cuộn 100px
+                    floatingBtn.classList.add("visible");
+                } else {
+                    floatingBtn.classList.remove("visible");
+                }
+            });
+
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 currentCategory = urlParams.get("category") || "event";
@@ -320,6 +332,12 @@
                 populateCityFilter(allCities);
                 populateServicesList(allTypes);
                 filterItems();
+
+                // Kiểm tra nếu cần mở modal sau khi đăng nhập
+                if (localStorage.getItem("openContractAfterLogin") === "true") {
+                    localStorage.removeItem("openContractAfterLogin");
+                    openContractModal();
+                }
             } catch (error) {
                 console.error("Lỗi khi tải dữ liệu:", error);
                 document.getElementById("item-container").innerHTML = "<p class='text-center'>Lỗi tải dữ liệu! Vui lòng thử lại sau.</p>";
@@ -413,33 +431,33 @@
             const baseImageUrl = "http://localhost:8080/event-management/api/v1/FileUpload/files/";
 
             items.forEach((item, index) => {
-                let detailPage = currentCategory === "event" ? "./event-detail.html" : "./item-detail.html";
-                let buttonText = currentCategory === "event" ? "Đăng Ký" : "Xem Chi Tiết";
+                let detailPage = currentCategory === "event" ? "./event_detail.html" : "./item-detail.html";
+                let buttonText = "Xem Chi Tiết";
                 let itemId = currentCategory === "event" ? item.id : encodeURIComponent(item.name);
                 let hoverInfo = `
-            <div class="row propery-info"><div class="col">Địa điểm</div></div>
-            <div class="row"><div class="col">${item.location || "Không xác định"}</div></div>
-        `;
+                    <div class="row propery-info"><div class="col">Địa điểm</div></div>
+                    <div class="row"><div class="col">${item.location || "Không xác định"}</div></div>
+                `;
 
                 const imageFileName = item.img ? item.img.split('/').pop() : null;
                 const imageUrl = imageFileName ? `${baseImageUrl}${imageFileName}` : '../client/assets/img/events/sk2.jpg';
-                console.log(`Image URL for event ${item.name}:`, imageUrl); // Debug URL
+                console.log(`Image URL for event ${item.name}:`, imageUrl);
 
                 const itemCard = `
-            <div class="col-xl-4 col-md-6" data-aos="fade-up" data-aos-delay="${index * 100}">
-                <div class="card">
-                    <img src="${imageUrl}" 
-                         onerror="this.src='../client/assets/img/events/sk2.jpg'" 
-                         alt="${item.name}" 
-                         class="img-fluid">
-                    <div class="card-body">
-                        <span class="sale-rent"><a href="${detailPage}?id=${itemId}&category=${currentCategory}">${buttonText}</a></span>
-                        <h3><a href="${detailPage}?id=${itemId}&category=${currentCategory}" class="stretched-link">${item.name}</a></h3>
-                        <div class="card-content">${hoverInfo}</div>
+                    <div class="col-xl-4 col-md-6" data-aos="fade-up" data-aos-delay="${index * 100}">
+                        <div class="card">
+                            <img src="${imageUrl}" 
+                                 onerror="this.src='../client/assets/img/events/sk2.jpg'" 
+                                 alt="${item.name}" 
+                                 class="img-fluid">
+                            <div class="card-body">
+                                <span class="sale-rent"><a href="${detailPage}?id=${itemId}&category=${currentCategory}">${buttonText}</a></span>
+                                <h3><a href="${detailPage}?id=${itemId}&category=${currentCategory}" class="stretched-link">${item.name}</a></h3>
+                                <div class="card-content">${hoverInfo}</div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        `;
+                `;
                 itemContainer.innerHTML += itemCard;
             });
         }
@@ -462,6 +480,49 @@
             });
 
             displayItems(filteredItems);
+        }
+
+        function checkLoginAndOpenContract() {
+            console.log("Nút Đăng ký được nhấn");
+            const token = localStorage.getItem("token");
+            if (!token) {
+                localStorage.setItem("openContractAfterLogin", "true");
+                localStorage.setItem("redirectAfterLogin", "service.html?category=event");
+                window.location.href = "login.html";
+            } else {
+                openContractModal();
+            }
+        }
+
+        function openContractModal() {
+            console.log("Mở modal hợp đồng");
+            const iframe = document.getElementById("contractIframe");
+            if (!iframe) {
+                console.error("Không tìm thấy iframe!");
+                return;
+            }
+            iframe.src = "contract.html";
+
+            const modalElement = document.getElementById("iframeModal");
+            if (!modalElement) {
+                console.error("Không tìm thấy modal!");
+                return;
+            }
+            const modal = new bootstrap.Modal(modalElement, {});
+            modal.show();
+
+            iframe.onload = function () {
+                console.log("Iframe loaded");
+                // Không gửi dữ liệu (mở form trống)
+            };
+
+            window.addEventListener("message", function closeModal(event) {
+                if (event.data === "closeIframe") {
+                    console.log("Nhận tín hiệu đóng modal");
+                    modal.hide();
+                    window.removeEventListener("message", closeModal);
+                }
+            }, { once: true });
         }
     </script>
     <script src="assets/js/main.js"></script>
