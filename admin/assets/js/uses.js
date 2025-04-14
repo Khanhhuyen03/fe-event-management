@@ -173,7 +173,7 @@ function updateUserRole(userId) {
         .then(res => res.json())
         .then(roles => {
             roleSelect.innerHTML = roles.map(role =>
-                `<option value="${role.id}">${role.name}</option>`
+                `<option value="${role.name}">${role.name}</option>`
             ).join('');
         })
         .catch(error => console.error("Lỗi khi lấy roles:", error));

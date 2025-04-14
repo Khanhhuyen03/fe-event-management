@@ -1,6 +1,6 @@
 var EventAPI = 'http://localhost:8080/event-management/event';
 var EventTypeAPI = 'http://localhost:8080/event-management/event-type';
-var CreateEventAPI = 'http://localhost:8080/event-management/create-event';
+var CreateEventAPI = 'http://localhost:8080/event-management/event/create-event';
 function start() {
     getData((events, eventTypes) => {
         renderEvents(events, eventTypes);
@@ -119,7 +119,7 @@ function getData(callback) {
     Promise.all([
         fetch(EventAPI, {
             headers: {
-                "Authorization": `Bearer ${token}`,
+                // "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json"
             }
         }).then(res => res.json()),
@@ -136,6 +136,127 @@ function getData(callback) {
     })
         .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
 }
+// function handleCreateForm() {
+//     var createBtn = document.querySelector('#create');
+//     if (!createBtn) return;
+
+//     var editEventId = localStorage.getItem("editEventId");
+
+//     if (editEventId) {
+//         loadEditForm(editEventId); // Gọi hàm cập nhật nếu đang chỉnh sửa
+//         return;
+//     }
+
+//     createBtn.onclick = function (event) {
+//         event.preventDefault(); // Ngăn chặn reload trang mặc định của form
+
+//         var pictureInput = document.querySelector('input[name="picture"]');
+//         var name = document.querySelector('input[name="name"]').value;
+//         var description = document.querySelector('input[name="description"]').value;
+//         var eventTypeID = document.querySelector('select[name="eventype"]').value;
+//         var detail = document.querySelector('textarea[name="detail"]').value;
+
+//         // Kiểm tra dữ liệu đầu vào
+//         console.log('Form Data:', {
+//             name,
+//             description,
+//             eventTypeID,
+//             detail,
+//             hasImage: pictureInput && pictureInput.files.length > 0
+//         });
+
+//         if (!name || !eventTypeID) {
+//             alert("Vui lòng nhập đầy đủ tên sự kiện và loại sự kiện!");
+//             return;
+//         }
+
+//         // Sử dụng FormData để gửi dữ liệu
+//         var formData = new FormData();
+//         if (pictureInput && pictureInput.files.length > 0) {
+//             formData.append("img", pictureInput.files[0]); // Gửi file thực tế
+//         }
+//         formData.append("name", name);
+//         formData.append("description", description);
+//         formData.append("event_type_id", eventTypeID);
+//         formData.append("detail", detail);
+//         formData.append("created_at", new Date().toISOString().split('T')[0]);
+//         formData.append("updated_at", new Date().toISOString().split('T')[0]);
+
+//         // Log ra để kiểm tra dữ liệu
+//         console.log("Dữ liệu gửi lên:");
+//         for (var pair of formData.entries()) {
+//             console.log(pair[0] + ': ' + pair[1]);
+//         }
+
+//         createEvent(formData, function (eventResponse) {
+//             var eventId = eventResponse.id;
+//             console.log("Event vừa tạo có ID:", eventId);
+//             console.log("Đã tạo sự kiện thành công:", eventResponse);
+//             alert("Tạo sự kiện thành công!");
+//         });
+//     };
+// }
+// function createEvent(data, callback) {
+//     let token = localStorage.getItem("token");
+
+//     if (!token) {
+//         console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+//         alert("Vui lòng đăng nhập lại để tiếp tục!");
+//         return;
+//     }
+
+//     var options = {
+//         method: 'POST',
+//         headers: {
+//             "Authorization": `Bearer ${token}`,
+//             "Accept": "application/json"
+//             // Không set Content-Type vì browser sẽ tự set với boundary cho multipart/form-data
+//         },
+//         body: data
+//     };
+
+//     console.log('Sending request to:', CreateEventAPI);
+//     console.log('Request options:', {
+//         method: options.method,
+//         headers: options.headers
+//     });
+
+//     fetch(CreateEventAPI, options)
+//         .then(async function (response) {
+//             console.log('Response status:', response.status);
+//             console.log('Response headers:', [...response.headers.entries()]);
+
+//             const text = await response.text();
+//             console.log('Response body:', text);
+
+//             if (!response.ok) {
+//                 try {
+//                     const json = JSON.parse(text);
+//                     throw new Error(json.message || `HTTP error! Status: ${response.status}`);
+//                 } catch (e) {
+//                     throw new Error(`HTTP error! Status: ${response.status}, Message: ${text}`);
+//                 }
+//             }
+
+//             try {
+//                 return JSON.parse(text);
+//             } catch (e) {
+//                 throw new Error('Invalid JSON response from server');
+//             }
+//         })
+//         .then(function (eventResponse) {
+//             console.log('Server response:', eventResponse);
+//             if (eventResponse.code && eventResponse.code !== 200) {
+//                 throw new Error(eventResponse.message || "Lỗi không xác định từ server");
+//             }
+//             callback(eventResponse);
+//         })
+//         .catch(function (error) {
+//             console.error("Lỗi khi tạo sự kiện:", error);
+//             alert("Đã có lỗi xảy ra khi tạo sự kiện: " + error.message);
+//         });
+// }
+
 function handleCreateForm() {
     var createBtn = document.querySelector('#create');
     if (!createBtn) return;
@@ -148,7 +269,7 @@ function handleCreateForm() {
     }
 
     createBtn.onclick = function (event) {
-        event.preventDefault(); // Ngăn chặn reload trang mặc định của form
+        event.preventDefault();
 
         var pictureInput = document.querySelector('input[name="picture"]');
         var name = document.querySelector('input[name="name"]').value;
@@ -156,47 +277,46 @@ function handleCreateForm() {
         var eventTypeID = document.querySelector('select[name="eventype"]').value;
         var detail = document.querySelector('textarea[name="detail"]').value;
 
-        // Kiểm tra dữ liệu đầu vào
-        console.log('Form Data:', {
-            name,
-            description,
-            eventTypeID,
-            detail,
-            hasImage: pictureInput && pictureInput.files.length > 0
-        });
-
         if (!name || !eventTypeID) {
             alert("Vui lòng nhập đầy đủ tên sự kiện và loại sự kiện!");
             return;
         }
 
-        // Sử dụng FormData để gửi dữ liệu
-        var formData = new FormData();
-        if (pictureInput && pictureInput.files.length > 0) {
-            formData.append("img", pictureInput.files[0]); // Gửi file thực tế
+        if (!pictureInput || !pictureInput.files || pictureInput.files.length === 0) {
+            alert("Vui lòng chọn ảnh cho sự kiện!");
+            return;
         }
-        formData.append("name", name);
-        formData.append("description", description);
-        formData.append("event_type_id", eventTypeID);
-        formData.append("detail", detail);
-        formData.append("created_at", new Date().toISOString().split('T')[0]);
-        formData.append("updated_at", new Date().toISOString().split('T')[0]);
 
-        // Log ra để kiểm tra dữ liệu
-        console.log("Dữ liệu gửi lên:");
-        for (var pair of formData.entries()) {
-            console.log(pair[0] + ': ' + pair[1]);
-        }
+        // Tạo object chứa thông tin event
+        const eventData = {
+            name: name,
+            description: description,
+            eventType_id: eventTypeID,
+            detail: detail,
+            event_format: true,
+            is_template: false
+        };
+
+        // Tạo FormData
+        const formData = new FormData();
+
+        // Thêm file với key là 'file'
+        formData.append('file', pictureInput.files[0]);
+
+        // Thêm event data dưới dạng JSON string với key là 'event'
+        formData.append('event', new Blob([JSON.stringify(eventData)], {
+            type: 'application/json'
+        }));
 
         createEvent(formData, function (eventResponse) {
-            var eventId = eventResponse.id;
-            console.log("Event vừa tạo có ID:", eventId);
+            console.log("Event vừa tạo có ID:", eventResponse.id);
             console.log("Đã tạo sự kiện thành công:", eventResponse);
             alert("Tạo sự kiện thành công!");
         });
     };
 }
-function createEvent(data, callback) {
+
+function createEvent(formData, callback) {
     let token = localStorage.getItem("token");
 
     if (!token) {
@@ -205,57 +325,52 @@ function createEvent(data, callback) {
         return;
     }
 
-    var options = {
+    console.log("FormData entries:");
+    for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+    }
+
+    fetch(CreateEventAPI, {
         method: 'POST',
         headers: {
-            "Authorization": `Bearer ${token}`,
-            "Accept": "application/json"
-            // Không set Content-Type vì browser sẽ tự set với boundary cho multipart/form-data
+            'Authorization': `Bearer ${token}`
         },
-        body: data
-    };
-
-    console.log('Sending request to:', CreateEventAPI);
-    console.log('Request options:', {
-        method: options.method,
-        headers: options.headers
-    });
-
-    fetch(CreateEventAPI, options)
-        .then(async function (response) {
+        body: formData
+    })
+        .then(async response => {
             console.log('Response status:', response.status);
-            console.log('Response headers:', [...response.headers.entries()]);
-            
             const text = await response.text();
             console.log('Response body:', text);
 
             if (!response.ok) {
                 try {
-                    const json = JSON.parse(text);
-                    throw new Error(json.message || `HTTP error! Status: ${response.status}`);
+                    const errorData = JSON.parse(text);
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
                 } catch (e) {
                     throw new Error(`HTTP error! Status: ${response.status}, Message: ${text}`);
                 }
             }
 
             try {
-                return JSON.parse(text);
+                const data = JSON.parse(text);
+                return data;
             } catch (e) {
                 throw new Error('Invalid JSON response from server');
             }
         })
-        .then(function (eventResponse) {
-            console.log('Server response:', eventResponse);
-            if (eventResponse.code && eventResponse.code !== 200) {
-                throw new Error(eventResponse.message || "Lỗi không xác định từ server");
+        .then(data => {
+            if (data.code && data.code !== 200) {
+                throw new Error(data.message || "Lỗi không xác định từ server");
             }
-            callback(eventResponse);
+            callback(data.result);
         })
-        .catch(function (error) {
+        .catch(error => {
             console.error("Lỗi khi tạo sự kiện:", error);
             alert("Đã có lỗi xảy ra khi tạo sự kiện: " + error.message);
         });
 }
+
+//////
 function createEventType(data, callback) {
     let token = localStorage.getItem("token"); // Lấy token từ localStorage
 
@@ -379,4 +494,149 @@ document.getElementById("inputImage").addEventListener("change", function (event
 function handleUpdateEvent(eventId) {
     localStorage.setItem("editEventId", eventId); // Lưu ID vào localStorage
     window.location.href = "form-event.html"; // Chuyển đến form cập nhật
+}
+
+function loadEditForm(editEventId) {
+    if (!editEventId) return;
+
+    console.log("Chỉnh sửa sự kiện ID:", editEventId);
+    const inputPicture = document.querySelector('input[name="picture"]');
+    const imagePreview = document.getElementById("image");
+    const defaultImagePath = "assets/img/card.jpg";
+
+    // Lấy token từ localStorage
+    let token = localStorage.getItem("token");
+
+    if (!token) {
+        console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+        return;
+    }
+
+    // Lấy danh sách loại sự kiện (event types)
+    fetch(EventTypeAPI, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => response.json())
+        .then(eventTypes => {
+            // Log để debug
+            console.log('Event Types:', eventTypes);
+
+            var selectEventType = document.querySelector('select[name="eventype"]');
+            selectEventType.innerHTML = '<option value="">Chọn loại sự kiện</option>';
+
+            if (Array.isArray(eventTypes)) {
+                eventTypes.forEach(type => {
+                    var option = document.createElement("option");
+                    option.value = type.name;
+                    option.textContent = type.name;
+                    selectEventType.appendChild(option);
+                });
+            }
+
+            // Lấy thông tin sự kiện
+            return fetch(`${EventAPI}/${editEventId}`, {
+                method: 'GET',
+                headers: {
+                    // 'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => response.json());
+        })
+        .then(event => {
+            // Log để debug
+            console.log('Event Data:', event);
+
+            document.querySelector('input[name="name"]').value = event.name || "";
+            document.querySelector('input[name="description"]').value = event.description || "";
+            document.querySelector('textarea[name="detail"]').value = event.detail || "";
+            document.querySelector('select[name="eventype"]').value = event.eventTypeName;
+
+            // Set giá trị cho select box
+            const selectElement = document.querySelector('select[name="eventype"]');
+            if (event.eventType_id) {
+                selectElement.value = event.name;
+            }
+
+            // Xử lý hiển thị ảnh
+            if (event.img) {
+                try {
+                    const baseApiUrl = 'http://localhost:8080/event-management/api/v1/FileUpload/files/';
+                    const fileName = event.img.split('/').pop();
+                    const imageUrl = `${baseApiUrl}${fileName}`;
+
+                    // Log để debug
+                    console.log('Image URL:', imageUrl);
+
+                    // Tạo thẻ img mới
+                    const newImg = document.createElement('img');
+                    newImg.id = 'image';
+                    newImg.style.maxWidth = '100%';
+                    newImg.style.height = 'auto';
+                    newImg.alt = 'Event Preview';
+
+                    // Thay thế ảnh cũ bằng ảnh mới
+                    if (imagePreview) {
+                        imagePreview.parentNode.replaceChild(newImg, imagePreview);
+                    }
+
+                    // Set source cho ảnh mới
+                    newImg.src = imageUrl;
+
+                    // Xử lý lỗi load ảnh
+                    newImg.onerror = function () {
+                        console.error('Lỗi tải ảnh:', imageUrl);
+                        this.src = defaultImagePath;
+                    };
+                } catch (error) {
+                    console.error('Lỗi xử lý ảnh:', error);
+                    if (imagePreview) imagePreview.src = defaultImagePath;
+                }
+            } else {
+                if (imagePreview) imagePreview.src = defaultImagePath;
+            }
+            document.querySelector("#create").textContent = "Cập nhật";
+            document.querySelector("#create").onclick = function () {
+                const inputPicture = document.querySelector('input[name="picture"]');
+                const inputName = document.querySelector('input[name="name"]').value;
+                const inputDescription = document.querySelector('input[name="description"]').value;
+                const inputEventTypeID = document.querySelector('select[name="eventype"]').value;
+                const inputDetail = document.querySelector('textarea[name="detail"]').value;
+                const img = inputPicture.files.length > 0 ? imagePreview.src : event.img;
+
+                const updatedEvent = {
+                    img: img,
+                    name: inputName,
+                    description: inputDescription,
+                    event_type_id: inputEventTypeID,
+                    detail: inputDetail,
+                    created_at: event.created_at,
+                    updated_at: new Date().toISOString().split('T')[0]
+                };
+
+                fetch(`${EventAPI}/${editEventId}`, {
+                    method: 'PUT',
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(updatedEvent)
+                })
+                    .then(response => response.json())
+                    .then(() => {
+                        console.log("Cập nhật thành công!");
+                        window.location.href = "table-event.html";
+                    })
+                    .catch(error => console.error("Lỗi khi cập nhật sự kiện:", error));
+            }
+        })
+        .catch(error => {
+            console.error('Lỗi:', error);
+            alert('Có lỗi xảy ra khi tải dữ liệu');
+        });
+
+
 }
