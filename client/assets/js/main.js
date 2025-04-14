@@ -19,7 +19,7 @@ function highlightActiveMenu() {
 
 document.addEventListener("DOMContentLoaded", function () {
   // Import header
-  fetch("/client/component/header.html")
+  fetch("../client/component/header.html")
     .then(response => response.text())
     .then(data => {
       document.getElementById("header").innerHTML = data;
