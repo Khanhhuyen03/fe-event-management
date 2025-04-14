@@ -90,7 +90,6 @@ function handleLogin(data) {
         toastr.error("Sai tài khoản hoặc mật khẩu!", "Lỗi");
     }
 }
-
 // Hàm xử lý quên mật khẩu
 async function handleForgotPassword(event) {
     event.preventDefault();
@@ -133,63 +132,6 @@ async function handleForgotPassword(event) {
         submitButton.textContent = "GỬI YÊU CẦU";
     }
 }
-
-// Hàm xử lý xác thực mã
-async function handleVerifyCode(event) {
-    event.preventDefault();
-
-    const code = [
-        document.getElementById("code1").value,
-        document.getElementById("code2").value,
-        document.getElementById("code3").value,
-        document.getElementById("code4").value,
-        document.getElementById("code5").value,
-        document.getElementById("code6").value,
-    ].join("");
-
-    if (code.length !== 6) {
-        showAlert("Vui lòng nhập đầy đủ mã xác thực!", "danger");
-        return;
-    }
-
-    const submitButton = event.target.querySelector("button[type='submit']");
-    submitButton.disabled = true;
-    submitButton.textContent = "Đang xác nhận...";
-
-    try {
-        const email = localStorage.getItem("resetEmail");
-        const response = await fetch("http://localhost:8080/event-management/auth/verify-code", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                email,
-                code,
-            }),
-        });
-
-        const result = await response.json();
-
-        if (response.ok && result.code === 1000) {
-            showAlert("Mã xác thực đúng! Vui lòng đặt lại mật khẩu.", "success");
-            localStorage.setItem("resetToken", result.token); // Lưu token tạm thời
-            setTimeout(() => {
-                switchForm("resetPassword");
-            }, 2000);
-        } else {
-            showAlert(result.message || "Mã xác thực không đúng!", "danger");
-        }
-    } catch (error) {
-        showAlert("Lỗi kết nối đến máy chủ! Vui lòng thử lại.", "danger");
-        console.error("Lỗi trong handleVerifyCode:", error);
-    } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "XÁC NHẬN";
-    }
-}
-
-// Hàm xử lý đặt lại mật khẩu
 async function handleResetPassword(event) {
     event.preventDefault();
 
@@ -203,7 +145,7 @@ async function handleResetPassword(event) {
     submitButton.textContent = "Đang cập nhật...";
 
     if (!token) {
-        showAlert("Liên kết không hợp lệ! Vui lòng thử lại.", "danger");
+        showAlert("Mã xác thực không hợp lệ! Vui lòng thử lại.", "danger");
         submitButton.disabled = false;
         submitButton.textContent = "CẬP NHẬT MẬT KHẨU";
         return;
@@ -231,7 +173,6 @@ async function handleResetPassword(event) {
             },
             body: JSON.stringify({
                 email,
-                token,
                 newPassword,
             }),
         });
@@ -256,7 +197,6 @@ async function handleResetPassword(event) {
         submitButton.textContent = "CẬP NHẬT MẬT KHẨU";
     }
 }
-
 // Hàm chuyển đổi form
 function switchForm(formType) {
     const loginSection = document.getElementById("loginSection");
@@ -286,8 +226,6 @@ function switchForm(formType) {
         formTitle.textContent = "ĐĂNG NHẬP";
     }
 }
-
-// Gắn sự kiện khi DOM được tải
 document.addEventListener("DOMContentLoaded", function () {
     const loginForm = document.getElementById("loginForm");
     const forgotPasswordForm = document.getElementById("forgotPasswordForm");
@@ -344,7 +282,6 @@ document.addEventListener("DOMContentLoaded", function () {
             switchForm("login");
         });
     }
-
     // Tự động chuyển con trỏ giữa các ô input mã xác thực
     const inputs = document.querySelectorAll(".verification-input");
     inputs.forEach((input, index) => {

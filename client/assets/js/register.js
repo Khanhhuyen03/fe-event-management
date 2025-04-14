@@ -99,7 +99,7 @@ async function handleRegister(event) {
     if (!ten) return showAlert("Vui lòng nhập tên!", "danger");
     if (!email) return showAlert("Vui lòng nhập email!", "danger");
     if (!phone) return showAlert("Vui lòng nhập số điện thoại!", "danger");
-    if (!/^(03|05|07|08|09)\d{8}$/.test(phone)) return showAlert("Số điện thoại không hợp lệ!", "danger");
+    // if (!/^(03|05|07|08|09)\d{8}$/.test(phone)) return showAlert("Số điện thoại không hợp lệ!", "danger");
     if (!password) return showAlert("Vui lòng nhập mật khẩu!", "danger");
 
     const formData = {
@@ -148,26 +148,27 @@ async function handleRegister(event) {
         console.error("Lỗi trong handleRegister:", error);
     }
 }
-
 // async function handleVerify(event) {
-
 //     event.preventDefault();
 
-//     const verificationCode = getValue("verificationCode");
+//     // const verificationCode = getValue("verificationCode");
+//     const verificationCode = [
+//         getValue("code1"),
+//         getValue("code2"),
+//         getValue("code3"),
+//         getValue("code4"),
+//         getValue("code5"),
+//         getValue("code6")
+//     ].join('');
 //     const tempUser = JSON.parse(localStorage.getItem("tempUser"));
 
-//     if (!verificationCode) return showAlert("Vui lòng nhập mã xác thực!", "danger");
+//     // if (!verificationCode) return showAlert("Vui lòng nhập mã xác thực!", "danger");
+//     if (verificationCode.length !== 6) return showAlert("Vui lòng nhập đầy đủ 6 ký tự mã xác thực!", "danger");
 //     if (!tempUser) return showAlert("Dữ liệu người dùng tạm thời không tồn tại!", "danger");
 
 //     try {
-//         // Tạo query string từ userId và verificationCode
-//         const queryParams = new URLSearchParams({
-//             userId: tempUser.id,
-//             verificationCode: verificationCode,
-//         }).toString();
-
-//         // URL với query string
-//         const url = `http://localhost:8080/event-management/api/verification/verify`;
+//         // Tạo URL với code là query parameter
+//         const url = `http://localhost:8080/event-management/api/verification/verify?code=${verificationCode}`;
 //         console.log("Request URL:", url);
 
 //         const response = await fetch(url, {
@@ -199,55 +200,9 @@ async function handleRegister(event) {
 //     }
 // }
 
-
-//Xử lý form xác thực
-// async function handleVerify(event) {
-//     event.preventDefault();
-
-//     const verificationCode = getValue("verificationCode");
-//     const tempUser = JSON.parse(localStorage.getItem("tempUser"));
-
-//     if (!verificationCode) return showAlert("Vui lòng nhập mã xác thực!", "danger");
-//     if (!tempUser) return showAlert("Dữ liệu người dùng tạm thời không tồn tại!", "danger");
-
-//     try {
-//         const response = await fetch("http://localhost:8080/event-management/api/verification/verify", {
-//             method: "POST",
-//             headers: { "Content-Type": "application/json" },
-//             body: JSON.stringify({
-//                 userId: tempUser.id,
-//                 verificationCode: verificationCode,
-//             }),
-//         });
-
-//         const data = await response.json();
-
-//         if (response.ok) {
-//             showAlert("Đăng ký thành công!", "success");
-//             localStorage.setItem("token", data.token);
-//             localStorage.setItem("user", JSON.stringify(data.user));
-//             localStorage.removeItem("tempUser");
-
-//             // Cập nhật header nếu cần
-//             if (typeof window.updateHeader === "function") {
-//                 window.updateHeader();
-//             }
-
-//             setTimeout(() => (window.location.href = "login.html"), 2000);
-//         } else {
-//             showAlert(data.message || "Mã xác thực không đúng!", "danger");
-//         }
-//     } catch (error) {
-//         showAlert("Lỗi kết nối đến máy chủ! Vui lòng thử lại.", "danger");
-//         console.error("Lỗi trong handleVerify:", error);
-//     }
-// }
-
-
 async function handleVerify(event) {
     event.preventDefault();
 
-    // const verificationCode = getValue("verificationCode");
     const verificationCode = [
         getValue("code1"),
         getValue("code2"),
@@ -258,7 +213,6 @@ async function handleVerify(event) {
     ].join('');
     const tempUser = JSON.parse(localStorage.getItem("tempUser"));
 
-    // if (!verificationCode) return showAlert("Vui lòng nhập mã xác thực!", "danger");
     if (verificationCode.length !== 6) return showAlert("Vui lòng nhập đầy đủ 6 ký tự mã xác thực!", "danger");
     if (!tempUser) return showAlert("Dữ liệu người dùng tạm thời không tồn tại!", "danger");
 
@@ -272,8 +226,20 @@ async function handleVerify(event) {
             headers: { "Content-Type": "application/json" },
         });
 
-        const data = await response.json();
         console.log("Response status:", response.status);
+
+        // Kiểm tra Content-Type trước khi parse
+        const contentType = response.headers.get("content-type");
+        let data;
+
+        if (contentType && contentType.includes("application/json")) {
+            data = await response.json();
+        } else {
+            // Nếu không phải JSON, đọc như text
+            const text = await response.text();
+            data = { message: text };
+        }
+
         console.log("Response data:", data);
 
         if (response.ok) {
@@ -294,49 +260,4 @@ async function handleVerify(event) {
         showAlert("Lỗi kết nối đến máy chủ! Vui lòng thử lại.", "danger");
         console.error("Lỗi trong handleVerify:", error);
     }
-}// ... existing code ...
-
-// Hàm toggle password visibility
-function togglePassword(inputId, iconId) {
-    const input = document.getElementById(inputId);
-    const icon = document.getElementById(iconId);
-    if (input.type === "password") {
-        input.type = "text";
-        icon.classList.remove("bi-eye-slash");
-        icon.classList.add("bi-eye");
-    } else {
-        input.type = "password";
-        icon.classList.remove("bi-eye");
-        icon.classList.add("bi-eye-slash");
-    }
-}
-
-// Hàm tiện ích (giữ nguyên từ utils.js)
-function getValue(id) {
-    const element = document.getElementById(id);
-    return element ? element.value.trim() : "";
-}
-
-function showAlert(message, type) {
-    const alertBox = document.getElementById("alertBox");
-    if (!alertBox) return;
-    alertBox.textContent = message;
-    alertBox.classList.remove("d-none", "alert-danger", "alert-success");
-    alertBox.classList.add(`alert-${type}`);
-    setTimeout(() => alertBox.classList.add("d-none"), 5000);
-}
-
-function setupValidation(id, requiredMessage, regex, invalidMessage) {
-    const input = document.getElementById(id);
-    if (!input) return;
-
-    input.addEventListener("input", function () {
-        if (!input.value.trim()) {
-            input.setCustomValidity(requiredMessage);
-        } else if (regex && !regex.test(input.value.trim())) {
-            input.setCustomValidity(invalidMessage || "Dữ liệu không hợp lệ!");
-        } else {
-            input.setCustomValidity("");
-        }
-    });
 }

@@ -5,14 +5,19 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Danh sách - MyEvent</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
         rel="stylesheet">
-    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
-    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="/client/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/client/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/client/assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="/client/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="/client/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
     <link href="assets/css/main.css" rel="stylesheet">
     <link href="assets/css/service.css" rel="stylesheet">
     <style>
@@ -275,16 +280,16 @@
     <button class="floating-register-btn" onclick="checkLoginAndOpenContract()">
         Đăng Ký Ngay
     </button>
-    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/vendor/aos/aos.js"></script>
-    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-    <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
-    <script src="assets/js/main.js"></script>
+    <script src="./assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="./assets/vendor/aos/aos.js"></script>
+    <script src="./assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="./assets/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="./assets/js/main.js"></script>
     <script>
         let allItems = [];
         let allTypes = [];
         let allCities = [];
-        let suppliers = []; // Lưu danh sách nhà cung cấp
+        let suppliers = [];
         let currentTypeId = null;
         let currentCategory = null;
 
@@ -294,59 +299,27 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 currentCategory = urlParams.get("category") || "event";
 
-                // Gọi API tỉnh thành
-                const citiesResponse = await fetch("https://api.myevent.com/cities", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json"
-                        // "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
-                    }
-                });
-                if (!citiesResponse.ok) {
-                    throw new Error(`Lỗi khi lấy danh sách tỉnh thành: ${citiesResponse.statusText}`);
-                }
-                allCities = await citiesResponse.json();
-
-                // Gọi API nhà cung cấp
-                const suppliersResponse = await fetch("https://api.myevent.com/users?role=supplier", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json"
-                        // "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
-                    }
-                });
-                if (!suppliersResponse.ok) {
-                    throw new Error(`Lỗi khi lấy danh sách nhà cung cấp: ${suppliersResponse.statusText}`);
-                }
-                suppliers = await suppliersResponse.json();
-
                 // Gọi API dữ liệu chính
-                const dataResponse = await fetch("https://api.myevent.com/data", {
+                const dataResponse = await fetch("http://localhost:8080/event-management/event", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
-                        // "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
                     }
                 });
                 if (!dataResponse.ok) {
                     throw new Error(`Lỗi khi lấy dữ liệu chính: ${dataResponse.statusText}`);
                 }
                 const data = await dataResponse.json();
+                console.log("Dữ liệu API:", data);
 
                 allTypes = getTypesByCategory(data);
                 allItems = getItemsByCategory(data);
+                console.log("allTypes:", allTypes);
+                console.log("allItems:", allItems);
 
                 populateCityFilter(allCities);
                 populateServicesList(allTypes);
                 filterItems();
-
-                const token = localStorage.getItem("token");
-                if (localStorage.getItem("openContractAfterLogin") === "true" && token) {
-                    localStorage.removeItem("openContractAfterLogin");
-                    openContractModal();
-                } else if (localStorage.getItem("openContractAfterLogin") === "true" && !token) {
-                    localStorage.removeItem("openContractAfterLogin");
-                }
             } catch (error) {
                 console.error("Lỗi khi tải dữ liệu:", error);
                 document.getElementById("item-container").innerHTML = "<p class='text-center'>Lỗi tải dữ liệu! Vui lòng thử lại sau.</p>";
@@ -355,47 +328,30 @@
             }
         });
 
-        // Hàm lấy tên nhà cung cấp từ supplier_id
-        function getSupplierName(supplierId) {
-            const supplier = suppliers.find(s => s.id === supplierId);
-            return supplier ? `${supplier.first_name} ${supplier.last_name}` : "Không xác định";
-        }
-
         function getTypesByCategory(data) {
             if (currentCategory === "event") {
-                return data.event_type || [];
-            } else if (currentCategory === "device") {
-                return data.device_type || [];
-            } else if (currentCategory === "service") {
-                return data.service_type || [];
-            } else if (currentCategory === "location") {
-                return [];
+                const types = Array.isArray(data)
+                    ? [...new Set(data.map(item => item.eventTypeName))].map((name, index) => ({
+                        id: index + 1,
+                        name
+                    }))
+                    : [{ id: 1, name: data.eventTypeName }];
+                return types;
             }
             return [];
         }
 
         function getItemsByCategory(data) {
             if (currentCategory === "event") {
-                return data.event || [];
-            } else if (currentCategory === "device") {
-                return data.event.flatMap(event => event.device || []);
-            } else if (currentCategory === "service") {
-                return data.event.flatMap(event => event.service || []);
-            } else if (currentCategory === "location") {
-                return data.event.flatMap(event => event.location || []);
+                return Array.isArray(data) ? data : [data];
             }
             return [];
         }
 
         function populateCityFilter(cities) {
             const cityFilter = document.getElementById("cityFilter");
-            cityFilter.innerHTML = '<option value="">Tất cả tỉnh</option>'; // Reset dropdown
-            cities.forEach(city => {
-                const option = document.createElement("option");
-                option.value = city.id;
-                option.textContent = city.name;
-                cityFilter.appendChild(option);
-            });
+            cityFilter.innerHTML = '<option value="">Tất cả tỉnh</option>';
+            // Thêm logic nếu có dữ liệu tỉnh thành
         }
 
         function populateServicesList(types) {
@@ -405,16 +361,6 @@
 
             if (currentCategory === "event") {
                 categoryTitle.textContent = "Danh mục sự kiện";
-            } else if (currentCategory === "device") {
-                categoryTitle.textContent = "Danh mục thiết bị";
-            } else if (currentCategory === "service") {
-                categoryTitle.textContent = "Danh mục dịch vụ";
-                servicesList.style.display = "none"; // Ẩn danh mục dịch vụ
-                return;
-            } else if (currentCategory === "location") {
-                categoryTitle.textContent = "Địa điểm";
-                servicesList.style.display = "none"; // Ẩn danh mục địa điểm
-                return;
             }
 
             if (!types || types.length === 0) {
@@ -460,39 +406,32 @@
             const itemContainer = document.getElementById("item-container");
             itemContainer.innerHTML = "";
             if (!items || items.length === 0) {
-                itemContainer.innerHTML = "<p class='text-center'> transforming complex concepts into clear, concise answers is my forte!Không có mục nào!</p>";
+                itemContainer.innerHTML = "<p class='text-center'>Không có mục nào!</p>";
                 return;
             }
+
+            const baseImageUrl = "http://localhost:8080/event-management/api/v1/FileUpload/files/";
+
             items.forEach((item, index) => {
                 let detailPage = currentCategory === "event" ? "./event-detail.html" : "./item-detail.html";
                 let buttonText = currentCategory === "event" ? "Đăng Ký" : "Xem Chi Tiết";
                 let itemId = currentCategory === "event" ? item.id : encodeURIComponent(item.name);
-                let hoverInfo = "";
-                if (currentCategory === "event") {
-                    hoverInfo = `
-                <div class="row propery-info"><div class="col">Địa điểm</div></div>
-                <div class="row"><div class="col">${item.location || "Không xác định"}</div></div>
-            `;
-                } else if (currentCategory === "device") {
-                    hoverInfo = `
-                <div class="row propery-info"><div class="col">Nhà cung cấp</div></div>
-                <div class="row"><div class="col">${getSupplierName(item.supplier_id)}</div></div>
-            `;
-                } else if (currentCategory === "service") {
-                    hoverInfo = `
-                <div class="row propery-info"><div class="col">Nhà cung cấp</div></div>
-                <div class="row"><div class="col">${getSupplierName(item.supplier_id)}</div></div>
-            `;
-                } else if (currentCategory === "location") {
-                    hoverInfo = `
-                <div class="row propery-info"><div class="col">Nhà cung cấp</div></div>
-                <div class="row"><div class="col">${getSupplierName(item.supplier_id)}</div></div>
-            `;
-                }
+                let hoverInfo = `
+            <div class="row propery-info"><div class="col">Địa điểm</div></div>
+            <div class="row"><div class="col">${item.location || "Không xác định"}</div></div>
+        `;
+
+                const imageFileName = item.img ? item.img.split('/').pop() : null;
+                const imageUrl = imageFileName ? `${baseImageUrl}${imageFileName}` : '../client/assets/img/events/sk2.jpg';
+                console.log(`Image URL for event ${item.name}:`, imageUrl); // Debug URL
+
                 const itemCard = `
             <div class="col-xl-4 col-md-6" data-aos="fade-up" data-aos-delay="${index * 100}">
                 <div class="card">
-                    <img src="${item.image || item.img || './assets/img/placeholder.jpg'}" alt="${item.name}" class="img-fluid">
+                    <img src="${imageUrl}" 
+                         onerror="this.src='../client/assets/img/events/sk2.jpg'" 
+                         alt="${item.name}" 
+                         class="img-fluid">
                     <div class="card-body">
                         <span class="sale-rent"><a href="${detailPage}?id=${itemId}&category=${currentCategory}">${buttonText}</a></span>
                         <h3><a href="${detailPage}?id=${itemId}&category=${currentCategory}" class="stretched-link">${item.name}</a></h3>
@@ -505,42 +444,13 @@
             });
         }
 
-        function checkLoginAndOpenContract() {
-            const token = localStorage.getItem("token");
-            if (!token) {
-                localStorage.setItem("openContractAfterLogin", "true");
-                window.location.href = "login.html";
-            } else {
-                openContractModal();
-            }
-        }
-
-        function openContractModal() {
-            const iframe = document.getElementById("contractIframe");
-            iframe.src = "contract.html";
-            const modal = new bootstrap.Modal(document.getElementById("iframeModal"), {});
-            modal.show();
-            window.addEventListener("message", function closeModal(event) {
-                if (event.data === "closeIframe") {
-                    modal.hide();
-                    window.removeEventListener("message", closeModal);
-                }
-            });
-        }
-
         function filterItems() {
             const searchInput = document.getElementById("searchInput").value.toLowerCase();
             const cityId = document.getElementById("cityFilter").value;
             let filteredItems = allItems;
 
             if (currentTypeId !== null) {
-                if (currentCategory === "event") {
-                    filteredItems = filteredItems.filter(item => item.event_type_id === currentTypeId);
-                } else if (currentCategory === "device") {
-                    filteredItems = filteredItems.filter(item => item.device_type_id === currentTypeId);
-                } else if (currentCategory === "service") {
-                    filteredItems = filteredItems.filter(item => item.service_type_id === currentTypeId);
-                }
+                filteredItems = filteredItems.filter(item => item.eventTypeName === allTypes.find(t => t.id === currentTypeId)?.name);
             }
 
             if (cityId) {
@@ -553,15 +463,6 @@
 
             displayItems(filteredItems);
         }
-
-        window.addEventListener("scroll", function () {
-            const floatingBtn = document.querySelector(".floating-register-btn");
-            if (window.scrollY > 300) {
-                floatingBtn.style.display = "block";
-            } else {
-                floatingBtn.style.display = "none";
-            }
-        });
     </script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/header.js"></script>
