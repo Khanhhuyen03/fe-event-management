@@ -1,9 +1,8 @@
 var ServiceAPI = 'http://localhost:3000/service';
 var UsersAPI ='http://localhost:3000/user';
-var RoleAPI='http://localhost:3000/role';
 function start(){
-    getData((services, user, role) => {
-        renderServices(services, user, role);
+    getData((services, user) => {
+        renderServices(services, user);
         
     });
     
@@ -31,16 +30,9 @@ function getData(callback) {
                 "Content-Type": "application/json"
             }
         }).then(res => res.json()),
-
-        fetch(RoleAPI, {
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
-            }
-        }).then(res => res.json()),
     ])
-        .then(([services, users, role]) => {
-            callback(services, users, role);
+        .then(([services, users]) => {
+            callback(services, users);
         })
         .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
 }
