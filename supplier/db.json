@@ -83,6 +83,12 @@
       "name": "loại tb",
       "created_at": "2025-04-12",
       "updated_at": "2025-04-12"
+    },
+    {
+      "id": "122b",
+      "name": "pad",
+      "created_at": "2025-04-15",
+      "updated_at": "2025-04-15"
     }
   ],
   "service": [
@@ -259,6 +265,114 @@
       "created_at": "2025-03-19 10:00:00",
       "updated_at": "2025-03-19 12:00:00",
       "user_id": "user1"
+    }
+  ],
+  "provinces": [
+    {
+      "id": "01",
+      "name": "Hà Nội"
+    },
+    {
+      "id": "48",
+      "name": "Đà Nẵng"
+    },
+    {
+      "id": "79",
+      "name": "TP. Hồ Chí Minh"
+    }
+  ],
+  "districts": [
+    {
+      "id": "001",
+      "name": "Quận Ba Đình",
+      "province_id": "01"
+    },
+    {
+      "id": "002",
+      "name": "Quận Hoàn Kiếm",
+      "province_id": "01"
+    },
+    {
+      "id": "760",
+      "name": "Quận Hải Châu",
+      "province_id": "48"
+    },
+    {
+      "id": "761",
+      "name": "Quận Thanh Khê",
+      "province_id": "48"
+    },
+    {
+      "id": "769",
+      "name": "Quận 1",
+      "province_id": "79"
+    },
+    {
+      "id": "770",
+      "name": "Quận 3",
+      "province_id": "79"
+    }
+  ],
+  "wards": [
+    {
+      "id": "00001",
+      "name": "Phường Phúc Xá",
+      "district_id": "001"
+    },
+    {
+      "id": "00004",
+      "name": "Phường Trúc Bạch",
+      "district_id": "001"
+    },
+    {
+      "id": "00007",
+      "name": "Phường Hàng Mã",
+      "district_id": "002"
+    },
+    {
+      "id": "00010",
+      "name": "Phường Hàng Bông",
+      "district_id": "002"
+    },
+    {
+      "id": "26830",
+      "name": "Phường Hải Châu I",
+      "district_id": "760"
+    },
+    {
+      "id": "26833",
+      "name": "Phường Hải Châu II",
+      "district_id": "760"
+    },
+    {
+      "id": "26836",
+      "name": "Phường Thanh Khê Đông",
+      "district_id": "761"
+    },
+    {
+      "id": "26839",
+      "name": "Phường Thanh Khê Tây",
+      "district_id": "761"
+    },
+    {
+      "id": "27685",
+      "name": "Phường Bến Nghé",
+      "district_id": "769"
+    },
+    {
+      "id": "27688",
+      "name": "Phường Bến Thành",
+      "district_id": "769"
+    },
+    {
+      "id": "27691",
+      "name": "Phường Tân Định",
+      "district_id": "770"
+    },
+    {
+      "id": "27694",
+      "name": "Phường Cầu Ông Lãnh",
+      "district_id": "770"
     }
   ]
 }
