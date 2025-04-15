@@ -1,3 +1,5 @@
+var ServiceAPI = 'http://localhost:3000/service'; // Có thể thêm ?user_id=${user.id} nếu API hỗ trợ
+
 // Lấy thông tin user từ localStorage
 const token = localStorage.getItem("token");
 let user;
@@ -9,11 +11,11 @@ try {
     user = null;
 }
 
-var ServiceAPI = 'http://localhost:3000/service'; // Có thể thêm ?user_id=${user.id} nếu API hỗ trợ
 function start() {
     getData((services) => {
         renderServices(services);
     });
+    handleCreateForm()
 }
 start();
 function getData(callback) {
@@ -41,10 +43,7 @@ function getData(callback) {
 
 function renderServices(services) {
     var listServicesBlock = document.querySelector('#list-service tbody');
-    if (!listServicesBlock) {
-        console.error("Không tìm thấy #list-service tbody trong DOM");
-        return;
-    }
+    if (!listServicesBlock) return;
 
     // Lọc dịch vụ của user hiện tại
     const userServices = services.filter(service => String(service.user_id) === String(user.id));
@@ -118,4 +117,83 @@ function renderServices(services) {
         $('.dropdown-content').hide();
     });
 }
+// Thêm dịch vụ
+function handleCreateForm() {
+    var createBtn = document.querySelector('#create');
+    if (!createBtn) return;
+
+    var editServiceId = localStorage.getItem("editServiceId");
+
+    if (editServiceId) {
+        loadEditForm(editServiceId); // Gọi hàm cập nhật nếu đang chỉnh sửa
+        return;
+    }
+
+    createBtn.onclick = function (event) {
+        event.preventDefault();
+
+        var pictureInput = document.querySelector('input[name="picture"]');
+        var name = document.querySelector('input[name="name"]').value;
+        var description = document.querySelector('input[name="description"]').value;
+        var price = document.querySelector('input[name="price"]').value;
+        var quantity = document.querySelector('input[name="quantity"]').value;
+        var location = document.querySelector('input[name="location"]').value;
+
+        // Validation
+        if (!name || !price || !quantity) {
+            alert("Vui lòng nhập đầy đủ tên dịch vụ, tiền công và số lượng!");
+            return;
+        }
+
+        if (!pictureInput || !pictureInput.files || pictureInput.files.length === 0) {
+            alert("Vui lòng chọn ảnh cho dịch vụ!");
+            return;
+        }
+
+        // Create object containing service info
+        const serviceData = {
+            name: name,
+            description: description,
+            price: parseFloat(price),
+            quantity: parseInt(quantity),
+            location: location
+        };
+
+        // Create FormData
+        const formData = new FormData();
+
+        // Append file with key 'file'
+        formData.append('file', pictureInput.files[0]);
+
+        // Append service data as JSON string with key 'service'
+        formData.append('service', new Blob([JSON.stringify(serviceData)], {
+            type: 'application/json'
+        }));
+
+        createService(formData, function (serviceResponse) {
+            console.log("Service vừa tạo có ID:", serviceResponse.id);
+            console.log("Đã tạo dịch vụ thành công:", serviceResponse);
+            alert("Tạo dịch vụ thành công!");
+        });
+    };
+}
+
+function createService(formData, callback) {
+    const token = localStorage.getItem("token");
+    if (!token) return alert("Vui lòng đăng nhập lại!");
+  
+    fetch(ServiceAPI, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData
+    })
+      .then(response => {
+        if (!response.ok) throw new Error("Lỗi server");
+        return response.json();
+      })
+      .then(data => {
+        callback(data.result || data);
+      })
+      .catch(error => alert(`Lỗi tạo dịch vụ: ${error.message}`));
+  }
 
