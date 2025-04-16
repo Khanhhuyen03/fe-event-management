@@ -130,7 +130,7 @@ function renderUsers(users) {
     });
 }
 
-//Tạo Xoá hợp đồng
+// xóa user
 function handleDeleteUser(id) {
     var options = {
         method: 'DELETE',
@@ -155,6 +155,8 @@ function handleDeleteUser(id) {
         });
 
 }
+
+
 function updateUserRole(userId) {
     const modalElement = document.getElementById("upgradeRoleModal");
     const modal = new bootstrap.Modal(modalElement);
@@ -194,7 +196,7 @@ function updateUserRole(userId) {
                 "Authorization": `Bearer ${localStorage.getItem("token")}`,
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ role_id: newRoleId })
+            body: JSON.stringify({ role: newRoleId })
         })
             .then(response => response.json())
             .then(data => {
