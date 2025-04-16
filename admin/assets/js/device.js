@@ -1,21 +1,21 @@
 var DeviceAPI = 'http://localhost:3000/device';
 var DeviceTypeAPI = 'http://localhost:3000/device_type';
-var UsersAPI ='http://localhost:3000/user';
-function start(){
+var UsersAPI = 'http://localhost:3000/user';
+function start() {
     getData((devices, deviceTypes, users) => {
         renderDevices(devices, deviceTypes, users)
-        
+
     });
-    
+
 }
 start();
 function getData(callback) {
     let token = localStorage.getItem("token"); // Lấy token từ localStorage
 
-    // if (!token) {
-    //     console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
-    //     return;
-    // }
+    if (!token) {
+        console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+        return;
+    }
 
     Promise.all([
         fetch(DeviceAPI, {
