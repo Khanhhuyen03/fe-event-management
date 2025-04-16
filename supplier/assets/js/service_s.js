@@ -35,10 +35,10 @@ function getData(callback) {
             return res.json();
         })
     ])
-    .then(([services]) => {
-        callback(services);
-    })
-    .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
+        .then(([services]) => {
+            callback(services);
+        })
+        .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
 }
 
 function renderServices(services) {
@@ -109,7 +109,7 @@ function renderServices(services) {
 
     $('#list-service tbody').off('click', '.update-btn').on('click', '.update-btn', function () {
         let serviceId = $(this).data('id');
-        handleUpdateService(serviceId); 
+        handleUpdateService(serviceId);
     });
 
     // Đóng dropdown khi bấm ra ngoài
@@ -181,19 +181,135 @@ function handleCreateForm() {
 function createService(formData, callback) {
     const token = localStorage.getItem("token");
     if (!token) return alert("Vui lòng đăng nhập lại!");
-  
-    fetch(ServiceAPI, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}` },
-      body: formData
-    })
-      .then(response => {
-        if (!response.ok) throw new Error("Lỗi server");
-        return response.json();
-      })
-      .then(data => {
-        callback(data.result || data);
-      })
-      .catch(error => alert(`Lỗi tạo dịch vụ: ${error.message}`));
-  }
 
+    fetch(ServiceAPI, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    })
+        .then(response => {
+            if (!response.ok) throw new Error("Lỗi server");
+            return response.json();
+        })
+        .then(data => {
+            callback(data.result || data);
+        })
+        .catch(error => alert(`Lỗi tạo dịch vụ: ${error.message}`));
+}
+
+function handleUpdateService(serviceId) {
+    localStorage.setItem("editServiceId", serviceId); // Lưu ID vào localStorage
+    window.location.href = "service_manage.html"; // Chuyển đến trang form
+}
+
+function loadEditForm(editServiceId) {
+    if (!editServiceId) return;
+
+    console.log("Chỉnh sửa dịch vụ ID:", editServiceId);
+    const inputPicture = document.querySelector('input[name="picture"]');
+    const imagePreview = document.getElementById("image");
+    const defaultImagePath = "assets/img/services/casi.png";
+
+    // Lấy token từ localStorage
+    let token = localStorage.getItem("token");
+    if (!token) {
+        console.error("Không tìm thấy token, đăng nhập lại!");
+        return;
+    }
+
+    // Lấy thông tin dịch vụ
+    fetch(`${ServiceAPI}/${editServiceId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(res => res.json())
+        .then(service => {
+            console.log('Dữ liệu dịch vụ:', service);
+
+            // Điền dữ liệu vào form
+            document.querySelector('input[name="name"]').value = service.name || "";
+            document.querySelector('input[name="description"]').value = service.description || "";
+            document.querySelector('input[name="price"]').value = service.hourly_salary || "";
+            document.querySelector('input[name="quantity"]').value = service.quantity || 1;
+            document.querySelector('input[name="location"]').value = service.place || "";
+
+            // Xử lý ảnh
+            if (service.img) {
+                try {
+                    const baseApiUrl = 'http://localhost:8080/service-management/api/v1/FileUpload/files/';
+                    const fileName = service.img.split('/').pop();
+                    const imageUrl = `${baseApiUrl}${fileName}`;
+
+                    console.log('URL ảnh:', imageUrl);
+
+                    const newImg = document.createElement('img');
+                    newImg.id = 'image';
+                    newImg.style.maxWidth = '500px';
+                    newImg.style.height = '400px';
+                    newImg.alt = 'Xem trước dịch vụ';
+
+                    if (imagePreview) {
+                        imagePreview.parentNode.replaceChild(newImg, imagePreview);
+                    }
+
+                    newImg.src = imageUrl;
+
+                    newImg.onerror = function () {
+                        console.error('Lỗi tải ảnh:', imageUrl);
+                        this.src = defaultImagePath;
+                    };
+                } catch (error) {
+                    console.error('Lỗi xử lý ảnh:', error);
+                    if (imagePreview) imagePreview.src = defaultImagePath;
+                }
+            } else {
+                if (imagePreview) imagePreview.src = defaultImagePath;
+            }
+
+            // Đổi nút "Lưu" thành "Cập nhật"
+            document.querySelector("#create").textContent = "Cập nhật";
+            document.querySelector("#create").onclick = function () {
+                const inputPicture = document.querySelector('input[name="picture"]');
+                const inputName = document.querySelector('input[name="name"]').value;
+                const inputDescription = document.querySelector('input[name="description"]').value;
+                const inputPrice = document.querySelector('input[name="price"]').value;
+                const inputQuantity = document.querySelector('input[name="quantity"]').value;
+                const inputLocation = document.querySelector('input[name="location"]').value;
+                const img = inputPicture.files.length > 0 ? imagePreview.src : service.img;
+
+                const updatedService = {
+                    img: img,
+                    name: inputName,
+                    description: inputDescription,
+                    hourly_salary: parseFloat(inputPrice),
+                    quantity: parseInt(inputQuantity),
+                    place: inputLocation,
+                    created_at: service.created_at,
+                    updated_at: new Date().toISOString().split('T')[0]
+                };
+
+                fetch(`${ServiceAPI}/${editServiceId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(updatedService)
+                })
+                    .then(res => res.json())
+                    .then(() => {
+                        console.log("Cập nhật dịch vụ thành công!");
+                        window.location.href = "service_table.html";
+                    })
+                    .catch(error => {
+                        console.error("Lỗi cập nhật dịch vụ:", error);
+                    });
+            };
+        })
+        .catch(error => {
+            console.error("Lỗi tải dữ liệu dịch vụ:", error);
+        });
+}

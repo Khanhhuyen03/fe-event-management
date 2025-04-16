@@ -9,7 +9,7 @@ try {
 } catch (e) {
     console.error("Dữ liệu user không hợp lệ:", e);
     user = null;
-}   
+}
 function start() {
     getData((devices, deviceTypes) => {
         renderDevices(devices, deviceTypes);
@@ -50,10 +50,10 @@ function getData(callback) {
             return res.json();
         })
     ])
-    .then(([devices, deviceTypes]) => {
-        callback(devices, deviceTypes);
-    })
-    .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
+        .then(([devices, deviceTypes]) => {
+            callback(devices, deviceTypes);
+        })
+        .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
 }
 
 function renderDevices(devices, deviceTypes) {
@@ -276,7 +276,6 @@ function handleCreateForm() {
             price: parseFloat(price),
             quantity: parseInt(quantity),
             location: location,
-            detail: detail
         };
 
         // Create FormData
@@ -301,18 +300,163 @@ function handleCreateForm() {
 function createDevice(formData, callback) {
     const token = localStorage.getItem("token");
     if (!token) return alert("Vui lòng đăng nhập lại!");
-  
+
     fetch(DeviceAPI, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}` },
-      body: formData
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
     })
-      .then(response => {
-        if (!response.ok) throw new Error("Lỗi server");
-        return response.json();
-      })
-      .then(data => {
-        callback(data.result || data);
-      })
-      .catch(error => alert(`Lỗi tạo thiết bị: ${error.message}`));
-  }
+        .then(response => {
+            if (!response.ok) throw new Error("Lỗi server");
+            return response.json();
+        })
+        .then(data => {
+            callback(data.result || data);
+        })
+        .catch(error => alert(`Lỗi tạo thiết bị: ${error.message}`));
+}
+//Cập nhật thiết bị
+function handleUpdateDevice(deviceId) {
+    localStorage.setItem("editDeviceId", deviceId); // Lưu ID vào localStorage
+    window.location.href = "device_manage.html"; // Chuyển đến trang form
+}
+
+// Tải form chỉnh sửa thiết bị
+function loadEditForm(editDeviceId) {
+    if (!editDeviceId) return;
+
+    console.log("Chỉnh sửa thiết bị ID:", editDeviceId);
+    const inputPicture = document.querySelector('input[name="picture"]');
+    const imagePreview = document.getElementById("image");
+    const defaultImagePath = "assets/img/device/densk.png";
+
+    //Lấy token từ localStorage
+    let token = localStorage.getItem("token");
+    if (!token) {
+        console.error("Không tìm thấy token, đăng nhập lại đi!");
+        return;
+    }
+
+    // Lấy danh sách loại thiết bị
+    fetch(DeviceTypeAPI, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(res => res.json())
+        .then(deviceTypes => {
+            console.log('Loại thiết bị:', deviceTypes);
+
+            const selectDeviceType = document.querySelector('select[name="devicetype"]');
+            selectDeviceType.innerHTML = '<option value="">Chọn loại thiết bị</option>';
+
+            if (Array.isArray(deviceTypes)) {
+                deviceTypes.forEach(type => {
+                    const option = document.createElement("option");
+                    option.value = type.id;
+                    option.textContent = type.name;
+                    selectDeviceType.appendChild(option);
+                });
+            }
+
+            // Lấy thông tin thiết bị
+            return fetch(`${DeviceAPI}/${editDeviceId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            }).then(res => res.json());
+        })
+        .then(device => {
+            console.log('Dữ liệu thiết bị:', device);
+
+            // Điền dữ liệu vào form
+            document.querySelector('input[name="name"]').value = device.name || "";
+            document.querySelector('input[name="description"]').value = device.description || "";
+            document.querySelector('select[name="devicetype"]').value = device.device_types_id || "";
+            document.querySelector('input[name="price"]').value = device.hourly_rental_fee || "";
+            document.querySelector('input[name="quantity"]').value = device.quantity || 1;
+            document.querySelector('input[name="location"]').value = device.place || "";
+
+            // Xử lý ảnh
+            if (device.img) {
+                try {
+                    const baseApiUrl = 'http://localhost:8080/device-management/api/v1/FileUpload/files/';
+                    const fileName = device.img.split('/').pop();
+                    const imageUrl = `${baseApiUrl}${fileName}`;
+
+                    console.log('URL ảnh:', imageUrl);
+
+                    const newImg = document.createElement('img');
+                    newImg.id = 'image';
+                    newImg.style.maxWidth = '500px';
+                    newImg.style.height = '400px';
+                    newImg.alt = 'Xem trước thiết bị';
+
+                    if (imagePreview) {
+                        imagePreview.parentNode.replaceChild(newImg, imagePreview);
+                    }
+
+                    newImg.src = imageUrl;
+
+                    newImg.onerror = function () {
+                        console.error('Lỗi tải ảnh:', imageUrl);
+                        this.src = defaultImagePath;
+                    };
+                } catch (error) {
+                    console.error('Lỗi xử lý ảnh:', error);
+                    if (imagePreview) imagePreview.src = defaultImagePath;
+                }
+            } else {
+                if (imagePreview) imagePreview.src = defaultImagePath;
+            }
+
+            // Đổi nút "Lưu" thành "Cập nhật"
+            document.querySelector("#create").textContent = "Cập nhật";
+            document.querySelector("#create").onclick = function () {
+                const inputPicture = document.querySelector('input[name="picture"]');
+                const inputName = document.querySelector('input[name="name"]').value;
+                const inputDescription = document.querySelector('input[name="description"]').value;
+                const inputDeviceType = document.querySelector('select[name="devicetype"]').value;
+                const inputPrice = document.querySelector('input[name="price"]').value;
+                const inputQuantity = document.querySelector('input[name="quantity"]').value;
+                const inputLocation = document.querySelector('input[name="location"]').value;
+                const img = inputPicture.files.length > 0 ? imagePreview.src : device.img;
+
+                const updatedDevice = {
+                    img: img,
+                    name: inputName,
+                    description: inputDescription,
+                    device_types_id: inputDeviceType,
+                    hourly_rental_fee: parseFloat(inputPrice),
+                    quantity: parseInt(inputQuantity),
+                    place: inputLocation,
+                    created_at: device.created_at,
+                    updated_at: new Date().toISOString().split('T')[0]
+                };
+
+                fetch(`${DeviceAPI}/${editDeviceId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(updatedDevice)
+                })
+                    .then(res => res.json())
+                    .then(() => {
+                        console.log("Cập nhật thiết bị thành công!");
+                        window.location.href = "device_table.html";
+                    })
+                    .catch(error => {
+                        console.error("Lỗi cập nhật thiết bị:", error);
+                    });
+            };
+        })
+        .catch(error => {
+            console.error("Lỗi tải dữ liệu thiết bị:", error);
+        });
+}
