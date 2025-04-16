@@ -179,7 +179,7 @@ function updateUserRole(userId) {
         .then(roles => {
             const allowedRoles = roles.filter(role => role.name === "USER" || role.name === "SUPPLIER");
             roleSelect.innerHTML = allowedRoles.map(role =>
-                `<option value="${role.id}">${role.name}</option>`
+                `<option value="${role.name}">${role.name}</option>`
             ).join('');
         })
         .catch(error => console.error("Lỗi khi lấy roles:", error));
@@ -200,7 +200,7 @@ function updateUserRole(userId) {
                 "Authorization": `Bearer ${localStorage.getItem("token")}`,
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ role_id: newRoleId })
+            body: JSON.stringify({ role: newRoleId })
         })
             .then(response => response.json())
             .then(data => {
