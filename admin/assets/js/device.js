@@ -1,6 +1,7 @@
-var DeviceAPI = 'http://localhost:3000/device';
-var DeviceTypeAPI = 'http://localhost:3000/device_type';
-var UsersAPI ='http://localhost:3000/user';
+const API_BASE = 'http://localhost:8080/event-management';
+const DeviceAPI = `${API_BASE}/devices`;
+const DeviceTypeAPI = `${API_BASE}/deviceType`;
+const UsersAPI = `${API_BASE}/users`;
 function start(){
     getData((devices, deviceTypes, users) => {
         renderDevices(devices, deviceTypes, users)
@@ -18,19 +19,9 @@ function getData(callback) {
     // }
 
     Promise.all([
-        fetch(DeviceAPI, {
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
-            }
-        }).then(res => res.json()),
+        fetch(`${DeviceAPI}/list`).then(res => res.json()),
 
-        fetch(DeviceTypeAPI, {
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
-            }
-        }).then(res => res.json()),
+        fetch(`${DeviceTypeAPI}/list`).then(res => res.json()),
 
         fetch(UsersAPI, {
             headers: {
@@ -40,6 +31,8 @@ function getData(callback) {
         }).then(res => res.json()),
     ])
         .then(([devices, deviceTypes, users]) => {
+            devices = devices.data.items;
+            deviceTypes = deviceTypes.data.items;
             callback(devices, deviceTypes, users);
         })
         .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
@@ -65,11 +58,11 @@ function renderDevices(devices, deviceTypes, users) {
 
     var htmls = devices.map(function (device) {
         // Lấy loại thiết bị
-        var deviceType = deviceTypes.find(dt => String(dt.id) === String(device.device_types_id));
+        var deviceType = deviceTypes.find(dt => String(dt.id) === String(device.deviceType_id));
         var deviceTypeName = deviceType ? deviceType.name : "Không xác định";
 
         // Lấy nhà cung cấp
-        var supplier = users.find(user => String(user.id) === String(device.user_id));
+        var supplier = users.find(user => String(user.id) === String(device.userID));
         var supplierName = supplier ? `${supplier.last_name} ${supplier.first_name} ` : "Không có nhà cung cấp";
 
         return `
@@ -78,8 +71,8 @@ function renderDevices(devices, deviceTypes, users) {
                 <td>${deviceTypeName}</td>
                 <td>${device.description || "Không có mô tả"}</td>
                 <td>${device.quantity || 0}</td>
-                <td>${device.hourly_rental_fee ? device.hourly_rental_fee.toLocaleString() + " VND" : "Không xác định"}</td>
-                <td>${device.created_at || "Không xác định"}</td>
+                <td>${device.hourlyRentalFee ? device.hourlyRentalFee.toLocaleString() + " VND" : "Không xác định"}</td>
+                <td>${device.created_at ? new Date(device.created_at).toLocaleDateString("en-US", {year: "2-digit", month: "2-digit", day: "2-digit"}) : "Không xác định"}</td>
                 <td>${supplierName}</td>
                 <td class="text-center">
                     <div class="action-dropdown">

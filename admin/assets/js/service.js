@@ -1,5 +1,6 @@
-var ServiceAPI = 'http://localhost:3000/service';
-var UsersAPI ='http://localhost:3000/user';
+const API_BASE = 'http://localhost:8080/event-management';
+var ServiceAPI =`${API_BASE}/services`;
+var UsersAPI =`${API_BASE}/users`;
 function start(){
     getData((services, user) => {
         renderServices(services, user);
@@ -17,12 +18,7 @@ function getData(callback) {
     }
 
     Promise.all([
-        fetch(ServiceAPI, {
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
-            }
-        }).then(res => res.json()),
+        fetch(`${ServiceAPI}/list`).then(res => res.json()),
 
         fetch(UsersAPI, {
             headers: {
@@ -32,6 +28,7 @@ function getData(callback) {
         }).then(res => res.json()),
     ])
         .then(([services, users]) => {
+            services = services.data.items;
             callback(services, users);
         })
         .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
@@ -40,14 +37,19 @@ function getData(callback) {
 function renderServices(services, users) {
     var listServicesBlock = document.querySelector('#list-service tbody');
     if (!listServicesBlock) return;
+    console.log("Services:", services);
 
+    if (!services || services.length === 0) {
+        console.warn("Danh sách services rỗng!");
+        return;
+    }
     // Hủy DataTables nếu đã khởi tạo
     if ($.fn.DataTable.isDataTable('#list-service')) {
         $('#list-service').DataTable().destroy();
     }
 
     var htmls = services.map(function (service) {
-        var supplier = users.find(user => user.id === service.user_id);
+        var supplier = users.find(user => String(user.id) === String(service.userID));
         var supplierName = supplier ? `${supplier.last_name} ${supplier.first_name}` : 'Không có nhà cung cấp';
 
         return `
@@ -56,7 +58,7 @@ function renderServices(services, users) {
                 <td style="width: 40%;">${service.description || 'Không có mô tả'}</td>
                 <td>${service.quantity}</td>
                 <td>${service.hourly_salary ? service.hourly_salary.toLocaleString() + " VND" : '0 VND'}</td>
-                <td>${service.created_at}</td>
+                <td>${service.created_at ? new Date(service.created_at).toLocaleDateString("en-US", {year: "2-digit", month: "2-digit", day: "2-digit"}) : "Không xác định"}</td>
                 <td>${supplierName}</td>
                 <td class="text-center">
                     <div class="action-dropdown">
