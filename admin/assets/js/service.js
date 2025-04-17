@@ -59,6 +59,7 @@ function renderServices(services, users) {
                 <td>${service.quantity}</td>
                 <td>${service.hourly_salary ? service.hourly_salary.toLocaleString() + " VND" : '0 VND'}</td>
                 <td>${service.created_at ? new Date(service.created_at).toLocaleDateString("en-US", {year: "2-digit", month: "2-digit", day: "2-digit"}) : "Không xác định"}</td>
+                <td>${service.place}</td>
                 <td>${supplierName}</td>
                 <td class="text-center">
                     <div class="action-dropdown">

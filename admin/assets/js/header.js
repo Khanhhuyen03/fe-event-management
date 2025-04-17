@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-  fetch("header.html")
+  fetch("../header.html")
     .then(response => {
       if (!response.ok) throw new Error("Không thể tải header.html");
       return response.text();
@@ -41,19 +41,41 @@ function loadMainScript() {
     existingScript.remove(); // Xóa nếu script đã tồn tại
   }
   let script = document.createElement("script");
-  script.src = "assets/js/main.js";
+  script.src = "../assets/js/main.js";
   script.defer = true;
   document.body.appendChild(script);
 }
+// Hàm ánh xạ role_id thành tên vai trò
+function getRoleName(roleId) {
+  const roleMap = {
+    "ef09daa2-ee20-4e1f-a662-e0d9fcd6dfbc": "Admin",
+    "459fd90e-8f59-4d0d-a644-2b53963acda8": "Manager"
+  };
+  return roleMap[roleId] || "Unknown"; // Trả về "Unknown" nếu role_id không hợp lệ
+}
+//_____________
 function updateUserInfo() {
   const user = JSON.parse(localStorage.getItem("user"));
   console.log("User từ localStorage:", user);
 
+  // Kiểm tra role_id và chuyển hướng nếu cần
+  if (user && user.role_id) {
+    const currentPath = window.location.pathname;
+    if (user.role_id === "ef09daa2-ee20-4e1f-a662-e0d9fcd6dfbc" && !currentPath.includes("admin")) {
+      window.location.href = "../admin/index.html"; // Chuyển hướng đến admin
+      return;
+    } else if (user.role_id === "459fd90e-8f59-4d0d-a644-2b53963acda8" && !currentPath.includes("manager")) {
+      window.location.href = "../manager/index.html"; // Chuyển hướng đến manager
+      return;
+    }
+  }
+//________________-
   const loginBtn = document.getElementById("login-btn");
   const userInfo = document.getElementById("user-info");
   const userAvatar = document.getElementById("user-avatar");
   const userName = document.getElementById("user-name");
   const fullName = document.getElementById("full-name");
+  const roleElement = document.getElementById("role");
   const logoutBtn = document.getElementById("logout-btn");
 
   if (user) {
@@ -69,7 +91,13 @@ function updateUserInfo() {
     const displayName = `${user.last_name || ""} ${user.first_name || ""}`.trim();
     if (userName) userName.textContent = displayName;
     if (fullName) fullName.textContent = displayName;
-
+    //_________
+    if (roleElement) {
+      const roleName = getRoleName(user.role_id);
+      roleElement.textContent = roleName; // Cập nhật tên vai trò vào phần tử role
+      console.log("Vai trò hiển thị:", roleName);
+    }
+    //_________
     console.log("Tên hiển thị:", displayName);
   } else {
     loginBtn?.classList.remove("d-none");
