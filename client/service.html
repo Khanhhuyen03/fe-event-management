@@ -134,7 +134,8 @@
             border-radius: 5px;
             padding: 8px 8px;
             cursor: pointer;
-            display: none; /* Ẩn mặc định, hiển thị khi cuộn */
+            display: none;
+            /* Ẩn mặc định, hiển thị khi cuộn */
             z-index: 1000;
             transition: all 0.3s ease;
             writing-mode: vertical-rl;
@@ -223,7 +224,8 @@
                 <!-- danh mục -->
                 <div class="col-lg-3" data-aos="fade-up" data-aos-delay="100">
                     <div class="filter-section mb-4">
-                        <button class="btn-register w-100" onclick="checkLoginAndOpenContract()">Đăng ký tổ chức sự kiện</button>
+                        <button class="btn-register w-100" onclick="checkLoginAndOpenContract()">Đăng ký tổ chức sự
+                            kiện</button>
                     </div>
                     <div class="service-details">
                         <div class="service-box">
@@ -431,7 +433,7 @@
             const baseImageUrl = "http://localhost:8080/event-management/api/v1/FileUpload/files/";
 
             items.forEach((item, index) => {
-                let detailPage = currentCategory === "event" ? "./event_detail.html" : "./item-detail.html";
+                let detailPage = currentCategory === "event" ? "./event-detail.html" : "./item-detail.html";
                 let buttonText = "Xem Chi Tiết";
                 let itemId = currentCategory === "event" ? item.id : encodeURIComponent(item.name);
                 let hoverInfo = `

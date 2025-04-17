@@ -3,8 +3,21 @@ let currentUserData = null;
 const defaultAvatar = './assets/img/avatar/avt.jpg';
 let isDefaultAvatar = true;
 
+// function updateAvatarState(avatarSrc, containerId = 'avatarContainer') {
+//     const avatarContainer = document.getElementById(containerId);
+//     isDefaultAvatar = avatarSrc === defaultAvatar;
+//     if (isDefaultAvatar) {
+//         avatarContainer.classList.add('default');
+//     } else {
+//         avatarContainer.classList.remove('default');
+//     }
+// }
 function updateAvatarState(avatarSrc, containerId = 'avatarContainer') {
     const avatarContainer = document.getElementById(containerId);
+    if (!avatarContainer) {
+        console.error(`Không tìm thấy phần tử với ID: ${containerId}`);
+        return;
+    }
     isDefaultAvatar = avatarSrc === defaultAvatar;
     if (isDefaultAvatar) {
         avatarContainer.classList.add('default');
@@ -40,23 +53,63 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-document.getElementById('editAvatarInput').addEventListener('change', function (event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const avatarImage = document.getElementById('editAvatarImage');
-            avatarImage.src = e.target.result;
-            updateAvatarState(e.target.result, 'editAvatarContainer');
-            console.log('Ảnh đã tải lên:', e.target.result);
-        };
-        reader.onerror = function (e) {
-            console.error('Lỗi khi đọc file ảnh:', e);
-            alert('Không thể tải ảnh lên. Vui lòng thử lại.');
-        };
-        reader.readAsDataURL(file);
+// document.getElementById('editAvatarInput').addEventListener('change', function (event) {
+//     const file = event.target.files[0];
+//     if (file) {
+//         const reader = new FileReader();
+//         reader.onload = function (e) {
+//             const avatarImage = document.getElementById('editAvatarImage');
+//             avatarImage.src = e.target.result;
+//             updateAvatarState(e.target.result, 'editAvatarContainer');
+//             console.log('Ảnh đã tải lên:', e.target.result);
+//         };
+//         reader.onerror = function (e) {
+//             console.error('Lỗi khi đọc file ảnh:', e);
+//             alert('Không thể tải ảnh lên. Vui lòng thử lại.');
+//         };
+//         reader.readAsDataURL(file);
+//     } else {
+//         alert('Vui lòng chọn một file ảnh!');
+//     }
+// });
+document.addEventListener('DOMContentLoaded', function () {
+    const userData = JSON.parse(localStorage.getItem('user'));
+    console.log('userData:', userData);
+    if (!userData) {
+        alert('Vui lòng đăng nhập để xem thông tin cá nhân!');
+        window.location.href = 'login.html';
+        return;
+    }
+
+    currentUserId = userData.id;
+    currentUserData = userData;
+
+    const emailElement = document.getElementById('email');
+    const lastNameElement = document.getElementById('last_name');
+    const firstNameElement = document.getElementById('first_name');
+    const phoneNumberElement = document.getElementById('phone_number');
+
+    if (!emailElement || !lastNameElement || !firstNameElement || !phoneNumberElement) {
+        console.error('Không tìm thấy các phần tử HTML để hiển thị thông tin người dùng');
+        return;
+    }
+
+    emailElement.innerText = userData.email || 'Chưa có thông tin';
+    lastNameElement.innerText = userData.last_name || 'Chưa có thông tin';
+    firstNameElement.innerText = userData.first_name || 'Chưa có thông tin';
+    phoneNumberElement.innerText = userData.phone_number || 'Chưa có thông tin';
+
+    const avatarImage = document.getElementById('avatarImage');
+    const avatarSrc = userData.avatar || defaultAvatar;
+    if (avatarSrc !== defaultAvatar) {
+        loadAvatarWithAuth(getAbsoluteAvatarUrl(avatarSrc), avatarImage);
     } else {
-        alert('Vui lòng chọn một file ảnh!');
+        avatarImage.src = avatarSrc;
+    }
+    updateAvatarState(avatarSrc, 'avatarContainer');
+
+    if (typeof window.updateHeader === 'function') {
+        window.updateHeader();
     }
 });
 
@@ -340,7 +393,7 @@ async function saveChanges() {
 
     try {
         // Sửa URL endpoint
-        const response = await fetch(`http://localhost:8080/users/${currentUserId}`, {
+        const response = await fetch(`http://localhost:8080/event-management/users/${currentUserId}`, {
             method: 'PATCH',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -414,6 +467,98 @@ async function saveChanges() {
         alert(`Không thể cập nhật thông tin: ${error.message}`);
     }
 }
+
+// async function saveChanges() {
+//     localStorage.removeItem('user');
+
+//     const newEmail = document.getElementById('editEmail').value;
+//     const newLastName = document.getElementById('editLastName').value;
+//     const newFirstName = document.getElementById('editFirstName').value;
+//     const newPhoneNumber = document.getElementById('editPhoneNumber').value;
+//     const avatarInput = document.getElementById('editAvatarInput');
+//     const avatarFile = avatarInput.files[0];
+
+//     // Kiểm tra các trường bắt buộc
+//     if (!newEmail.trim() || !newLastName.trim() || !newFirstName.trim()) {
+//         alert('Email, họ và tên không được để trống!');
+//         return;
+//     }
+
+//     const formData = new FormData();
+//     const patchData = {};
+//     if (newEmail && newEmail.trim() && newEmail !== currentUserData.email) patchData.email = newEmail;
+//     if (newLastName && newLastName.trim() && newLastName !== currentUserData.last_name) patchData.last_name = newLastName;
+//     if (newFirstName && newFirstName.trim() && newFirstName !== currentUserData.first_name) patchData.first_name = newFirstName;
+//     if (newPhoneNumber && newPhoneNumber.trim() && newPhoneNumber !== currentUserData.phone_number) patchData.phone_number = newPhoneNumber;
+//     if (Object.keys(patchData).length > 0) {
+//         formData.append('data', JSON.stringify(patchData));
+//     }
+
+//     if (avatarFile) {
+//         formData.append('avatar', avatarFile);
+//     }
+
+//     if (!avatarFile && Object.keys(patchData).length === 0) {
+//         alert('Không có thay đổi để lưu!');
+//         const modalElement = document.getElementById('editModal');
+//         const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+//         modal.hide();
+//         return;
+//     }
+
+//     const token = localStorage.getItem('token');
+//     if (!token) {
+//         alert('Không tìm thấy token. Vui lòng đăng nhập lại!');
+//         window.location.href = 'login.html';
+//         return;
+//     }
+
+//     try {
+//         const response = await fetch(`http://localhost:8080/event-management/users/${currentUserId}`, {
+//             method: 'PATCH',
+//             headers: {
+//                 'Authorization': `Bearer ${token}`,
+//                 "Content-Type": "application/json"
+//             },
+//             body: formData
+//         });
+
+//         if (!response.ok) {
+//             const errorText = await response.text();
+//             throw new Error(`Lỗi khi cập nhật dữ liệu: ${response.status} - ${errorText}`);
+//         }
+
+//         const updatedDataFromServer = await response.json();
+
+//         // Hợp nhất dữ liệu cẩn thận
+//         const updatedData = {
+//             ...currentUserData,
+//             email: patchData.email || currentUserData.email,
+//             last_name: patchData.last_name || currentUserData.last_name,
+//             first_name: patchData.first_name || currentUserData.first_name,
+//             phone_number: patchData.phone_number || currentUserData.phone_number,
+//             avatar: updatedDataFromServer.avatar || currentUserData.avatar,
+//             id: currentUserId
+//         };
+
+//         localStorage.setItem('user', JSON.stringify(updatedData));
+//         currentUserData = updatedData;
+
+//         // Cập nhật giao diện
+//         updateUserInterface(updatedData);
+
+//         const modalElement = document.getElementById('editModal');
+//         const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+//         modal.hide();
+//         alert('Cập nhật thông tin thành công!');
+//     } catch (error) {
+//         console.error('Lỗi chi tiết:', error);
+//         alert(`Không thể cập nhật thông tin: ${error.message}`);
+//     }
+// }
+
+
+
 function updateUserInterface(userData) {
     // Cập nhật thông tin text
     document.getElementById('email').innerText = userData.email || 'Chưa có thông tin';
@@ -449,4 +594,33 @@ function checkResponse(response) {
         throw new Error(`HTTP error! status: ${response.status}`);
     }
     return response;
+}
+
+function loadAvatarWithAuth(avatarUrl, imageElement) {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    fetch(avatarUrl, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+        .then(response => response.blob())
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            imageElement.src = url;
+        })
+        .catch(error => {
+            console.error('Lỗi tải avatar:', error);
+            imageElement.src = defaultAvatar;
+        });
+}
+
+// Sử dụng trong updateAvatarState hoặc khi cập nhật avatar
+const avatarImage = document.getElementById('avatarImage');
+const avatarSrc = userData.avatar || defaultAvatar;
+if (avatarSrc !== defaultAvatar) {
+    loadAvatarWithAuth(getAbsoluteAvatarUrl(avatarSrc), avatarImage);
+} else {
+    avatarImage.src = avatarSrc;
 }

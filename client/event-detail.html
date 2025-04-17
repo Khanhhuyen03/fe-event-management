@@ -38,8 +38,9 @@
     <main class="container mt-4">
         <div class="row">
             <div class="col-lg-8">
+                <!-- Chỉ hiển thị 1 hình ảnh, không dùng carousel -->
                 <img id="eventImage" src="" alt="" class="img-fluid"
-                    style="max-height: 400px; object-fit: cover; display: none;">
+                    style="height: 400px; width: 800px; object-fit: fill; display: none;">
             </div>
 
             <div class="col-lg-4">
@@ -51,6 +52,7 @@
         </div>
 
         <section class="mt-5">
+            <!-- Thiết Bị -->
             <div class="table-responsive mt-4">
                 <h3>THIẾT BỊ</h3>
                 <table class="table table-bordered text-center">
@@ -73,6 +75,7 @@
                 </table>
             </div>
 
+            <!-- Dịch Vụ -->
             <div class="table-responsive mt-4">
                 <h3>DỊCH VỤ</h3>
                 <table class="table table-bordered text-center">
@@ -87,9 +90,28 @@
                             <th>Thành Tiền</th>
                         </tr>
                     </thead>
-                    <tbody id="staffList">
+                    <tbody id="serviceList">
                         <tr>
                             <td colspan="7">Đang tải...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Địa Điểm (Thêm phần này nếu cần) -->
+            <div class="table-responsive mt-4">
+                <h3>ĐỊA ĐIỂM</h3>
+                <table class="table table-bordered text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Tên Địa Điểm</th>
+                            <th>Mô Tả</th>
+                            <th>Địa Chỉ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="locationList">
+                        <tr>
+                            <td colspan="3">Đang tải...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -143,22 +165,16 @@
 
     <!-- Main JS File -->
     <script src="assets/js/main.js"></script>
-    <script src="assets/js/event-detail.js"></script>
     <script src="assets/js/header.js"></script>
 
     <script>
-        let selectedEvent; // Biến toàn cục để lưu trữ dữ liệu sự kiện
         let suppliers = []; // Lưu trữ danh sách nhà cung cấp
         let deviceTypes = []; // Lưu trữ danh sách loại thiết bị
         const baseImageUrl = "http://localhost:8080/event-management/api/v1/FileUpload/files/";
 
-        // Hàm định dạng ngày thành dd/mm/yyyy
-        function formatDateToDDMMYYYY(dateStr) {
-            const date = new Date(dateStr);
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            return `${day}/${month}/${year}`;
+        // Hàm định dạng tiền tệ
+        function formatCurrency(amount) {
+            return (amount || 0).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
         }
 
         // Hàm lấy tên nhà cung cấp
@@ -173,6 +189,26 @@
             return type ? type.name : "Không xác định";
         }
 
+        // Hàm gọi API chung
+        async function fetchData(url, errorMessage) {
+            try {
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`${errorMessage}: ${response.statusText}`);
+                }
+                return await response.json();
+            } catch (error) {
+                console.error(error);
+                return null;
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", async function () {
             const urlParams = new URLSearchParams(window.location.search);
             const eventId = urlParams.get("id");
@@ -184,46 +220,23 @@
             }
 
             try {
-                // Lấy danh sách nhà cung cấp
-                const suppliersResponse = await fetch("http://localhost:8080/event-management/users?role=supplier", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
-                    }
-                });
-                if (!suppliersResponse.ok) {
-                    throw new Error(`Lỗi khi lấy danh sách nhà cung cấp: ${suppliersResponse.statusText}`);
-                }
-                suppliers = await suppliersResponse.json();
+                // 1. Lấy danh sách nhà cung cấp
+                suppliers = await fetchData(
+                    "http://localhost:8080/event-management/users?role=supplier",
+                    "Lỗi khi lấy danh sách nhà cung cấp"
+                ) || [];
 
-                // Lấy danh sách loại thiết bị
-                const deviceTypesResponse = await fetch("http://localhost:8080/event-management/device-types", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
-                    }
-                });
-                if (!deviceTypesResponse.ok) {
-                    throw new Error(`Lỗi khi lấy danh sách loại thiết bị: ${deviceTypesResponse.statusText}`);
-                }
-                deviceTypes = await deviceTypesResponse.json();
+                // 2. Lấy danh sách loại thiết bị
+                deviceTypes = await fetchData(
+                    "http://localhost:8080/event-management/device-types",
+                    "Lỗi khi lấy danh sách loại thiết bị"
+                ) || [];
 
-                // Lấy chi tiết sự kiện
-                const eventResponse = await fetch(`http://localhost:8080/event-management/event/${eventId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem("token") || ""}`
-                    }
-                });
-
-                if (!eventResponse.ok) {
-                    throw new Error(`Lỗi khi tải chi tiết sự kiện: ${eventResponse.status}`);
-                }
-
-                const event = await eventResponse.json();
+                // 3. Lấy chi tiết sự kiện (chỉ lấy tên, mô tả, hình ảnh)
+                const event = await fetchData(
+                    `http://localhost:8080/event-management/event/${eventId}`,
+                    "Lỗi khi tải chi tiết sự kiện"
+                );
 
                 if (!event) {
                     document.getElementById("eventName").textContent = "Sự kiện không tồn tại!";
@@ -231,49 +244,10 @@
                     return;
                 }
 
-                // Lấy dữ liệu từ các API khác
-                const [timelineResponse, devicesResponse, servicesResponse] = await Promise.all([
-                    fetch(`http://localhost:8080/event-management/events/${eventId}/timeline`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${localStorage.getItem("token") || ""}`
-                        }
-                    }),
-                    fetch(`http://localhost:8080/event-management/rentals/event/${eventId}/devices`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${localStorage.getItem("token") || ""}`
-                        }
-                    }),
-                    fetch(`http://localhost:8080/event-management/rentals/event/${eventId}/services`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${localStorage.getItem("token") || ""}`
-                        }
-                    })
-                ]);
-
-                // Kiểm tra trạng thái các yêu cầu
-                const timeline = timelineResponse.ok ? await timelineResponse.json() : [];
-                const devices = devicesResponse.ok ? await devicesResponse.json() : [];
-                const services = servicesResponse.ok ? await servicesResponse.json() : [];
-
-                // Kết hợp dữ liệu vào selectedEvent
-                selectedEvent = {
-                    ...event, // name, description, detail, img, event_format
-                    timeline,
-                    device: devices,
-                    service: services
-                };
-
-                // Cập nhật tiêu đề và mô tả
+                // Cập nhật tiêu đề, mô tả và hình ảnh
                 document.getElementById("eventName").textContent = event.name || "Không có tiêu đề";
                 document.getElementById("eventDescription").textContent = event.description || "Không có mô tả";
 
-                // Cập nhật ảnh sự kiện
                 const eventImage = document.getElementById("eventImage");
                 const imageFileName = event.img ? event.img.split('/').pop() : null;
                 const imageUrl = imageFileName ? `${baseImageUrl}${imageFileName}` : "assets/img/default-image.jpg";
@@ -281,7 +255,12 @@
                 eventImage.onerror = () => { eventImage.src = "assets/img/default-image.jpg"; };
                 eventImage.style.display = "block";
 
-                // Cập nhật lịch trình
+                // 4. Lấy dữ liệu lịch trình
+                const timeline = await fetchData(
+                    `http://localhost:8080/event-management/events/${eventId}/timeline`,
+                    "Lỗi khi lấy lịch trình"
+                ) || [];
+
                 const timelineElement = document.getElementById("eventTimeline");
                 timelineElement.innerHTML = "";
                 if (timeline.length === 0) {
@@ -293,7 +272,12 @@
                     });
                 }
 
-                // Cập nhật danh sách thiết bị
+                // 5. Lấy danh sách thiết bị
+                const devices = await fetchData(
+                    `http://localhost:8080/event-management/rentals/event/${eventId}/devices`,
+                    "Lỗi khi lấy danh sách thiết bị"
+                ) || [];
+
                 const equipmentList = document.getElementById("equipmentList");
                 equipmentList.innerHTML = "";
                 if (devices.length === 0) {
@@ -308,30 +292,57 @@
                                 <td>${item.description || "Không có mô tả"}</td>
                                 <td>${getSupplierName(item.user_id)}</td>
                                 <td>${item.quantity || 0}</td>
-                                <td>${(item.hourly_salary || 0).toLocaleString()}</td>
-                                <td>${((item.quantity || 0) * (item.hourly_salary || 0)).toLocaleString()}</td>
+                                <td>${formatCurrency(item.hourly_salary)}</td>
+                                <td>${formatCurrency((item.quantity || 0) * (item.hourly_salary || 0))}</td>
                             </tr>
                         `;
                     });
                 }
 
-                // Cập nhật danh sách dịch vụ
-                const staffList = document.getElementById("staffList");
-                staffList.innerHTML = "";
+                // 6. Lấy danh sách dịch vụ
+                const services = await fetchData(
+                    `http://localhost:8080/event-management/rentals/event/${eventId}/services`,
+                    "Lỗi khi lấy danh sách dịch vụ"
+                ) || [];
+
+                const serviceList = document.getElementById("serviceList");
+                serviceList.innerHTML = "";
                 if (services.length === 0) {
-                    staffList.innerHTML = "<tr><td colspan='7'>Không có dịch vụ</td></tr>";
+                    serviceList.innerHTML = "<tr><td colspan='7'>Không có dịch vụ</td></tr>";
                 } else {
                     services.forEach(item => {
                         const serviceImageUrl = item.image ? `${baseImageUrl}${item.image.split('/').pop()}` : "assets/img/default-service.jpg";
-                        staffList.innerHTML += `
+                        serviceList.innerHTML += `
                             <tr>
                                 <td><img src="${serviceImageUrl}" onerror="this.src='assets/img/default-service.jpg'" alt="${item.name}" style="max-width: 50px;"></td>
                                 <td>${item.name || "Không xác định"}</td>
                                 <td>${item.description || "Không có mô tả"}</td>
                                 <td>${getSupplierName(item.user_id)}</td>
                                 <td>${item.quantity || 0}</td>
-                                <td>${(item.hourly_salary || 0).toLocaleString()}</td>
-                                <td>${((item.quantity || 0) * (item.hourly_salary || 0)).toLocaleString()}</td>
+                                <td>${formatCurrency(item.hourly_salary)}</td>
+                                <td>${formatCurrency((item.quantity || 0) * (item.hourly_salary || 0))}</td>
+                            </tr>
+                        `;
+                    });
+                }
+
+                // 7. Lấy danh sách địa điểm (giả sử bạn có API cho địa điểm)
+                const locations = await fetchData(
+                    `http://localhost:8080/event-management/events/${eventId}/locations`,
+                    "Lỗi khi lấy danh sách địa điểm"
+                ) || [];
+
+                const locationList = document.getElementById("locationList");
+                locationList.innerHTML = "";
+                if (locations.length === 0) {
+                    locationList.innerHTML = "<tr><td colspan='3'>Không có địa điểm</td></tr>";
+                } else {
+                    locations.forEach(item => {
+                        locationList.innerHTML += `
+                            <tr>
+                                <td>${item.name || "Không xác định"}</td>
+                                <td>${item.description || "Không có mô tả"}</td>
+                                <td>${item.address || "Không có địa chỉ"}</td>
                             </tr>
                         `;
                     });
@@ -380,41 +391,6 @@
             }
             const modal = new bootstrap.Modal(modalElement, {});
             modal.show();
-
-            iframe.onload = function () {
-                console.log("Iframe loaded, gửi dữ liệu:", selectedEvent);
-                if (selectedEvent) {
-                    const eventData = {
-                        type: "preloadEvent",
-                        event: {
-                            name: selectedEvent.name || "",
-                            description: selectedEvent.description || "",
-                            device: selectedEvent.device.map(item => ({
-                                id: item.id || Date.now().toString(),
-                                name: item.name || "Không xác định",
-                                description: item.description || "Không có mô tả",
-                                supplier: getSupplierName(item.user_id),
-                                unitPrice: item.hourly_salary || 0,
-                                quantity: item.quantity || 1,
-                                image: item.img ? `${baseImageUrl}${item.img.split('/').pop()}` : "assets/img/default-device.jpg"
-                            })),
-                            service: selectedEvent.service.map(item => ({
-                                id: item.id || Date.now().toString(),
-                                name: item.name || "Không xác định",
-                                description: item.description || "Không có mô tả",
-                                supplier: getSupplierName(item.user_id),
-                                unitPrice: item.hourly_salary || 0,
-                                quantity: item.quantity || 1,
-                                image: item.image ? `${baseImageUrl}${item.image.split('/').pop()}` : "assets/img/default-service.jpg"
-                            })),
-                            timeline: selectedEvent.timeline || []
-                        }
-                    };
-                    iframe.contentWindow.postMessage(eventData, "*");
-                } else {
-                    console.error("Không có dữ liệu sự kiện để gửi!");
-                }
-            };
 
             window.addEventListener("message", function closeModal(event) {
                 if (event.data === "closeIframe") {
