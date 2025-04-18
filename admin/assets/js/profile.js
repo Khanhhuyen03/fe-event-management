@@ -57,7 +57,7 @@ function renderBigAvatarProfile(users) {
 
         <img src="${users.avatar}" alt="Profile" class="rounded-circle">
         <h2>${users.last_name} ${users.first_name}</h2>
-        <h3>Admin</h3>
+        <h3>${users.roleName || 'User'}</h3> <!-- Lấy role từ user, mặc định là 'User' nếu không có -->
         <div class="social-links mt-2">
             <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
             <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
@@ -75,7 +75,7 @@ function handleInfo() {
 
     // Gán thông tin vào các phần tử có ID tương ứng
     document.getElementById("nameinfo").textContent = `${user.last_name} ${user.first_name}`;
-    document.getElementById("roleinfo").textContent = "Admin"; // Vai trò mặc định
+    document.getElementById("roleinfo").textContent = user.roleName || 'User';
     document.getElementById("phoneinfo").textContent = user.phone_number;
     document.getElementById("emailinfo").textContent = user.email;
 }
