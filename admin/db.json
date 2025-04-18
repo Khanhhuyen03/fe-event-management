@@ -1019,6 +1019,7 @@
       "img": "device_a.jpg",
       "hourly_rental_fee": 100.5,
       "quantity": 100,
+      "place":"Đà Nẵng",
       "created_at": "12/03/2025",
       "updated_at": "15/03/2025",
       "description": "Thiết bị A chuyên dùng cho sự kiện lớn",
@@ -1031,6 +1032,7 @@
       "img": "device_b.jpg",
       "hourly_rental_fee": 150,
       "quantity": 500,
+      "place":"Đà Nẵng",
       "created_at": "14/03/2025",
       "updated_at": "16/03/2025",
       "description": "Thiết bị B phục vụ sân khấu ngoài trời",
@@ -1043,6 +1045,7 @@
       "img": "device_b.jpg",
       "hourly_rental_fee": 15000,
       "quantity": 500,
+      "place":"Đà Nẵng",
       "created_at": "14/03/2025",
       "updated_at": "16/03/2025",
       "description": "Thiết bị C phục vụ sân khấu ngoài trời",
@@ -1055,6 +1058,7 @@
       "img": "device_b.jpg",
       "hourly_rental_fee": 25000,
       "quantity": 500,
+      "place":"Đà Nẵng",
       "created_at": "14/03/2025",
       "updated_at": "16/03/2025",
       "description": "Thiết bị C phục vụ sân khấu ngoài trời",
@@ -1090,6 +1094,7 @@
       "img": "service_a.jpg",
       "hourly_salary": 50,
       "quantity": 300,
+      "place":"Đà Nẵng",
       "created_at": "12/03/2025",
       "updated_at": "15/03/2025",
       "user_id": "user1"
@@ -1101,6 +1106,7 @@
       "img": "service_b.jpg",
       "hourly_salary": 75,
       "quantity": 200,
+      "place":"Đà Nẵng",
       "created_at": "14/03/2025",
       "updated_at": "16/03/2025",
       "user_id": "user1"
@@ -1112,6 +1118,7 @@
       "img": "service_c.jpg",
       "hourly_salary": 1000,
       "quantity": 200,
+      "place":"Đà Nẵng",
       "created_at": "14/03/2025",
       "updated_at": "16/03/2025",
       "user_id": "user1"
@@ -1123,6 +1130,7 @@
       "img": "service_d.jpg",
       "hourly_salary": 1000,
       "quantity": 200,
+      "place":"Đà Nẵng",
       "created_at": "14/03/2025",
       "updated_at": "16/03/2025",
       "user_id": "user1"
@@ -1134,6 +1142,7 @@
       "img": "service_f.jpg",
       "hourly_salary": 10090,
       "quantity": 200,
+      "place":"Đà Nẵng",
       "created_at": "14/03/2025",
       "updated_at": "16/03/2025",
       "user_id": "user1"
@@ -1145,6 +1154,7 @@
       "img": "service_g.jpg",
       "hourly_salary": 20000,
       "quantity": 200,
+      "place":"Đà Nẵng",
       "created_at": "14/03/2025",
       "updated_at": "16/03/2025",
       "user_id": "user1"
@@ -4589,7 +4599,7 @@
   "user": [
     {
       "id": "user1",
-      "role_id": "role1",
+      "role_id": "role2",
       "email": "nguyenhongminh013@gmail.com",
       "password": "123456",
       "first_name": "Trinh",
@@ -4601,7 +4611,7 @@
     },
     {
       "id": "user2",
-      "role_id": "role3",
+      "role_id": "role4",
       "email": "nguyenhongminh4@gmail.com",
       "password": "123456",
       "first_name": "Hồng Minh",
@@ -4613,7 +4623,7 @@
     },
     {
       "id": "user3",
-      "role_id": "role3",
+      "role_id": "role4",
       "email": "hello@gmail.com",
       "password": "123",
       "first_name": "Ngân",
@@ -4625,7 +4635,7 @@
     },
     {
       "id": "user4",
-      "role_id": "role3",
+      "role_id": "role4",
       "email": "tuan@gmail.com",
       "password": "123",
       "first_name": "Tuấn",
@@ -4639,22 +4649,29 @@
   "role": [
     {
       "id": "role1",
-      "name": "NhaCungCap",
+      "name": "SUPPLIER",
       "created_at": "2024-03-19T12:00:00Z",
       "updated_at": "2024-03-19T12:00:00Z"
     },
     {
       "id": "role2",
-      "name": "Admin",
+      "name": "ADMiN",
       "created_at": "2024-03-19T12:00:00Z",
       "updated_at": "2024-03-19T12:00:00Z"
     },
     {
       "id": "role3",
-      "name": "Người dùng",
+      "name": "USER",
+      "created_at": "2024-03-19T12:00:00Z",
+      "updated_at": "2024-03-19T12:00:00Z"
+    },
+    {
+      "id": "role4",
+      "name": "MANAGER",
       "created_at": "2024-03-19T12:00:00Z",
       "updated_at": "2024-03-19T12:00:00Z"
     }
+
   ],
   "contract": [
     {

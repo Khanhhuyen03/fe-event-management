@@ -80,6 +80,7 @@ function renderDevices(devices, deviceTypes, users) {
                 <td>${device.quantity || 0}</td>
                 <td>${device.hourly_rental_fee ? device.hourly_rental_fee.toLocaleString() + " VND" : "Không xác định"}</td>
                 <td>${device.created_at || "Không xác định"}</td>
+                <td>${device.place || "ko có địa điểm"}</td>
                 <td>${supplierName}</td>
                 <td class="text-center">
                     <div class="action-dropdown">
