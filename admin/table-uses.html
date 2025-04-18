@@ -62,9 +62,9 @@
 
     <!-- ======= Header ======= -->
     <div id="header"></div>
-   <!-- ======= Sidebar ======= -->
-   <div id="sidebar-container"></div>
-   <script src="assets/js/sidebar.js" type="module"></script><!-- End Sidebar-->
+    <!-- ======= Sidebar ======= -->
+    <div id="sidebar-container"></div>
+    <script src="assets/js/sidebar.js" type="module"></script><!-- End Sidebar-->
 
 
     <main id="main" class="main">
@@ -139,31 +139,31 @@
     <!-- Hành động API data cho table User -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-          const user = JSON.parse(localStorage.getItem("user"));
-          const token = localStorage.getItem("token");
-      
-          fetch("http://localhost:3000/role", {
-            headers: {
-              //"Authorization": `Bearer ${token}`
-            }
-          })
-            .then(res => res.json())
-            .then(roles => {
-              const role = roles.find(r => r.id === user.role_id);
-              const roleName = role ? role.name.toUpperCase() : "USER";
-      
-              const script = document.createElement("script");
-              script.src = roleName === "MANAGER" 
-                ? "assets/js/users_mgr.js"
-                : "assets/js/uses.js";
-              script.defer = true;
-              document.body.appendChild(script);
+            const user = JSON.parse(localStorage.getItem("user"));
+            const token = localStorage.getItem("token");
+
+            fetch("http://localhost:8080/event-management/roles", {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
             })
-            .catch(error => {
-              console.error("Lỗi khi lấy role:", error);
-            });
+                .then(res => res.json())
+                .then(roles => {
+                    const role = roles.find(r => r.id === user.roleName);
+                    const roleName = role ? role.name.toUpperCase() : "USER";
+
+                    const script = document.createElement("script");
+                    script.src = user.roleName === "MANAGER"
+                        ? "assets/js/users_mgr.js"
+                        : "assets/js/uses.js";
+                    script.defer = true;
+                    document.body.appendChild(script);
+                })
+                .catch(error => {
+                    console.error("Lỗi khi lấy role:", error);
+                });
         });
-      </script>
+    </script>
     <!-- Script for Modal -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
