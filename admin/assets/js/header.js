@@ -56,12 +56,12 @@ function updateUserInfo() {
     const displayName = `${user.last_name || ""} ${user.first_name || ""}`.trim();
     if (userName) userName.textContent = displayName;
     if (fullName) fullName.textContent = displayName;
-    if (roleElement) roleElement.textContent = "Đang tải...";
+    if (roleElement) roleElement.textContent = user.roleName || "Vô phận sự";
     else console.error("Không tìm thấy phần tử #role trong DOM");
 
     // Lấy role_name từ API /role
-    console.log("Gọi API /role với role_id:", user.role_id);
-    fetch('http://localhost:3000/role', {
+    console.log("Gọi API /role với role_id:", user.roleName);
+    fetch('http://localhost:8080/event-management/roles', {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem("token") || ""}`, // Thêm token nếu có
         'Content-Type': 'application/json'
@@ -74,9 +74,9 @@ function updateUserInfo() {
       })
       .then(roles => {
         console.log("Danh sách roles từ API:", roles);
-        console.log("Tìm role với id:", user.role_id);
-        const role = roles.find(role => role.id === user.role_id); 
-        const roleName = role ? role.name : "Vô phận sự";
+        console.log("Tìm role với id:", user.roleName);
+        const role = roles.find(role => role.id === user.roleName || role.id.toString() === user.roleName);
+        const roleName = user.roleName;
         console.log("Tên vai trò tìm được:", roleName);
         if (roleElement) roleElement.textContent = roleName;
       })

@@ -1,4 +1,4 @@
-const RolesAPI = 'http://localhost:3000/role';
+const RolesAPI = 'http://localhost:8080/event-management/roles';
 
 document.addEventListener("DOMContentLoaded", function () {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
         </aside>
     `;
 
-    if (!user || !user.role_id) {
+    if (!user || !user.roleName) {
         console.error("Không tìm thấy user hoặc role_id trong localStorage");
         adjustSidebarLinks([]);
         adjustSidebar([]);
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    console.log("Gọi API /role với role_id:", user.role_id);
+    console.log("Gọi API /role với role_id:", user.roleName);
     let token = localStorage.getItem("token"); // Lấy token từ localStorage
 
     if (!token) {
@@ -108,7 +108,7 @@ function adjustSidebarLinks(roles) {
     if (user && user.role_id) {
         console.log("Tìm role với id:", user.role_id);
         const role = roles.find(r => r.id === user.role_id || r.id.toString() === user.role_id);
-        const roleName = role ? role.name : "ADMIN";
+        const roleName = user.roleName;
         console.log("Tên vai trò tìm được (adjustSidebarLinks):", roleName);
 
         if (roleName.toUpperCase() === "MANAGER") {
@@ -135,14 +135,14 @@ function adjustSidebar(roles) {
     }
 
     let roleName = "ADMIN";
-    if (user && user.role_id) {
+    if (user && user.role) {
         console.log("Tìm role với id:", user.role_id);
         const role = roles.find(r => r.id === user.role_id || r.id.toString() === user.role_id);
-        roleName = role ? role.name : "ADMIN";
+        roleName = user.roleName;
         console.log("Tên vai trò tìm được (adjustSidebar):", roleName);
     }
 
-    if (roleName.toUpperCase() === "MANAGER") {
+    if (user.roleName === "MANAGER") {
         formsNavContainer.innerHTML = `
             <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
                 <i class="bi bi-journal-text"></i><span>Biểu Mẫu</span><i class="bi bi-chevron-down ms-auto"></i>

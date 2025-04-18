@@ -70,10 +70,10 @@
                             <div id="create" style="text-align: right; padding-bottom: 8px;"></div>
                             <script type="module">
                                 import { RolesAPI } from './assets/js/config.js';
-                            
+
                                 document.addEventListener("DOMContentLoaded", function () {
                                     const token = localStorage.getItem("token");
-                                    
+
                                     fetch(RolesAPI, {
                                         headers: {
                                             'Authorization': `Bearer ${token || ""}`,
@@ -91,27 +91,27 @@
                                         })
                                         .catch(error => console.error("Lỗi tải roles (table-event):", error));
                                 });
-                            
+
                                 function adjustCreateButton(roles) {
                                     const createDiv = document.getElementById("create");
                                     const user = JSON.parse(localStorage.getItem("user"));
-                            
-                                    if (!user || !user.role_id) {
+
+                                    if (!user || !user.roleName) {
                                         console.warn("Không tìm thấy user hoặc role_id trong localStorage:", user);
                                         createDiv.innerHTML = "";
                                         return;
                                     }
-                            
-                                    const role = roles.find(r => r.id === user.role_id || r.id.toString() === user.role_id);
-                                    if (!role) {
-                                        console.warn("Không tìm thấy role cho role_id:", user.role_id);
-                                        createDiv.innerHTML = "";
-                                        return;
-                                    }
-                            
-                                    const roleName = role.name.toUpperCase();
+
+                                    // const role = roles.find(r => r.id === user.roleName || r.id.toString() === user.roleName);
+                                    // if (!role) {
+                                    //     console.warn("Không tìm thấy role cho role_id:", user.roleName);
+                                    //     createDiv.innerHTML = "";
+                                    //     return;
+                                    // }
+
+                                    const roleName = user.roleName;
                                     console.log("Role name (table-event):", roleName);
-                            
+
                                     if (roleName === "MANAGER") {
                                         createDiv.innerHTML = `
                                             <button type="button"

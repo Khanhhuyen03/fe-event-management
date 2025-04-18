@@ -1,9 +1,9 @@
-var UserAPI = 'http://localhost:8080/event-management/users';
+var UserAPI = 'http://localhost:8080/event-management/users/manager';
 var RoleAPI = 'http://localhost:8080/event-management/roles';
 var UpdateRole = 'http://localhost:8080/event-management/users/update-role'
 function start() {
-    getData((uses) => {
-        renderUsers(uses)
+    getData((users) => {
+        renderUsers(users)
 
     });
 
@@ -35,6 +35,11 @@ function getData(callback) {
     ]).then(([uses]) => {
         callback(uses);
     })
+        .then(data => {
+            console.log("Dữ liệu từ API:", data);
+            // Truyền danh sách users vào callback
+            callback(data.users); // Chỉ lấy danh sách users từ đối tượng trả về
+        })
         .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
 }
 
