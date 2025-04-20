@@ -4,6 +4,10 @@ function start(){
     getData((locations, users) => {
         renderLocation(locations, users);
     });
+    var editLocationId = localStorage.getItem("editLocationId");
+    if (editLocationId && window.location.pathname.includes("detail_location.html")) {
+        watchDetailLocation(editLocationId);
+    }
     
 }
 start();
@@ -18,7 +22,7 @@ function getData(callback) {
     Promise.all([
         fetch(LocationsAPI, {
             headers: {
-                "Authorization": `Bearer ${token}`,
+               "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json"
             }
         }).then(res => res.json()),
@@ -55,12 +59,14 @@ function renderLocation(locations, users) {
                 <td style="width: 40%;">${location.description || 'Không có mô tả'}</td>
                 <td>${location.hourly_rental_fee ? location.hourly_rental_fee.toLocaleString() + " VND" : '0 VND'}</td>
                 <td>${location.created_at}</td>
+                <td>${location.address}||"Ko tìm thấy địa chỉ"</td>
                 <td>${supplierName}</td>
                 <td class="text-center">
                     <div class="action-dropdown">
                         <button class="btn btn-light action-btn">...</button>
                         <div class="dropdown-content">
                             <button class="dropdown-item delete-btn" data-id="${location.id}">Xoá</button>
+                            <button class="dropdown-item detail-btn" data-id="${location.id}">Xem chi tiết</button>
                         </div>
                     </div>
                 </td>
@@ -101,6 +107,11 @@ function renderLocation(locations, users) {
         let locationId = $(this).data('id');
         handleDeleteLocation(locationId);
     });
+    // Xử lý sự kiện xem chi tiết
+    $('#list-place tbody').on('click', '.detail-btn', function () {
+        let locationId = $(this).data('id');
+        handleDetailLocation(locationId);
+    });
 
     // Đóng dropdown khi bấm ra ngoài
     $(document).click(function () {
@@ -132,4 +143,84 @@ function handleDeleteLocation(id) {
             alert("Xoá không thành công!");
         });
 
+}
+//Xem chi tiết
+function handleDetailLocation(locationId) {
+    localStorage.setItem("editLocationId", locationId); // Lưu ID vào localStorage
+    window.location.href = "detail_location.html"; // Chuyển đến trang chi tiết
+}
+function watchDetailLocation(editLocationId) {
+    if (!editLocationId) return;
+
+    const imagePreview = document.getElementById("Image"); // Khớp với id trong HTML
+    const defaultImagePath = "assets/img/card.jpg";
+
+    // Lấy token từ localStorage
+    let token = localStorage.getItem("token");
+
+    if (!token) {
+        console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+        alert("Vui lòng đăng nhập lại!");
+        return;
+    }
+
+    // Lấy danh sách người dùng
+    fetch(UsersAPI, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => response.json())
+        .then(users => {
+            // Lấy thông tin địa điểm
+            return fetch(`${LocationsAPI}/${editLocationId}`, {
+                method: 'GET',
+                headers: {
+                   'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(location => ({ location, users })); // Trả về cả location và users
+        })
+        .then(({ location, users }) => {
+            // Tìm nhà cung cấp từ users dựa trên location.user_id
+            const supplier = users.find(user => user.id === location.user_id);
+            const supplierName = supplier ? `${supplier.last_name} ${supplier.first_name}` : "Không xác định";
+
+            // Cập nhật các thẻ <div> với dữ liệu địa điểm
+            document.getElementById("name").textContent = location.name || "Không có tên";
+            document.getElementById("description").textContent = location.description || "Không có mô tả";
+            document.getElementById("address").textContent = location.address || "Không có địa điểm";
+            document.getElementById("price").textContent = location.hourly_rental_fee ? `${location.hourly_rental_fee.toLocaleString()} VND` : "Không xác định";
+            document.getElementById("supplier").textContent = supplierName;
+
+            // Hiển thị ảnh địa điểm
+            if (location.img) {
+                try {
+                    const baseApiUrl = 'http://localhost:8080/event-management/api/v1/FileUpload/files/';
+                    const fileName = location.img.split('/').pop();
+                    const imageUrl = `${baseApiUrl}${fileName}`;
+
+                    if (imagePreview) {
+                        imagePreview.src = imageUrl;
+                        imagePreview.onerror = function () {
+                            console.error('Lỗi tải ảnh:', imageUrl);
+                            this.src = defaultImagePath;
+                        };
+                    }
+                } catch (error) {
+                    console.error('Lỗi xử lý ảnh:', error);
+                    if (imagePreview) imagePreview.src = defaultImagePath;
+                }
+            } else {
+                if (imagePreview) imagePreview.src = defaultImagePath;
+            }
+        })
+        .catch(error => {
+            console.error("Lỗi khi lấy dữ liệu địa điểm:", error);
+            alert("Không thể tải thông tin địa điểm!");
+        });
 }

@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>Tables / Place - My Event</title>
+    <title>Forms / Location - My Event</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
 
@@ -30,86 +30,64 @@
 
     <!-- Template Main CSS File -->
     <link href="assets/css/style.css" rel="stylesheet">
-    <!---->>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-
-
-
 </head>
 
 <body>
-
     <!-- ======= Header ======= -->
     <div id="header"></div>
-    <script src="assets/js/header.js"></script><!-- End Header -->
-
     <!-- ======= Sidebar ======= -->
     <div id="sidebar-container"></div>
-    <script src="assets/js/sidebar.js" type="module"></script><!-- End Sidebar-->
+    <script src="assets/js/sidebar.js" type="module"></script><!-- End Header --><!-- End Sidebar-->
 
     <main id="main" class="main">
-
         <div class="pagetitle">
-            <h1>Quản Lý Địa Điểm</h1>
-            <nav>
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Trang chủ</a></li>
-                    <li class="breadcrumb-item">Quản lý</li>
-                    <li class="breadcrumb-item active">Quản lý địa điểm</li>
-                </ol>
-            </nav>
+            <h1>Chi tiết địa điểm</h1>
         </div><!-- End Page Title -->
 
         <section class="section">
             <div class="row">
-                <div class="col-lg-12">
-
+                <div>
                     <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Quản Lý Địa Điểm</h5>
-                            <!-- Table with stripped rows -->
-                            <table id="list-place">
-                                <thead>
-                                    <tr>
-                                        <th>Tên địa điểm</th>
-                                        <th>Mô tả</th>
-                                        <th>Đơn giá/ngày</th>
-                                        <th data-type="date" data-format="MM/DD/YYYY">Ngày tạo</th>
-                                        <th>Địa chỉ</th>
-                                        <th>Nhà cung cấp</th>
-                                        <th>Hành động</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Nhà hàng tiệc cưới MIKAZUKI</td>
-                                        <td>Cho dù lựa chọn sảnh tiệc nào: đại sảnh sang trọng ấm cúng, khung cảnh tuyệt
-                                            đẹp tại bãi cỏ, hay một tiệc cưới lãng mạn bên bãi biển và hồ bơi, bạn sẽ
-                                            không phải bận tâm quá nhiều về </td>
-                                        <th>500000</th>
-                                        <td>11/02/2025</td>
-                                        <td>Điện Biên Phủ</td>
-                                        <td>Nguyễn H.Minh</td>
-                                        <td>...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <!-- End Table with stripped rows -->
-
+                        <div class="card-body ">
+                            <div class="row mb-3">
+                                <label for="Image" class="col-sm-2 col-form-label" style=" font-weight: 600;color: rgba(1, 112, 7, 0.6);">Hình ảnh</label>
+                                <div class="col-sm-10">
+                                    <img src="assets/img/card.jpg" id="Image" name="picture"
+                                        style="height: 400px; width: 500px; padding-top: 10px;">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-lg-3 col-md-4 label "style=" font-weight: 600;color: rgba(1, 112, 7, 0.6);">Tên địa điểm</div>
+                                <div class="col-lg-3 col-md-4" id="name" name="name">Minh</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-lg-3 col-md-4 label " style=" font-weight: 600;color: rgba(1, 112, 7, 0.6);">Mô tả ngắn ngọn</div>
+                                <div class="col-lg-3 col-md-4" id="description" name="description">Minh</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-lg-3 col-md-4 label " style=" font-weight: 600;color: rgba(1, 112, 7, 0.6);">Địa chỉ</div>
+                                <div class="col-lg-3 col-md-4" id="address" name="address">Minh</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-lg-3 col-md-4 label " style=" font-weight: 600;color: rgba(1, 112, 7, 0.6);">Đơn giá/ngày</div>
+                                <div class="col-lg-3 col-md-4" id="price" name="price" >Minh</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-lg-3 col-md-4 label " style=" font-weight: 600;color: rgba(1, 112, 7, 0.6);">Nhà cung cấp</div>
+                                <div class="col-lg-3 col-md-4" id="supplier" name="supplier" >Minh</div>
+                            </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         </section>
-
     </main><!-- End #main -->
 
     <!-- ======= Footer ======= -->
     <footer id="footer" class="footer">
         <div class="copyright">
-            &copy; <strong><span>My Event</span></strong>. Tôn trọng bản quyền
+            © <strong><span>My Event</span></strong>. Tôn trọng bản quyền
         </div>
         <div class="credits">
             <h6>Liên hệ :Nhóm 58 để biết thêm chi tiết nhá🌟</h6>
@@ -131,9 +109,17 @@
 
     <!-- Template Main JS File -->
     <script src="assets/js/main.js"></script>
-    <!--Hành dộng API data cho table location-->
+    <script src="assets/js/header.js"></script>
+    <!--Hành động API data cho table event-->
     <script src="assets/js/place.js"></script>
-
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const editLocationId = localStorage.getItem("editLocationId");
+            if (editLocationId) {
+                watchDetailLocation(editLocationId);
+            }
+        });
+    </script>
 </body>
 
 </html>
