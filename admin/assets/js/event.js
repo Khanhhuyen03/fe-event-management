@@ -111,7 +111,7 @@ function renderEvents(events, eventTypes) {
         return;
     }
 
-    fetch(RolesAPI, {
+    fetch('http://localhost:8080/event-management/roles', {
         headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -130,8 +130,8 @@ function renderEvents(events, eventTypes) {
             }
 
             const htmls = events.map(event => {
-                const updateButton = roleName === "MANAGER" 
-                    ? `<button class="dropdown-item update-btn" data-id="${event.id}">Cập nhật</button>` 
+                const updateButton = roleName === "MANAGER"
+                    ? `<button class="dropdown-item update-btn" data-id="${event.id}">Cập nhật</button>`
                     : "";
 
                 return `
@@ -260,7 +260,7 @@ function getData(callback) {
     Promise.all([
         fetch(EventAPI, {
             headers: {
-                 "Authorization": `Bearer ${token}`,
+                "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json"
             }
         }).then(res => res.json()),
@@ -654,44 +654,20 @@ function watchDetailEvent(editEventId) {
     const imagePreview = document.getElementById("inputImage"); // Khớp với id trong HTML
     const defaultImagePath = "assets/img/card.jpg";
 
-    //Lấy token từ localStorage
-    let token = localStorage.getItem("token");
-
-    if (!token) {
-        console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
-        return;
-    }
-
-    // Lấy danh sách loại sự kiện
-    fetch(EventTypeAPI, {
+    // Gọi API lấy thông tin sự kiện (không cần token)
+    fetch(`${EventAPI}/${editEventId}`, {
         method: 'GET',
         headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
         }
     })
         .then(response => response.json())
-        .then(eventTypes => {
-            // Lấy thông tin sự kiện
-            return fetch(`${EventAPI}/${editEventId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(event => ({ event, eventTypes })); // Trả về cả event và eventTypes
-        })
-        .then(({ event, eventTypes }) => {
-            // Tìm tên loại sự kiện từ eventTypes dựa trên event.event_type_id
-            const eventType = eventTypes.find(type => type.id === event.event_type_id);//coi lại có đổi năm ko
-            const eventTypeName = eventType ? eventType.name : "Không xác định";
-
+        .then(event => {
             // Cập nhật các thẻ <div> với dữ liệu sự kiện
             document.getElementById("inputName").textContent = event.name || "";
             document.getElementById("inputDescription").textContent = event.description || "";
             document.getElementById("inputDetail").textContent = event.detail || "";
-            document.getElementById("EventTypes").textContent = event.eventTypeName||"";//eventTypeName; // Gán tên loại sự kiện
+            document.getElementById("EventTypes").textContent = event.eventTypeName || "";
 
             // Hiển thị ảnh sự kiện
             if (event.img) {
