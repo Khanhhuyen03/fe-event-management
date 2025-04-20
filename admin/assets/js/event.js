@@ -480,7 +480,6 @@ function handleUpdateEvent(eventId) {
     localStorage.setItem("editEventId", eventId); // Lưu ID vào localStorage
     window.location.href = "form-event.html"; // Chuyển đến form cập nhật
 }
-
 function loadEditForm(editEventId) {
     if (!editEventId) return;
 
@@ -489,7 +488,7 @@ function loadEditForm(editEventId) {
     const imagePreview = document.getElementById("image");
     const defaultImagePath = "assets/img/card.jpg";
 
-    //Lấy token từ localStorage
+    // Lấy token từ localStorage
     let token = localStorage.getItem("token");
 
     if (!token) {
@@ -538,13 +537,7 @@ function loadEditForm(editEventId) {
             document.querySelector('input[name="name"]').value = event.name || "";
             document.querySelector('input[name="description"]').value = event.description || "";
             document.querySelector('textarea[name="detail"]').value = event.detail || "";
-            document.querySelector('select[name="eventype"]').value = event.eventTypeName;
-
-            // Set giá trị cho select box
-            const selectElement = document.querySelector('select[name="eventype"]');
-            if (event.eventType_id) {
-                selectElement.value = event.name;
-            }
+            document.querySelector('select[name="eventype"]').value = event.eventTypeName || "";
 
             // Xử lý hiển thị ảnh
             if (event.img) {
@@ -583,40 +576,73 @@ function loadEditForm(editEventId) {
             } else {
                 if (imagePreview) imagePreview.src = defaultImagePath;
             }
+
             document.querySelector("#create").textContent = "Cập nhật";
-            document.querySelector("#create").onclick = function () {
+            document.querySelector("#create").onclick = function (event) {
+                event.preventDefault();
+
                 const inputPicture = document.querySelector('input[name="picture"]');
                 const inputName = document.querySelector('input[name="name"]').value;
                 const inputDescription = document.querySelector('input[name="description"]').value;
                 const inputEventTypeID = document.querySelector('select[name="eventype"]').value;
                 const inputDetail = document.querySelector('textarea[name="detail"]').value;
-                const img = inputPicture.files.length > 0 ? imagePreview.src : event.img;
+
+                if (!inputName || !inputEventTypeID) {
+                    alert("Vui lòng nhập đầy đủ tên sự kiện và loại sự kiện!");
+                    return;
+                }
 
                 const updatedEvent = {
-                    img: img,
                     name: inputName,
                     description: inputDescription,
                     eventTypeName: inputEventTypeID,
                     detail: inputDetail,
-                    created_at: event.created_at,
-                    updated_at: new Date().toISOString().split('T')[0]
+                    event_format: true,
+                    is_template: false
                 };
+
+                // Tạo FormData
+                const formData = new FormData();
+                // Thêm file nếu có
+                if (inputPicture.files[0]) {
+                    formData.append('file', inputPicture.files[0]);
+                }
+                // Thêm event data dưới dạng JSON string với key là 'event'
+                formData.append('event', new Blob([JSON.stringify(updatedEvent)], {
+                    type: 'application/json'
+                }));
+
+                // Logic của updatedEvent được gộp vào đây
+                if (!token) {
+                    alert("Vui lòng đăng nhập lại!");
+                    return;
+                }
 
                 fetch(`${EventAPI}/${editEventId}`, {
                     method: 'PATCH',
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(updatedEvent)
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
                 })
-                    .then(response => response.json())
-                    .then(() => {
-                        console.log("Cập nhật thành công!");
+                    .then(response => {
+                        if (!response.ok) throw new Error("Lỗi server");
+                        return response.json();
+                    })
+                    .then(data => {
+                        const eventResponse = data.result || data;
+                        console.log("Event vừa cập nhật có ID:", eventResponse.id);
+                        console.log("Đã cập nhật sự kiện thành công:", eventResponse);
+                        alert("Cập nhật sự kiện thành công!");
                         window.location.href = "table-event.html";
                     })
-            }
+                    .catch(error => {
+                        console.error('Lỗi cập nhật sự kiện:', error);
+                        alert(`Lỗi cập nhật sự kiện: ${error.message}`);
+                    });
+            };
         })
+        .catch(error => {
+            console.error('Lỗi khi tải dữ liệu:', error);
+        });
 }
 //Xoá event
 function handleDeleteEvent(id) {
