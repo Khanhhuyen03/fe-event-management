@@ -435,10 +435,10 @@
             items.forEach((item, index) => {
                 let detailPage = currentCategory === "event" ? "./event-detail.html" : "./item-detail.html";
                 let buttonText = "Xem Chi Tiết";
-                let itemId = currentCategory === "event" ? item.id : encodeURIComponent(item.name);
+                let itemId =  item.id;
                 let hoverInfo = `
                     <div class="row propery-info"><div class="col">Địa điểm</div></div>
-                    <div class="row"><div class="col">${item.location || "Không xác định"}</div></div>
+                    <div class="row"><div class="col">${item.place || "Không xác định"}</div></div>
                 `;
 
                 const imageFileName = item.img ? item.img.split('/').pop() : null;
