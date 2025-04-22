@@ -130,10 +130,10 @@ function updateProfile() {
         console.error("Không tìm thấy thông tin người dùng!");
         return;
     }
-    // if (!token) {
-    //     console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
-    //     return;
-    // }
+    if (!token) {
+        console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+        return;
+    }
 
     // Gán thông tin vào các ô input
     document.getElementById("lastname").value = user.last_name || "";
@@ -200,7 +200,7 @@ function updateProfile() {
         fetch('http://localhost:3000/user', {
             method: 'PATCH',
             headers: {
-                //'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`
             },
             body: formData
         })
