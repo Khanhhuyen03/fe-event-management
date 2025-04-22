@@ -158,11 +158,11 @@
                 // Xác định endpoint dựa trên category
                 let endpoint;
                 if (category === "device") {
-                    endpoint = `http://localhost:8080/event-management/devices?name=${encodeURIComponent(id)}`;
+                    endpoint = `http://localhost:8080/event-management/devices/${id}`;
                 } else if (category === "service") {
-                    endpoint = `http://localhost:8080/event-management/services?name=${encodeURIComponent(id)}`;
+                    endpoint = `http://localhost:8080/event-management/services/${id}`;
                 } else if (category === "location") {
-                    endpoint = `http://localhost:8080/event-management/locations?name=${encodeURIComponent(id)}`;
+                    endpoint = `http://localhost:8080/event-management/locations/${id}`;
                 } else {
                     throw new Error("Danh mục không hợp lệ");
                 }
@@ -180,8 +180,8 @@
                 }
                 const item = await itemResponse.json();
 
-                if (!item || (Array.isArray(item) && item.length === 0)) {
-                    console.warn(`Không tìm thấy ${category} với name=${id}`);
+                if (!item) {
+                    console.warn(`Không tìm thấy ${category} với id = ${id}`);
                     document.getElementById("itemName").textContent = "Không tìm thấy!";
                     document.getElementById("itemDescription").textContent = `Không có ${category === "device" ? "thiết bị" : category === "service" ? "dịch vụ" : "địa điểm"} với tên ${id}.`;
                     itemImage.style.display = "none";
@@ -199,18 +199,18 @@
                     detailsList.className = "list-group";
                     if (category === "device") {
                         detailsList.innerHTML = `
-                            <li class="list-group-item"><strong>Phí thuê/giờ:</strong> ${(itemData.hourly_salary || 0).toLocaleString()} VND</li>
-                            <li class="list-group-item"><strong>Số lượng:</strong> ${itemData.quantity || "Không xác định"}</li>
-                            <li class="list-group-item"><strong>Loại thiết bị:</strong> ${getDeviceTypeName(itemData.device_type_id)}</li>
-                            <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getSupplierName(itemData.user_id)}</li>
-                            <li class="list-group-item"><strong>Địa điểm:</strong> ${itemData.place || "Không xác định"}</li>
+                            <li class="list-group-item"><strong>Phí thuê/giờ:</strong> ${(item.hourlyRentalFee || 0).toLocaleString()} VND</li>
+                            <li class="list-group-item"><strong>Số lượng:</strong> ${item.quantity || "Không xác định"}</li>
+                            <li class="list-group-item"><strong>Loại thiết bị:</strong> ${item.deviceType_name}</li>
+                            <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getSupplierName(item.userID)}</li>
+                            <li class="list-group-item"><strong>Thành phố:</strong> ${item.place}</li>
                         `;
                     } else if (category === "service") {
                         detailsList.innerHTML = `
-                            <li class="list-group-item"><strong>Lương/giờ:</strong> ${(itemData.hourly_salary || 0).toLocaleString()} VND</li>
-                            <li class="list-group-item"><strong>Số lượng:</strong> ${itemData.quantity || "Không xác định"}</li>
-                            <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getSupplierName(itemData.user_id)}</li>
-                            <li class="list-group-item"><strong>Địa điểm:</strong> ${itemData.place || "Không xác định"}</li>
+                            <li class="list-group-item"><strong>Lương/giờ:</strong> ${(item.hourly_salary || 0).toLocaleString()} VND</li>
+                            <li class="list-group-item"><strong>Số lượng:</strong> ${item.quantity || "Không xác định"}</li>
+                            <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getSupplierName(item.userID)}</li>
+                            <li class="list-group-item"><strong>Thành phố:</strong> ${item.place}</li>
                         `;
                     } else if (category === "location") {
                         detailsList.innerHTML = `
