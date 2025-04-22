@@ -40,7 +40,33 @@ function getData(callback) {
         .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
 }
 
-// Render profile từ thông tin của user đã đăng nhập
+// Render profile từ thông tin của user đã đăng nhập cũ
+// function renderBigAvatarProfile(users) {
+//     var listBigProfile = document.querySelector('#big-profile');
+//     if (!listBigProfile) return;
+//     // Kiểm tra nếu `users` không có dữ liệu
+//     if (!users) {
+//         listBigProfile.innerHTML = "<p>Không tìm thấy thông tin người dùng!</p>";
+//         return;
+//     }
+//     console.log("Dữ liệu user:", users); // Kiểm tra dữ liệu đầu vào
+
+
+//     // Hiển thị thông tin user với vai trò mặc định là "Admin"
+//     listBigProfile.innerHTML = `
+
+//         <img src="${users.avatar}" alt="Profile" class="rounded-circle">
+//         <h2>${users.last_name} ${users.first_name}</h2>
+//         <h3>${users.roleName || 'User'}</h3> <!-- Lấy role từ user, mặc định là 'User' nếu không có -->
+//         <div class="social-links mt-2">
+//             <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+//             <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+//             <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+//             <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+//         </div>
+//     `;
+// }
+//new mới nhất xem ảnh đại diện từ be
 function renderBigAvatarProfile(users) {
     var listBigProfile = document.querySelector('#big-profile');
     if (!listBigProfile) return;
@@ -51,11 +77,22 @@ function renderBigAvatarProfile(users) {
     }
     console.log("Dữ liệu user:", users); // Kiểm tra dữ liệu đầu vào
 
+    // Xử lý ảnh avatar
+    let imageUrl = "assets/img/default-avatar.png"; // Ảnh mặc định
+    if (users.avatar) {
+        try {
+            const baseApiUrl = 'http://localhost:8080/event-management/api/v1/FileUpload/files/';
+            const fileName = users.avatar.split('/').pop();
+            imageUrl = `${baseApiUrl}${fileName}`;
+        } catch (error) {
+            console.error('Lỗi xử lý ảnh:', error);
+            imageUrl = "assets/img/default-avatar.png";
+        }
+    }
 
     // Hiển thị thông tin user với vai trò mặc định là "Admin"
     listBigProfile.innerHTML = `
-
-        <img src="${users.avatar}" alt="Profile" class="rounded-circle">
+        <img src="${imageUrl}" alt="Profile" class="rounded-circle" onerror="this.src='assets/img/default-avatar.png'">
         <h2>${users.last_name} ${users.first_name}</h2>
         <h3>${users.roleName || 'User'}</h3> <!-- Lấy role từ user, mặc định là 'User' nếu không có -->
         <div class="social-links mt-2">
@@ -82,3 +119,145 @@ function handleInfo() {
 
 // Gọi `handleInfo()` sau khi DOM đã tải xong
 document.addEventListener("DOMContentLoaded", handleInfo);
+
+//Cập nhật profile
+function updateProfile() {
+    // Lấy thông tin user từ localStorage
+    const user = JSON.parse(localStorage.getItem("user"));
+    const token = localStorage.getItem("token");
+    
+    if (!user) {
+        console.error("Không tìm thấy thông tin người dùng!");
+        return;
+    }
+    // if (!token) {
+    //     console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+    //     return;
+    // }
+
+    // Gán thông tin vào các ô input
+    document.getElementById("lastname").value = user.last_name || "";
+    document.getElementById("firstname").value = user.first_name || "";
+    document.getElementById("roleinfo").textContent = user.roleName || 'User';
+    document.getElementById("phone").value = user.phone_number || "";
+    document.getElementById("email").value = user.email || "";
+
+    // Xử lý hiển thị ảnh hiện tại
+    const imagePreview = document.getElementById("image");
+    const defaultImagePath = "assets/img/profile-img.jpg";
+    if (user.avatar) {
+        try {
+            const baseApiUrl = 'http://localhost:8080/event-management/api/v1/FileUpload/files/';
+            const fileName = user.avatar.split('/').pop();
+            const imageUrl = `${baseApiUrl}${fileName}`;
+            imagePreview.src = imageUrl;
+            imagePreview.onerror = function () {
+                console.error('Lỗi tải ảnh:', imageUrl);
+                this.src = defaultImagePath;
+            };
+        } catch (error) {
+            console.error('Lỗi xử lý ảnh:', error);
+            imagePreview.src = defaultImagePath;
+        }
+    } else {
+        imagePreview.src = defaultImagePath;
+    }
+
+    // Xử lý submit form
+    const form = document.querySelector("form");
+    form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const lastname = document.getElementById("lastname").value;
+        const firstname = document.getElementById("firstname").value;
+        const phone = document.getElementById("phone").value;
+        const email = document.getElementById("email").value;
+        const inputPicture = document.getElementById("fileInput");
+
+        if (!lastname || !firstname || !email) {
+            alert("Vui lòng nhập đầy đủ họ, tên và email!");
+            return;
+        }
+
+        // Tạo object dữ liệu cập nhật
+        const updatedUser = {
+            last_name: lastname,
+            first_name: firstname,
+            phone_number: phone,
+            email: email
+        };
+
+        // Tạo FormData để gửi dữ liệu và file
+        const formData = new FormData();
+        if (inputPicture && inputPicture.files[0]) {
+            formData.append('file', inputPicture.files[0]);
+        }
+        formData.append('user', new Blob([JSON.stringify(updatedUser)], {
+            type: 'application/json'
+        }));
+
+        // Gửi yêu cầu PATCH
+        fetch('http://localhost:3000/user', {
+            method: 'PATCH',
+            headers: {
+                //'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) throw new Error(`Lỗi server: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                console.log("Cập nhật hồ sơ thành công:", data);
+                // Cập nhật localStorage với thông tin mới
+                const updatedUserData = { ...user, ...updatedUser };
+                if (data.avatar) updatedUserData.avatar = data.avatar;
+                localStorage.setItem("user", JSON.stringify(updatedUserData));
+                alert("Cập nhật hồ sơ thành công!");
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Lỗi cập nhật hồ sơ:', error);
+                alert(`Lỗi cập nhật hồ sơ: ${error.message}`);
+            });
+    });
+}
+
+// Hàm xử lý upload ảnh
+function handleImageUpload() {
+    const fileInput = document.getElementById("fileInput");
+    const imagePreview = document.getElementById("image");
+    const uploadButton = document.getElementById("inputImage");
+
+    if (!fileInput || !imagePreview || !uploadButton) {
+        console.error("Không tìm thấy fileInput, imagePreview hoặc uploadButton!");
+        return;
+    }
+
+    uploadButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        console.log("Nút upload được nhấn!");
+        fileInput.click();
+    });
+
+    fileInput.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            console.log("File được chọn:", file.name);
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                imagePreview.src = e.target.result;
+                console.log("Đã hiển thị preview ảnh!");
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
+// Gọi các hàm sau khi DOM tải xong
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOM đã tải xong, gọi updateProfile và handleImageUpload");
+    updateProfile();
+    handleImageUpload();
+});
