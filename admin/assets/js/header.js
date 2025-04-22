@@ -47,10 +47,34 @@ function updateUserInfo() {
     loginBtn?.classList.add("d-none");
     userInfo?.classList.remove("d-none");
 
-    // Cập nhật avatar (kiểm tra nếu có avatar)
+    // Cập nhật avatar (kiểm tra nếu có avatar) cũ nè
+                // if (userAvatar) {
+                //   userAvatar.setAttribute("src", user.avatar || "assets/img/default-avatar.png");
+                // }
+    //_____________________________
+    // Cập nhật avatar (kiểm tra nếu có avatar) mới
     if (userAvatar) {
-      userAvatar.setAttribute("src", user.avatar || "assets/img/default-avatar.png");
+      const defaultAvatarPath = "assets/img/default-avatar.png";
+      if (user.avatar) {
+        try {
+          const baseApiUrl = 'http://localhost:8080/event-management/api/v1/FileUpload/files/';
+          const fileName = user.avatar.split('/').pop();
+          const imageUrl = `${baseApiUrl}${fileName}`;
+
+          userAvatar.src = imageUrl;
+          userAvatar.onerror = function () {
+            console.error('Lỗi tải ảnh:', imageUrl);
+            this.src = defaultAvatarPath;
+          };
+        } catch (error) {
+          console.error('Lỗi xử lý ảnh:', error);
+          userAvatar.src = defaultAvatarPath;
+        }
+      } else {
+        userAvatar.src = defaultAvatarPath;
+      }
     }
+     //_____________________________
 
     // Cập nhật tên hiển thị
     const displayName = `${user.last_name || ""} ${user.first_name || ""}`.trim();

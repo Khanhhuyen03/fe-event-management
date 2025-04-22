@@ -38,9 +38,9 @@
   <div id="header"></div>
   <script src="assets/js/header.js"></script><!-- End Header -->
 
- <!-- ======= Sidebar ======= -->
- <div id="sidebar-container"></div>
- <script src="assets/js/sidebar.js" type="module"></script><!-- End Sidebar-->
+  <!-- ======= Sidebar ======= -->
+  <div id="sidebar-container"></div>
+  <script src="assets/js/sidebar.js" type="module"></script><!-- End Sidebar-->
 
 
   <main id="main" class="main">
@@ -71,7 +71,7 @@
                 <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
                 <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
               </div>
-            </div> 
+            </div>
           </div>
 
         </div>
@@ -84,7 +84,11 @@
               <ul class="nav nav-tabs nav-tabs-bordered">
 
                 <li class="nav-item">
-                  <h4 class="custom-heading">Tổng quan</h4>
+                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Tổng
+                    quan</button>
+                </li>
+                <li class="nav-item">
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Chỉnh sửa hồ sơ</button>
                 </li>
               </ul>
               <div class="tab-content pt-2">
@@ -98,7 +102,7 @@
                   </div>
 
                   <div class="row">
-                    <div class="col-lg-3 col-md-4 label">Công việc</div>
+                    <div class="col-lg-3 col-md-4 label">Chức vụ</div>
                     <div class="col-lg-9 col-md-8" id="roleinfo">Admin</div>
                   </div>
 
@@ -113,11 +117,62 @@
                   </div>
 
                 </div>
-            </div>
-          </div>
+                <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
 
+                  <!-- Profile Edit Form -->
+                  <form>
+                    <div class="row mb-3">
+                      <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Ảnh</label>
+                      <div class="col-md-8 col-lg-9">
+                        <img src="assets/img/profile-img.jpg" alt="Profile" id="image" style="width: 400px;height: 150px;">
+                        <div class="pt-2">
+                          <input type="file" name="picture" id="fileInput" accept="image/*" style="display: none;">
+                          <a href="#" class="btn btn-primary btn-sm" title="Upload new profile image" id="inputImage"><i class="bi bi-upload"></i></a>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <!-- Họ -->
+                      <div class="col-md-6 d-flex align-items-center">
+                        <label for="lastname" class="form-label me-2 mb-0" style="width: 50px;">Họ</label>
+                        <input name="lastname" type="text" class="form-control" id="lastname" style="flex: 1;">
+                      </div>
+
+                      <!-- Tên -->
+                      <div class="col-md-6 d-flex align-items-center">
+                        <label for="firstname" class="form-label me-2 mb-0" style="width: 50px;">Tên</label>
+                        <input name="firstname" type="text" class="form-control" id="firstname" style="flex: 1;">
+                      </div>
+                    </div>
+                    <div class="row mb-3">
+                      <label for="Job" class="col-md-4 col-lg-3 col-form-label">Chức vụ</label>
+                      <div class="col-md-8 col-lg-9" id="roleinfo"></div>
+                    </div>
+                    <div class="row mb-3">
+                      <label for="Phone" class="col-md-4 col-lg-3 col-form-label">Số điẹn thoại</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="phone" type="text" class="form-control" id="phone">
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="Email" class="col-md-4 col-lg-3 col-form-label">Email</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="email" type="email" class="form-control" id="email">
+                      </div>
+                    </div>
+                    <div class="text-center">
+                      <button type="submit" class="btn btn-primary">Cập nhật</button>
+                    </div>
+                  </form><!-- End Profile Edit Form -->
+
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
-      </div>
     </section>
 
   </main><!-- End #main -->
