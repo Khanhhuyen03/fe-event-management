@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Forms / Device - My Event</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+        rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="assets/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- ======= Header ======= -->
+    <div id="header"></div>
+    <!-- ======= Sidebar ======= -->
+    <div id="sidebar-container"></div>
+    <script src="assets/js/sidebar.js" type="module"></script><!-- End Header --><!-- End Sidebar-->
+
+    <main id="main" class="main">
+        <div class="pagetitle">
+            <h1>Chi tiết hợp đồng</h1>
+        </div><!-- End Page Title -->
+
+        <section class="section">
+            <div class="row">
+                <div class="card">
+                    <div class="card-body" style="padding-top: 20px;">
+                        <h5 style="font-weight: bold; color: rgba(1, 112, 7, 0.6);">Trạng thái</h5>
+                        <table class="table table-bordered" style="max-width: 336px; overflow-x: auto;">
+                            <thead >
+                                <tr>
+                                    <th style="background-color: #E9F5DB;">Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td > <span class="status-label"  id="status" name="status">
+                                    </span></td>
+                                   
+                                </tr>
+                            </tbody>
+                        </table>
+                        <h5 style="font-weight: bold; color: rgba(1, 112, 7, 0.6);">Thông tin hợp đồng</h5>
+
+                        <table class="table table-bordered">
+                            <thead >
+                                <tr>
+                                    <th style="background-color: #E9F5DB;">Tên hợp đồng</th>
+                                    <th style="background-color: #E9F5DB;">Thời hạn hợp đồng</th>
+                                    <th style="background-color: #E9F5DB;">Giá trị hợp đồng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="name" name="name">HỢP ĐỒNG TỔ CHỨC SỰ KIỆN</td>
+                                    <td>
+                                        Ngày bắt đầu: <span id="RentalStart" name="RentalStart">20/12/2024</span><br>
+                                        Ngày kết thúc: <span id="RentalEnd" name="RentalEnd">22/02/2025</span>
+                                    </td>
+                                    <td id="price" style="font-size: large; font-weight: bold;">304.640.000 ₫</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h5 style="font-weight: bold; color: rgba(1, 112, 7, 0.6);">Thông tin khách hàng</h5>
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th style="background-color: #E9F5DB;">Tên khách hàng</th>
+                                    <td id="customerName" name="customerName">m</td>
+                                </tr>
+                                <tr>
+                                    <th style="background-color: #E9F5DB;">Số điện thoại</th>
+                                    <td id="phone" name="phone">0819901400</td>
+                                </tr>
+                                <tr>
+                                    <th style="background-color: #E9F5DB;">Địa chỉ</th>
+                                    <td id="address" name="address ">478 điện biên phủ, Xã Trung Trực, Huyện Yên Sơn, Tỉnh Tuyên Quang
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <h5 style="font-weight: bold; color: rgba(1, 112, 7, 0.6);"> <i class="bi bi-file-earmark-text-fill"></i> Bản thảo văn bản hợp đồng</h5>
+                </div>
+            </div>
+        </section>
+    </main><!-- End #main -->
+
+    <!-- ======= Footer ======= -->
+    <footer id="footer" class="footer">
+        <div class="copyright">
+            © <strong><span>My Event</span></strong>. Tôn trọng bản quyền
+        </div>
+        <div class="credits">
+            <h6>Liên hệ :Nhóm 58 để biết thêm chi tiết nhá🌟</h6>
+        </div>
+    </footer><!-- End Footer -->
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="assets/vendor/echarts/echarts.min.js"></script>
+    <script src="assets/vendor/quill/quill.js"></script>
+    <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/header.js"></script>
+    <!--Hành động API data cho table event-->
+    <script src="assets/js/contract.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const editContractId = localStorage.getItem("editContractId");
+            if (editContractId) {
+                watchDetailContract(editContractId);
+            }
+        });
+    </script>
+</body>
+
+</html>

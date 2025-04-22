@@ -131,6 +131,7 @@ function renderContracts(contracts, customers, rentals) {
                         <div class="dropdown-content">
                             <button class="dropdown-item cancel-btn" data-id="${contract.id}">Hủy hợp đồng</button>
                             <button class="dropdown-item update-btn" data-id="${contract.id}">Duyệt hợp đồng</button>
+                            <button class="dropdown-item detail-btn" data-id="${contract.id}">Xem chi tiết</button>
                         </div>
                     </div>
                 </td>
@@ -176,6 +177,11 @@ function renderContracts(contracts, customers, rentals) {
     $('#list-contact tbody').on('click', '.update-btn', function () {
         let contractId = $(this).data('id');
         handleUpdateContract(contractId);
+    });
+    //Xử lý sự kiện xem hợp đồng
+    $('#list-contact tbody').on('click', '.detail-btn', function () {
+        let contractId = $(this).data('id');
+        handleDetailContract(contractId);
     });
 
     // Đóng dropdown khi bấm ra ngoài
@@ -251,4 +257,98 @@ function handleCancelContract(contractId) {
     updateContractStatus(contractId, ContractStatus.AdminCancel, () => {
         alert("Hợp đồng đã bị hủy bởi hệ thống. Trong trường hợp khách hàng đã đặt cọc, tiền đặt cọc sẽ được hoàn trả lại cho khách hàng.");
     });
+}
+//Xem hợp đồng
+function handleDetailContract(contractId) {
+    localStorage.setItem("editContractId", contractId); // Lưu ID vào localStorage
+    window.location.href = "detail_contract.html"; // Chuyển đến trang chi tiết
+}
+function watchDetailContract(editContractId) {
+    if (!editContractId) {
+        console.error("Không có ID hợp đồng để xem chi tiết!");
+        return;
+    }
+
+    console.log("Xem chi tiết hợp đồng ID:", editContractId);
+
+    // Lấy token từ localStorage
+    const token = localStorage.getItem("token");
+    if (!token) {
+        console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+        return;
+    }
+
+    // Gọi API lấy thông tin hợp đồng
+    fetch(`http://localhost:3000/contract/${editContractId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`Lỗi khi lấy dữ liệu hợp đồng: ${response.status}`);
+            return response.json();
+        })
+        .then(contract => {
+            console.log("Dữ liệu hợp đồng:", contract);
+
+            // Gọi API lấy danh sách khách hàng
+            return fetch('http://localhost:3000/customer', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(customers => ({ contract, customers }));
+        })
+        .then(({ contract, customers }) => {
+            // Gọi API lấy danh sách rental
+            return fetch('http://localhost:3000/rental', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(rentals => ({ contract, customers, rentals }));
+        })
+        .then(({ contract, customers, rentals }) => {
+            // Tìm khách hàng tương ứng
+            const customer = customers.find(c => c.id === contract.customer_id);
+            const customerName = customer ? customer.name : "Không xác định";
+            const customerPhone = customer ? customer.phone_number : "N/A";
+            const customerAddress = customer ? customer.address : "N/A";
+
+            // Tìm rental tương ứng
+            const rental = rentals.find(r => r.id === contract.rental_id);
+            const totalPrice = rental ? rental.total_price.toLocaleString() + " ₫" : "0 ₫";
+            const rentalStartTime = rental ? new Date(rental.rental_start_time).toLocaleDateString() : "N/A";
+            const rentalEndTime = rental ? new Date(rental.rental_end_time).toLocaleDateString() : "N/A";
+
+            // Lấy thông tin trạng thái
+            const statusInfo = getStatusInfo(Number(contract.status));
+
+            // Cập nhật giao diện
+            document.getElementById("status").textContent = statusInfo.text;
+            document.getElementById("name").textContent = contract.name || "Hợp đồng không xác định";
+            document.getElementById("RentalStart").textContent = rentalStartTime;
+            document.getElementById("RentalEnd").textContent = rentalEndTime;
+            document.getElementById("price").textContent = totalPrice;
+            document.getElementById("customerName").textContent = customerName;
+            document.getElementById("phone").textContent = customerPhone;
+            document.getElementById("address").textContent = customerAddress;
+
+            // Cập nhật màu sắc cho trạng thái
+            const statusElement = document.getElementById("status");
+            statusElement.style.color = statusInfo.color;
+            statusElement.style.backgroundColor = getLighterColor(statusInfo.color);
+        })
+        .catch(error => {
+            console.error("Lỗi khi lấy dữ liệu chi tiết hợp đồng:", error);
+            alert("Không thể tải thông tin hợp đồng!");
+        });
 }
