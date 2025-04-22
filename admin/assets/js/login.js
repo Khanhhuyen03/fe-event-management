@@ -46,7 +46,7 @@ function handleLogin(data) {
                     first_name: body.user?.first_name,
                     avatar: body.user?.avatar,
                     phone_number: body.user?.phone_number,
-                    role_id: body.user?.role_id // Lưu role_id
+                    roleName: body.user?.roleName // Lưu role_id
                 })
             );
             console.log("User info saved to localStorage:", body.user);
@@ -54,9 +54,9 @@ function handleLogin(data) {
             console.error("No user data in response");
         }
         // Ánh xạ role_id thành vai trò
-        if (user.role_id === "ef09daa2-ee20-4e1f-a662-e0d9fcd6dfbc") {
+        if (body.user.roleName === "ADMIN") {
             redirectUrl = "../admin/index.htm"; // Chuyển hướng đến admin
-        } else if (user.role_id === "459fd90e-8f59-4d0d-a644-2b53963acda8") {
+        } else if (body.user.roleName === "MANAGER") {
             redirectUrl = "../manager/index.html"; // Chuyển hướng đến manager
         }
 

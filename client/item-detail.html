@@ -98,10 +98,10 @@
         }
 
         // Hàm lấy tên thành phố
-        function getCityName(cityId) {
-            const city = cities.find(c => c.id === cityId);
-            return city ? city.name : "Không xác định";
-        }
+        // function getCityName(cityId) {
+        //     const city = cities.find(c => c.id === cityId);
+        //     return city ? city.name : "Không xác định";
+        // }
 
         // Hàm lấy tên loại
         function getTypeName(typeId, types) {
@@ -136,84 +136,58 @@
 
             try {
                 // Lấy danh sách tỉnh thành
-                const citiesResponse = await fetch("https://api.myevent.com/cities", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
-                    }
-                });
-                if (!citiesResponse.ok) {
-                    throw new Error(`Lỗi khi lấy danh sách tỉnh thành: ${citiesResponse.statusText}`);
-                }
-                cities = await citiesResponse.json();
+                // const citiesResponse = await fetch("https://api.myevent.com/cities", {
+                //     method: "GET",
+                //     headers: {
+                //         "Content-Type": "application/json",
+                //         "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
+                //     }
+                // });
+                // if (!citiesResponse.ok) {
+                //     throw new Error(`Lỗi khi lấy danh sách tỉnh thành: ${citiesResponse.statusText}`);
+                // }
+                // cities = await citiesResponse.json();
 
-                // Lấy danh sách nhà cung cấp
-                const suppliersResponse = await fetch("https://api.myevent.com/users?role=supplier", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
-                    }
-                });
-                if (!suppliersResponse.ok) {
-                    throw new Error(`Lỗi khi lấy danh sách nhà cung cấp: ${suppliersResponse.statusText}`);
-                }
-                suppliers = await suppliersResponse.json();
-
-                // Lấy danh sách loại thiết bị
-                const deviceTypesResponse = await fetch("https://api.myevent.com/device_types", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
-                    }
-                });
-                if (!deviceTypesResponse.ok) {
-                    throw new Error(`Lỗi khi lấy danh sách loại thiết bị: ${deviceTypesResponse.statusText}`);
-                }
-                deviceTypes = await deviceTypesResponse.json();
-
-                // Lấy danh sách loại dịch vụ
-                const serviceTypesResponse = await fetch("https://api.myevent.com/service_types", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
-                    }
-                });
-                if (!serviceTypesResponse.ok) {
-                    throw new Error(`Lỗi khi lấy danh sách loại dịch vụ: ${serviceTypesResponse.statusText}`);
-                }
-                serviceTypes = await serviceTypesResponse.json();
+                // // Lấy danh sách nhà cung cấp
+                // const suppliersResponse = await fetch("https://api.myevent.com/users?role=supplier", {
+                //     method: "GET",
+                //     headers: {
+                //         "Content-Type": "application/json",
+                //         "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
+                //     }
+                // });
+                // if (!suppliersResponse.ok) {
+                //     throw new Error(`Lỗi khi lấy danh sách nhà cung cấp: ${suppliersResponse.statusText}`);
+                // }
+                // suppliers = await suppliersResponse.json();
+                // if (!serviceTypesResponse.ok) {
+                //     throw new Error(`Lỗi khi lấy danh sách loại dịch vụ: ${serviceTypesResponse.statusText}`);
+                // }
+                // serviceTypes = await serviceTypesResponse.json();
 
                 // Xác định endpoint dựa trên category
                 let endpoint;
                 if (category === "device") {
-                    endpoint = `https://api.myevent.com/devices?name=${encodeURIComponent(id)}`;
+                    endpoint = `http://localhost:8080/event-management/devices/${id}`;
                 } else if (category === "service") {
-                    endpoint = `https://api.myevent.com/services?name=${encodeURIComponent(id)}`;
+                    endpoint = `http://localhost:8080/event-management/services/${id}`;
                 } else if (category === "location") {
-                    endpoint = `https://api.myevent.com/locations?name=${encodeURIComponent(id)}`;
+                    endpoint = `http://localhost:8080/event-management/locations/${id}`;
                 } else {
                     throw new Error("Danh mục không hợp lệ");
                 }
 
                 // Lấy chi tiết mục
-                const itemResponse = await fetch(endpoint, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
-                    }
-                });
+                const itemResponse = await fetch(endpoint);
                 if (!itemResponse.ok) {
                     throw new Error(`Lỗi khi lấy dữ liệu mục: ${itemResponse.statusText}`);
                 }
-                const item = await itemResponse.json();
+                const a = await itemResponse.json();
+                const item = a.data;
+                console.log("Chi tiết mục:", item);
 
                 if (!item) {
-                    console.warn(`Không tìm thấy ${category} với name=${id}`);
+                    console.warn(`Không tìm thấy ${category} với id = ${id}`);
                     document.getElementById("itemName").textContent = "Không tìm thấy!";
                     document.getElementById("itemDescription").textContent = `Không có ${category === "device" ? "thiết bị" : category === "service" ? "dịch vụ" : "địa điểm"} với tên ${id}.`;
                     itemImage.style.display = "none";
@@ -230,19 +204,18 @@
                     detailsList.className = "list-group";
                     if (category === "device") {
                         detailsList.innerHTML = `
-                            <li class="list-group-item"><strong>Phí thuê/giờ:</strong> ${(item.unitPrice || 0).toLocaleString()} VND</li>
+                            <li class="list-group-item"><strong>Phí thuê/giờ:</strong> ${(item.hourlyRentalFee || 0).toLocaleString()} VND</li>
                             <li class="list-group-item"><strong>Số lượng:</strong> ${item.quantity || "Không xác định"}</li>
-                            <li class="list-group-item"><strong>Loại thiết bị:</strong> ${getTypeName(item.device_type_id, deviceTypes)}</li>
-                            <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getSupplierName(item.supplier_id)}</li>
-                            <li class="list-group-item"><strong>Thành phố:</strong> ${getCityName(item.city_id)}</li>
+                            <li class="list-group-item"><strong>Loại thiết bị:</strong> ${item.deviceType_name}</li>
+                            <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getSupplierName(item.userID)}</li>
+                            <li class="list-group-item"><strong>Thành phố:</strong> ${item.place}</li>
                         `;
                     } else if (category === "service") {
                         detailsList.innerHTML = `
-                            <li class="list-group-item"><strong>Lương/giờ:</strong> ${(item.unitPrice || 0).toLocaleString()} VND</li>
+                            <li class="list-group-item"><strong>Lương/giờ:</strong> ${(item.hourly_salary || 0).toLocaleString()} VND</li>
                             <li class="list-group-item"><strong>Số lượng:</strong> ${item.quantity || "Không xác định"}</li>
-                            <li class="list-group-item"><strong>Loại dịch vụ:</strong> ${getTypeName(item.service_type_id, serviceTypes)}</li>
-                            <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getSupplierName(item.supplier_id)}</li>
-                            <li class="list-group-item"><strong>Thành phố:</strong> ${getCityName(item.city_id)}</li>
+                            <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getSupplierName(item.userID)}</li>
+                            <li class="list-group-item"><strong>Thành phố:</strong> ${item.place}</li>
                         `;
                     } else if (category === "location") {
                         detailsList.innerHTML = `

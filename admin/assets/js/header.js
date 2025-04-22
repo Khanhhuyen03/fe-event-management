@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-  fetch("../header.html")
+  fetch("header.html")
     .then(response => {
       if (!response.ok) throw new Error("Không thể tải header.html");
       return response.text();

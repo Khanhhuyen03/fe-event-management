@@ -12,11 +12,11 @@
         rel="stylesheet">
 
     <!-- Vendor CSS Files -->
-    <link href="/client/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/client/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="/client/assets/vendor/aos/aos.css" rel="stylesheet">
-    <link href="/client/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-    <link href="/client/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link href="../client/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../client/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="../client/assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="../client/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="../client/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
     <link href="assets/css/main.css" rel="stylesheet">
     <link href="assets/css/service.css" rel="stylesheet">
@@ -124,7 +124,6 @@
             font-weight: bold;
         }
 
-        /* Floating Register Button */
         .floating-register-btn {
             position: fixed;
             bottom: 90px;
@@ -136,6 +135,7 @@
             padding: 8px 8px;
             cursor: pointer;
             display: none;
+            /* Ẩn mặc định, hiển thị khi cuộn */
             z-index: 1000;
             transition: all 0.3s ease;
             writing-mode: vertical-rl;
@@ -152,12 +152,15 @@
             display: block;
         }
 
+        .floating-register-btn.visible {
+            display: block;
+        }
+
         .scroll-top {
             bottom: 20px;
             right: 30px;
         }
 
-        /* Service List Styles */
         .service-details .service-box {
             background-color: var(--surface-color);
             padding: 20px;
@@ -280,11 +283,11 @@
     <button class="floating-register-btn" onclick="checkLoginAndOpenContract()">
         Đăng Ký Ngay
     </button>
-    <script src="./assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="./assets/vendor/aos/aos.js"></script>
-    <script src="./assets/vendor/swiper/swiper-bundle.min.js"></script>
-    <script src="./assets/vendor/purecounter/purecounter_vanilla.js"></script>
-    <script src="./assets/js/main.js"></script>
+    <script src="../client/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../client/assets/vendor/aos/aos.js"></script>
+    <script src="../client/assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="../client/assets/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="../client/assets/js/main.js"></script>
     <script>
         let allItems = [];
         let allTypes = [];
@@ -295,12 +298,35 @@
 
         document.addEventListener("DOMContentLoaded", async function () {
             const preloader = document.getElementById("preloader");
+            const floatingBtn = document.querySelector(".floating-register-btn");
+
+            // Hiển thị/ẩn nút nổi khi cuộn
+            window.addEventListener("scroll", function () {
+                if (window.scrollY > 100) { // Hiển thị sau khi cuộn 100px
+                    floatingBtn.classList.add("visible");
+                } else {
+                    floatingBtn.classList.remove("visible");
+                }
+            });
+
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 currentCategory = urlParams.get("category") || "event";
 
+                let apiUrl;
+                if (currentCategory === "event") {
+                    apiUrl = "http://localhost:8080/event-management/event";
+                } else if (currentCategory === "device") {
+                    apiUrl = "http://localhost:8080/event-management/devices/list";
+                } else if (currentCategory === "service") {
+                    apiUrl = "http://localhost:8080/event-management/services/list";
+                } else if (currentCategory === "location") {
+                    apiUrl = "http://localhost:8080/event-management/locations/list";
+                } else {
+                    throw new Error("Category not found");
+                }
                 // Gọi API dữ liệu chính
-                const dataResponse = await fetch("http://localhost:8080/event-management/event", {
+                const dataResponse = await fetch(apiUrl, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -309,17 +335,28 @@
                 if (!dataResponse.ok) {
                     throw new Error(`Lỗi khi lấy dữ liệu chính: ${dataResponse.statusText}`);
                 }
-                const data = await dataResponse.json();
-                console.log("Dữ liệu API:", data);
+                var data1 = await dataResponse.json();
+                console.log("Dữ liệu API:", data1);
 
-                allTypes = getTypesByCategory(data);
-                allItems = getItemsByCategory(data);
+                if (!(currentCategory === "event")) {
+                    var data2 = data1.data.items;
+                    data1 = data2;
+                }
+                console.log("ds:", data1);
+                allTypes = getTypesByCategory(data1);
+                allItems = getItemsByCategory(data1);
                 console.log("allTypes:", allTypes);
                 console.log("allItems:", allItems);
 
                 populateCityFilter(allCities);
                 populateServicesList(allTypes);
                 filterItems();
+
+                // Kiểm tra nếu cần mở modal sau khi đăng nhập
+                if (localStorage.getItem("openContractAfterLogin") === "true") {
+                    localStorage.removeItem("openContractAfterLogin");
+                    openContractModal();
+                }
             } catch (error) {
                 console.error("Lỗi khi tải dữ liệu:", error);
                 document.getElementById("item-container").innerHTML = "<p class='text-center'>Lỗi tải dữ liệu! Vui lòng thử lại sau.</p>";
@@ -337,12 +374,20 @@
                     }))
                     : [{ id: 1, name: data.eventTypeName }];
                 return types;
+            } else if (currentCategory === "device") {
+                const types = Array.isArray(data)
+                    ? [...new Set(data.map(item => item.deviceType_name))].map((name, index) => ({
+                        id: index + 1,
+                        name
+                    }))
+                    : [{ id: 1, name: data.name }];
+                return types;
             }
             return [];
         }
 
         function getItemsByCategory(data) {
-            if (currentCategory === "event") {
+            if (!(currentCategory === "")) {
                 return Array.isArray(data) ? data : [data];
             }
             return [];
@@ -414,32 +459,32 @@
 
             items.forEach((item, index) => {
                 let detailPage = currentCategory === "event" ? "./event-detail.html" : "./item-detail.html";
-                let buttonText = currentCategory === "event" ? "Đăng Ký" : "Xem Chi Tiết";
-                let itemId = currentCategory === "event" ? item.id : encodeURIComponent(item.name);
+                let buttonText = "Xem Chi Tiết";
+                let itemId =  item.id;
                 let hoverInfo = `
-            <div class="row propery-info"><div class="col">Địa điểm</div></div>
-            <div class="row"><div class="col">${item.location || "Không xác định"}</div></div>
-        `;
+                    <div class="row propery-info"><div class="col">Địa điểm</div></div>
+                    <div class="row"><div class="col">${item.place || "Không xác định"}</div></div>
+                `;
 
                 const imageFileName = item.img ? item.img.split('/').pop() : null;
                 const imageUrl = imageFileName ? `${baseImageUrl}${imageFileName}` : '../client/assets/img/events/sk2.jpg';
-                console.log(`Image URL for event ${item.name}:`, imageUrl); // Debug URL
+                console.log(`Image URL for event ${item.name}:`, imageUrl);
 
                 const itemCard = `
-            <div class="col-xl-4 col-md-6" data-aos="fade-up" data-aos-delay="${index * 100}">
-                <div class="card">
-                    <img src="${imageUrl}" 
-                         onerror="this.src='../client/assets/img/events/sk2.jpg'" 
-                         alt="${item.name}" 
-                         class="img-fluid">
-                    <div class="card-body">
-                        <span class="sale-rent"><a href="${detailPage}?id=${itemId}&category=${currentCategory}">${buttonText}</a></span>
-                        <h3><a href="${detailPage}?id=${itemId}&category=${currentCategory}" class="stretched-link">${item.name}</a></h3>
-                        <div class="card-content">${hoverInfo}</div>
+                    <div class="col-xl-4 col-md-6" data-aos="fade-up" data-aos-delay="${index * 100}">
+                        <div class="card">
+                            <img src="${imageUrl}" 
+                                 onerror="this.src='../client/assets/img/events/sk2.jpg'" 
+                                 alt="${item.name}" 
+                                 class="img-fluid">
+                            <div class="card-body">
+                                <span class="sale-rent"><a href="${detailPage}?id=${itemId}&category=${currentCategory}">${buttonText}</a></span>
+                                <h3><a href="${detailPage}?id=${itemId}&category=${currentCategory}" class="stretched-link">${item.name}</a></h3>
+                                <div class="card-content">${hoverInfo}</div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        `;
+                `;
                 itemContainer.innerHTML += itemCard;
             });
         }
@@ -448,9 +493,16 @@
             const searchInput = document.getElementById("searchInput").value.toLowerCase();
             const cityId = document.getElementById("cityFilter").value;
             let filteredItems = allItems;
+            console.log("filteredItems:", filteredItems);
 
             if (currentTypeId !== null) {
-                filteredItems = filteredItems.filter(item => item.eventTypeName === allTypes.find(t => t.id === currentTypeId)?.name);
+                if (currentTypeId !== null) {
+                    const selectedType = allTypes.find(type => type.id === currentTypeId);
+                    if (selectedType) {
+                    filteredItems = filteredItems.filter(item => item.deviceType_name === selectedType.name);
+                    }
+                }
+                // filteredItems = filteredItems.filter(item => item.eventTypeName === allTypes.find(t => t.id === currentTypeId)?.name);
             }
 
             if (cityId) {
@@ -462,6 +514,49 @@
             });
 
             displayItems(filteredItems);
+        }
+
+        function checkLoginAndOpenContract() {
+            console.log("Nút Đăng ký được nhấn");
+            const token = localStorage.getItem("token");
+            if (!token) {
+                localStorage.setItem("openContractAfterLogin", "true");
+                localStorage.setItem("redirectAfterLogin", "service.html?category=event");
+                window.location.href = "login.html";
+            } else {
+                openContractModal();
+            }
+        }
+
+        function openContractModal() {
+            console.log("Mở modal hợp đồng");
+            const iframe = document.getElementById("contractIframe");
+            if (!iframe) {
+                console.error("Không tìm thấy iframe!");
+                return;
+            }
+            iframe.src = "contract.html";
+
+            const modalElement = document.getElementById("iframeModal");
+            if (!modalElement) {
+                console.error("Không tìm thấy modal!");
+                return;
+            }
+            const modal = new bootstrap.Modal(modalElement, {});
+            modal.show();
+
+            iframe.onload = function () {
+                console.log("Iframe loaded");
+                // Không gửi dữ liệu (mở form trống)
+            };
+
+            window.addEventListener("message", function closeModal(event) {
+                if (event.data === "closeIframe") {
+                    console.log("Nhận tín hiệu đóng modal");
+                    modal.hide();
+                    window.removeEventListener("message", closeModal);
+                }
+            }, { once: true });
         }
     </script>
     <script src="assets/js/main.js"></script>
