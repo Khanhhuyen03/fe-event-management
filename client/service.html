@@ -313,8 +313,20 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 currentCategory = urlParams.get("category") || "event";
 
+                let apiUrl;
+                if (currentCategory === "event") {
+                    apiUrl = "http://localhost:8080/event-management/event";
+                } else if (currentCategory === "device") {
+                    apiUrl = "http://localhost:8080/event-management/service";
+                } else if (currentCategory === "service") {
+                    apiUrl = "http://localhost:8080/event-management/service";
+                } else if (currentCategory === "location") {
+                    apiUrl = "http://localhost:8080/event-management/supplier";
+                } else {
+                    throw new Error("Danh mục không hợp lệ!");
+                }
                 // Gọi API dữ liệu chính
-                const dataResponse = await fetch("http://localhost:8080/event-management/event", {
+                const dataResponse = await fetch(apiUrl, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"

@@ -33,10 +33,12 @@ function login() {
 function getUser(email, password, callback) {
     fetch(`http://localhost:8080/event-management/auth/login`, {
         method: "POST",
+        credentials: 'include',
         headers: {
             "Content-Type": "application/json",
+            // 'Accept': 'application/json'
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password })
     })
         .then((res) => res.json())
         .then(callback)
