@@ -313,8 +313,19 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 currentCategory = urlParams.get("category") || "event";
 
+                let endpoint;
+                if (currentCategory === "device") {
+                    endpoint = `http://localhost:8080/event-management/devices/list`;
+                } else if (currentCategory === "services") {
+                    endpoint = `http://localhost:8080/event-management/services/list`;
+                } else if (currentCategory === "location") {
+                    endpoint = `http://localhost:8080/event-management/locations/list`;
+                } else {
+                    throw new Error("Danh mục không hợp lệ");
+                }
+
                 // Gọi API dữ liệu chính
-                const dataResponse = await fetch("http://localhost:8080/event-management/event", {
+                const dataResponse = await fetch(endpoint, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -435,7 +446,7 @@
             items.forEach((item, index) => {
                 let detailPage = currentCategory === "event" ? "./event-detail.html" : "./item-detail.html";
                 let buttonText = "Xem Chi Tiết";
-                let itemId =  item.id;
+                let itemId = item.id;
                 let hoverInfo = `
                     <div class="row propery-info"><div class="col">Địa điểm</div></div>
                     <div class="row"><div class="col">${item.place || "Không xác định"}</div></div>

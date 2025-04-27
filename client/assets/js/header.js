@@ -2,7 +2,7 @@ function loadHeader() {
     const headerContainer = document.getElementById("header");
     if (!headerContainer) return;
 
-    fetch('/fe-event-management/client/component/header.html')
+    fetch('/client/component/header.html')
         .then(response => response.text())
         .then(data => {
             headerContainer.innerHTML = data;
@@ -71,7 +71,7 @@ function updateHeader() {
         loginBtn.style.display = "none";
         userMenu.style.display = "flex";
         userName.textContent = `${user.last_name || "Unknown"} ${user.first_name || "User"}`;
-        userAvatar.src = user.avatar || "/fe-event-management/client/assets/img/avatar/avt.jpg";
+        userAvatar.src = user.avatar || "/client/assets/img/avatar/avt.jpg";
         console.log("Đường dẫn ảnh:", userAvatar.src);
     } else {
         loginBtn.style.display = "inline-block";

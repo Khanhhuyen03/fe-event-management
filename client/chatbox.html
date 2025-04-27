@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 100%;
+            overflow: hidden;
+            /* Ngăn cuộn trong iframe */
+        }
+
+        .chat-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            cursor: pointer;
+        }
+
+        .chat-box {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 300px;
+            height: 400px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-box.hidden {
+            display: none;
+        }
+
+        .chat-header {
+            background: #007bff;
+            color: #fff;
+            padding: 10px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            flex-shrink: 0;
+            /* Ngăn header bị co lại */
+        }
+
+        .close-btn {
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .chat-content {
+            flex: 1;
+            /* Chiếm không gian còn lại */
+            padding: 10px;
+            overflow-y: auto;
+            background: #f9f9f9;
+            /* Màu nền để dễ nhận biết */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            /* Khoảng cách giữa các phần tử */
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            background: #fff;
+            flex-shrink: 0;
+            /* Ngăn input bị co lại */
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .chat-input button {
+            padding: 8px 15px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .chat-input button:hover {
+            background: #0056b3;
+        }
+
+        #result {
+            padding: 8px;
+            background: #e1e1e1;
+            border-radius: 5px;
+            color: #000;
+            word-wrap: break-word;
+            flex: 1;
+            /* Chiếm không gian còn lại */
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <img id="chatIcon" class="chat-icon" src="https://cdn-icons-png.flaticon.com/512/5948/5948551.png" alt="Chat Icon">
+
+    <div id="chatBox" class="chat-box hidden">
+        <div class="chat-header">
+            Xin chào! Tôi có thể giúp gì?
+            <span id="closeChat" class="close-btn">×</span>
+        </div>
+        <div class="chat-content">
+            <div class="chat-input">
+                <input type="text" id="promptInput" placeholder="Nhập prompt của bạn">
+                <button id="generateBtn">Gửi</button>
+            </div>
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Lấy các phần tử DOM
+        const chatIcon = document.getElementById('chatIcon');
+        const chatBox = document.getElementById('chatBox');
+        const closeChat = document.getElementById('closeChat');
+        const promptInput = document.getElementById('promptInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const result = document.getElementById('result');
+
+        // Hiển thị/Ẩn chat box khi nhấn vào icon
+        chatIcon.addEventListener('click', () => {
+            chatBox.classList.toggle('hidden');
+        });
+
+        // Đóng chat box khi nhấn nút đóng
+        closeChat.addEventListener('click', () => {
+            chatBox.classList.add('hidden');
+        });
+
+        // Lắng nghe sự kiện nhấn nút Gửi
+        generateBtn.addEventListener('click', function () {
+            // Lấy prompt từ input
+            const prompt = promptInput.value.trim();
+            if (prompt === "") return;
+
+            // Gửi POST request đến backend (Spring Boot)
+            fetch('http://localhost:8080/event-management/api/ai/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(prompt) // Gửi dữ liệu prompt
+            })
+                .then(response => {
+                    console.log('Response status:', response.status); // Debug trạng thái
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    // Thử parse JSON, nếu thất bại thì lấy text
+                    return response.json().catch(() => response.text());
+                })
+                .then(data => {
+                    console.log('Response data:', data); // Debug dữ liệu
+                    // Hiển thị kết quả từ AI
+                    result.innerText = typeof data === 'object' ? (data.response || JSON.stringify(data)) : data || "Xin lỗi, tôi không hiểu.";
+                    // Cuộn xuống cuối
+                    result.scrollTop = result.scrollHeight;
+                })
+                .catch(error => {
+                    console.error('Error:', error); // Debug lỗi
+                    result.innerText = "Đã xảy ra lỗi, vui lòng thử lại.";
+                    result.scrollTop = result.scrollHeight;
+                });
+
+            // Xóa input sau khi gửi
+            promptInput.value = "";
+        });
+
+        // Lắng nghe sự kiện nhấn Enter để gửi
+        promptInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                generateBtn.click();
+            }
+        });
+    </script>
+</body>
+
+</html>

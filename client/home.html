@@ -20,15 +20,39 @@
         rel="stylesheet">
 
     <!-- Vendor CSS Files -->
-    <link href="/fe-event-management/client/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/fe-event-management/client/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="/fe-event-management/client/assets/vendor/aos/aos.css" rel="stylesheet">
-    <link href="/fe-event-management/client/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-    <link href="/fe-event-management/client/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link href="/client/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/client/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/client/assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="/client/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="/client/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
     <!-- Main CSS File -->
     <link href="assets/css/main.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/home.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .chatbot-container {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 360px;
+            /* Đủ rộng để chứa khung chat */
+            height: 500px;
+            /* Đủ cao để chứa toàn bộ khung chat */
+        }
+
+        .chatbot-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 
 <body class="index-page">
@@ -245,6 +269,9 @@
 
         </section><!-- /Testimonials Section -->
 
+        <div class="chatbot-container">
+            <iframe src="../client/chatbox.html" title="Chatbot"></iframe>
+        </div>
 
 
     </main>
@@ -255,19 +282,19 @@
     <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
             class="bi bi-arrow-up-short"></i></a>
 
-    <!-- Preloader -->
-    <div id="preloader"></div>
+    <!-- Preloader
+    <div id="preloader"></div> -->
 
     <!-- Vendor JS Files -->
-    <script src="/fe-event-management/client/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="/fe-event-management/client/assets/vendor/aos/aos.js"></script>
-    <script src="/fe-event-management/client/assets/vendor/swiper/swiper-bundle.min.js"></script>
-    <script src="/fe-event-management/client/assets/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="/client/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/client/assets/vendor/aos/aos.js"></script>
+    <script src="/client/assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="/client/assets/vendor/purecounter/purecounter_vanilla.js"></script>
 
     <!-- Main JS File -->
-    <script src="/fe-event-management/client/assets/js/main.js"></script>
-    <script src="/fe-event-management/client/assets/js/header.js"></script>
-    <script src="/fe-event-management/client/assets/js/home.js"></script>
+    <script src="/client/assets/js/main.js"></script>
+    <script src="/client/assets/js/header.js"></script>
+    <script src="/client/assets/js/home.js"></script>
 
 
 </body>
