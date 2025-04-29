@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="service-card">
                     <img src="../client/assets/img/services/dv3.jpg" alt="Cung cấp dịch vụ" class="service-img">
                     <a href="service.html?category=service" class="stretched-link"></a>
-                    <h3>CUNG CẤP NHÂN SỰ</h3>
+                    <h3>CUNG CẤP DỊCH VỤ</h3>
                 </div>
             </div>
         </div>

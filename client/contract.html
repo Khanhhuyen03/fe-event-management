@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="utf-8">
@@ -79,6 +79,72 @@
             opacity: 0;
             cursor: pointer;
         }
+
+        /* Style cho modal chọn mục */
+        .item-selection-modal .modal-dialog {
+            max-width: 900px;
+        }
+
+        .item-selection-modal .item-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .item-selection-modal .item-card:hover {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .item-selection-modal .item-card.selected {
+            border: 3px solid #718355;
+            background-color: #e9f5db;
+        }
+
+        .item-selection-modal .item-card .card {
+            min-height: 350px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .item-selection-modal .item-card .card-img-top {
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .item-selection-modal .item-card .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 15px;
+        }
+
+        .item-selection-modal .item-card .card-title {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .item-selection-modal .item-card .card-text {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .item-selection-modal .item-card .quantity-input {
+            width: 80px;
+            margin-top: 10px;
+        }
+
+        .item-selection-modal .selected-count {
+            font-size: 0.9rem;
+            color: #718355;
+        }
     </style>
 </head>
 
@@ -101,10 +167,6 @@
                                         <select class="form-select" id="contractType" onchange="updateContractName()"
                                             required>
                                             <option value="">Chọn loại sự kiện</option>
-                                            <option value="Hội nghị">Hội nghị</option>
-                                            <option value="Đám cưới">Đám cưới</option>
-                                            <option value="Sinh nhật">Sinh nhật</option>
-                                            <option value="Khai trương">Khai trương</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">
@@ -125,20 +187,18 @@
                                     required>
                             </div>
                             <div class="col-12">
-                                <label class="form-label">Thời gian tổ chức <span class="text-danger">*</span></label>
+                                <label class="form-label">Thời gian tổ chức <span class="text-danger">*</ básica</span></label>
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="date-input-group w-100">
-                                        <input type="text" class="form-control" id="startDateDisplay"
-                                            placeholder="dd/mm/yyyy" required>
+                                        <input type="text" class="form-control" id="startDateDisplay" placeholder="dd/mm/yyyy" required>
                                         <i class="bi bi-calendar calendar-icon"></i>
-                                        <input type="date" id="startDate" min="2025-04-13">
+                                        <input type="date" id="startDate">
                                     </div>
                                     <span>→</span>
                                     <div class="date-input-group w-100">
-                                        <input type="text" class="form-control" id="endDateDisplay"
-                                            placeholder="dd/mm/yyyy" required>
+                                        <input type="text" class="form-control" id="endDateDisplay" placeholder="dd/mm/yyyy" required>
                                         <i class="bi bi-calendar calendar-icon"></i>
-                                        <input type="date" id="endDate" min="2025-04-13">
+                                        <input type="date" id="endDate">
                                     </div>
                                 </div>
                                 <div id="dateError" class="text-danger mt-1" style="display: none;"></div>
@@ -167,7 +227,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 Prefeitura">
                                 <label for="contractDate" class="form-label">Ngày tạo hợp đồng</label>
                                 <input type="date" class="form-control" id="contractDate" readonly>
                             </div>
@@ -177,9 +237,7 @@
                     <div class="card m-4 p-3">
                         <h5 class="fw-bold text-center mb-4">THIẾT BỊ</h5>
                         <div class="mb-3">
-                            <select class="form-select" id="deviceSelect" onchange="addDevice()">
-                                <option value="">Chọn thiết bị</option>
-                            </select>
+                            <button type="button" class="btn btn-primary" onclick="openItemSelectionModal('device')">Thêm thiết bị</button>
                         </div>
                         <table class="table table-bordered" id="deviceTable">
                             <thead>
@@ -201,9 +259,7 @@
                     <div class="card m-4 p-3">
                         <h5 class="fw-bold text-center mb-4">DỊCH VỤ</h5>
                         <div class="mb-3">
-                            <select class="form-select" id="serviceSelect" onchange="addService()">
-                                <option value="">Chọn dịch vụ</option>
-                            </select>
+                            <button type="button" class="btn btn-primary" onclick="openItemSelectionModal('service')">Thêm dịch vụ</button>
                         </div>
                         <table class="table table-bordered" id="serviceTable">
                             <thead>
@@ -240,9 +296,7 @@
                         </div>
                         <div class="location-form" id="providerLocationForm">
                             <div class="mb-3">
-                                <select class="form-select" id="locationSelect" onchange="addLocation()">
-                                    <option value="">Chọn địa điểm</option>
-                                </select>
+                                <button type="button" class="btn btn-primary" onclick="openItemSelectionModal('location')">Thêm địa điểm</button>
                             </div>
                             <table class="table table-bordered" id="locationTable">
                                 <thead>
@@ -283,14 +337,14 @@
                                             <input type="text" class="form-control" id="customStartDateDisplay"
                                                 placeholder="dd/mm/yyyy" required>
                                             <i class="bi bi-calendar calendar-icon"></i>
-                                            <input type="date" id="customStartDate" min="2025-04-13">
+                                            <input type="date" id="customStartDate">
                                         </div>
                                         <span>→</span>
                                         <div class="date-input-group w-100">
                                             <input type="text" class="form-control" id="customEndDateDisplay"
                                                 placeholder="dd/mm/yyyy" required>
                                             <i class="bi bi-calendar calendar-icon"></i>
-                                            <input type="date" id="customEndDate" min="2025-04-13">
+                                            <input type="date" id="customEndDate">
                                         </div>
                                     </div>
                                 </div>
@@ -333,16 +387,32 @@
         </div>
     </div>
 
+    <!-- Modal chọn mục -->
+    <div class="modal fade item-selection-modal" id="itemSelectionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="itemSelectionTitle">Chọn mục</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row gy-4" id="itemSelectionContainer"></div>
+                </div>
+                <div class="modal-footer">
+                    <span class="selected-count" id="selectedCount">Đã chọn: 0 mục</span>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmItemSelection()">Xác nhận</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Vendor JS Files -->
     <script src="/fe-event-management/client/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/fe-event-management/client/assets/vendor/aos/aos.js"></script>
     <script src="/fe-event-management/client/assets/vendor/swiper/swiper-bundle.min.js"></script>
     <script src="/fe-event-management/client/assets/vendor/purecounter/purecounter_vanilla.js"></script>
-
-    <!-- Main JS File -->
     <script src="/fe-event-management/client/assets/js/contract.js"></script>
-
-
 </body>
 
 </html>
