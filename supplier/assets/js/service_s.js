@@ -150,13 +150,25 @@ function handleCreateForm() {
             return;
         }
 
+        // Lấy thông tin người dùng từ localStorage
+        const user = JSON.parse(localStorage.getItem("user"));
+        const userId = user ? user.id : null;
+
+        if (!userId) {
+            alert("Không tìm thấy thông tin người dùng, vui lòng đăng nhập lại!");
+            return;
+        }
+
         // Create object containing service info
         const serviceData = {
             name: name,
             description: description,
-            price: parseFloat(price),
+            hourly_salary: parseFloat(price), // Đổi tên để khớp với schema backend
             quantity: parseInt(quantity),
-            location: location
+            place: location, // Đổi tên để khớp với schema backend
+            user_id: userId, // Thêm trường user_id
+            created_at: new Date().toISOString().split('T')[0], // Thêm ngày tạo
+            updated_at: new Date().toISOString().split('T')[0] // Thêm ngày cập nhật
         };
 
         // Create FormData
@@ -174,6 +186,7 @@ function handleCreateForm() {
             console.log("Service vừa tạo có ID:", serviceResponse.id);
             console.log("Đã tạo dịch vụ thành công:", serviceResponse);
             alert("Tạo dịch vụ thành công!");
+            window.location.href = "service_table.html"; // Chuyển hướng sau khi tạo thành công
         });
     };
 }
@@ -196,7 +209,90 @@ function createService(formData, callback) {
         })
         .catch(error => alert(`Lỗi tạo dịch vụ: ${error.message}`));
 }
+// function handleCreateForm() {
+//     const createBtn = document.querySelector('#create');
+//     if (!createBtn) return;
 
+//     const editServiceId = localStorage.getItem("editServiceId");
+
+//     if (editServiceId) {
+//         loadEditForm(editServiceId); // Gọi hàm cập nhật nếu đang chỉnh sửa
+//         return;
+//     }
+
+//     createBtn.onclick = function (event) {
+//         event.preventDefault();
+
+//         const pictureInput = document.querySelector('input[name="picture"]');
+//         const name = document.querySelector('input[name="name"]').value;
+//         const description = document.querySelector('input[name="description"]').value;
+//         const price = document.querySelector('input[name="price"]').value;
+//         const quantity = document.querySelector('input[name="quantity"]').value;
+//         const location = document.querySelector('input[name="location"]').value;
+
+//         // Validation (giống Device, nhưng bỏ deviceTypeID)
+//         if (!name || !price || !quantity) {
+//             alert("Vui lòng nhập đầy đủ tên dịch vụ, tiền công và số lượng!");
+//             return;
+//         }
+
+//         if (!pictureInput || !pictureInput.files || pictureInput.files.length === 0) {
+//             alert("Vui lòng chọn ảnh cho dịch vụ!");
+//             return;
+//         }
+
+//         // Lấy thông tin người dùng từ localStorage
+//         const user = JSON.parse(localStorage.getItem("user"));
+//         const userId = user ? user.id : null;
+
+//         if (!userId) {
+//             alert("Không tìm thấy thông tin người dùng, vui lòng đăng nhập lại!");
+//             return;
+//         }
+
+//         // Create object containing service info (giống Device, với img là tên file)
+//         const serviceData = {
+//             img: pictureInput.files[0].name, // Lưu tên file ảnh, giống Device
+//             name: name,
+//             description: description,
+//             hourly_salary: parseFloat(price) || 0, // Đổi tên để khớp với schema backend
+//             quantity: parseInt(quantity) || 1, // Đảm bảo số nguyên
+//             place: location,
+//             user_id: userId,
+//             created_at: new Date().toISOString().split('T')[0],
+//             updated_at: new Date().toISOString().split('T')[0]
+//         };
+
+//         createService(serviceData, function (serviceResponse) {
+//             console.log("Service vừa tạo có ID:", serviceResponse.id);
+//             console.log("Đã tạo dịch vụ thành công:", serviceResponse);
+//             alert("Tạo dịch vụ thành công!");
+//             window.location.href = "service_table.html"; // Chuyển hướng
+//         });
+//     };
+// }
+
+// function createService(serviceData, callback) {
+//     const token = localStorage.getItem("token");
+//     if (!token) return alert("Vui lòng đăng nhập lại!");
+
+//     fetch(ServiceAPI, {
+//         method: 'POST',
+//         headers: {
+//             'Authorization': `Bearer ${token}`,
+//             'Content-Type': 'application/json' // Gửi dữ liệu JSON, giống Device
+//         },
+//         body: JSON.stringify(serviceData) // Chuyển serviceData thành JSON
+//     })
+//         .then(response => {
+//             if (!response.ok) throw new Error("Lỗi server");
+//             return response.json();
+//         })
+//         .then(data => {
+//             callback(data.result || data);
+//         })
+//         .catch(error => alert(`Lỗi tạo dịch vụ: ${error.message}`));
+// }
 function handleUpdateService(serviceId) {
     localStorage.setItem("editServiceId", serviceId); // Lưu ID vào localStorage
     window.location.href = "service_manage.html"; // Chuyển đến trang form
@@ -213,7 +309,7 @@ function loadEditForm(editServiceId) {
     // Lấy token từ localStorage
     let token = localStorage.getItem("token");
     if (!token) {
-        console.error("Không tìm thấy token, đăng nhập lại!");
+        console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
         return;
     }
 
@@ -225,7 +321,7 @@ function loadEditForm(editServiceId) {
             'Content-Type': 'application/json'
         }
     })
-        .then(res => res.json())
+        .then(response => response.json())
         .then(service => {
             console.log('Dữ liệu dịch vụ:', service);
 
@@ -236,7 +332,7 @@ function loadEditForm(editServiceId) {
             document.querySelector('input[name="quantity"]').value = service.quantity || 1;
             document.querySelector('input[name="location"]').value = service.place || "";
 
-            // Xử lý ảnh
+            // Xử lý hiển thị ảnh
             if (service.img) {
                 try {
                     const baseApiUrl = 'http://localhost:8080/service-management/api/v1/FileUpload/files/';
@@ -271,45 +367,72 @@ function loadEditForm(editServiceId) {
 
             // Đổi nút "Lưu" thành "Cập nhật"
             document.querySelector("#create").textContent = "Cập nhật";
-            document.querySelector("#create").onclick = function () {
+            document.querySelector("#create").onclick = function (event) {
+                event.preventDefault();
+
                 const inputPicture = document.querySelector('input[name="picture"]');
                 const inputName = document.querySelector('input[name="name"]').value;
                 const inputDescription = document.querySelector('input[name="description"]').value;
                 const inputPrice = document.querySelector('input[name="price"]').value;
                 const inputQuantity = document.querySelector('input[name="quantity"]').value;
                 const inputLocation = document.querySelector('input[name="location"]').value;
-                const img = inputPicture.files.length > 0 ? imagePreview.src : service.img;
+
+                // Kiểm tra dữ liệu bắt buộc
+                if (!inputName) {
+                    alert("Vui lòng nhập đầy đủ tên dịch vụ!");
+                    return;
+                }
 
                 const updatedService = {
-                    img: img,
                     name: inputName,
                     description: inputDescription,
-                    hourly_salary: parseFloat(inputPrice),
-                    quantity: parseInt(inputQuantity),
+                    hourly_salary: parseFloat(inputPrice) || 0,
+                    quantity: parseInt(inputQuantity) || 1,
                     place: inputLocation,
                     created_at: service.created_at,
                     updated_at: new Date().toISOString().split('T')[0]
                 };
 
+                // Tạo FormData
+                const formData = new FormData();
+                // Thêm file nếu có
+                if (inputPicture.files[0]) {
+                    formData.append('file', inputPicture.files[0]);
+                }
+                // Thêm service data dưới dạng JSON string với key là 'service'
+                formData.append('service', new Blob([JSON.stringify(updatedService)], {
+                    type: 'application/json'
+                }));
+
+                // Gửi yêu cầu cập nhật
+                if (!token) {
+                    alert("Vui lòng đăng nhập lại!");
+                    return;
+                }
+
                 fetch(`${ServiceAPI}/${editServiceId}`, {
                     method: 'PATCH',
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(updatedService)
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
                 })
-                    .then(res => res.json())
-                    .then(() => {
-                        console.log("Cập nhật dịch vụ thành công!");
+                    .then(response => {
+                        if (!response.ok) throw new Error("Lỗi server");
+                        return response.json();
+                    })
+                    .then(data => {
+                        const serviceResponse = data.result || data;
+                        console.log("Dịch vụ vừa cập nhật có ID:", serviceResponse.id);
+                        console.log("Đã cập nhật dịch vụ thành công:", serviceResponse);
+                        alert("Cập nhật dịch vụ thành công!");
                         window.location.href = "service_table.html";
                     })
                     .catch(error => {
-                        console.error("Lỗi cập nhật dịch vụ:", error);
+                        console.error('Lỗi cập nhật dịch vụ:', error);
+                        alert(`Lỗi cập nhật dịch vụ: ${error.message}`);
                     });
             };
         })
         .catch(error => {
-            console.error("Lỗi tải dữ liệu dịch vụ:", error);
+            console.error('Lỗi khi tải dữ liệu:', error);
         });
 }
