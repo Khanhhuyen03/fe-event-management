@@ -51,6 +51,19 @@
       "description": "Thiết bị C phục vụ sân khấu ngoài trời",
       "device_types_id": "3",
       "user_id": "user1"
+    },
+    {
+      "id": "7a6a",
+      "img": "avater.jpg",
+      "name": "Remi pad pro",
+      "description": "Level C2 đạt năng lực từ IELTS 6.5 8.0",
+      "device_types_id": "122b",
+      "hourly_rental_fee": 20000,
+      "quantity": 3,
+      "place": "Đà nẵng",
+      "user_id": "1",
+      "created_at": "2025-04-29",
+      "updated_at": "2025-04-29"
     }
   ],
   "device_type": [
@@ -89,6 +102,12 @@
       "name": "pad",
       "created_at": "2025-04-15",
       "updated_at": "2025-04-15"
+    },
+    {
+      "id": "ad4e",
+      "name": "Ipad",
+      "created_at": "2025-04-29",
+      "updated_at": "2025-04-29"
     }
   ],
   "service": [
@@ -163,6 +182,18 @@
       "created_at": "14/03/2025",
       "updated_at": "16/03/2025",
       "user_id": "user1"
+    },
+    {
+      "id": "575f",
+      "img": "avater.jpg",
+      "name": "phục vụ tận mồm",
+      "description": "Level C2 đạt năng lực từ IELTS 6.5 8.0",
+      "hourly_salary": 10090,
+      "quantity": 1,
+      "place": "Đà nẵng",
+      "user_id": "1",
+      "created_at": "2025-04-29",
+      "updated_at": "2025-04-29"
     }
   ],
   "user": [
@@ -242,6 +273,7 @@
       "description": "Sang trọng, quý tộc.",
       "img": "location_a.jpg",
       "hourly_rental_fee": 5000000,
+      "address": "Quận Thanh Khê, phường Hoà Khê",
       "created_at": "2025-03-19 10:00:00",
       "updated_at": "2025-03-19 12:00:00",
       "user_id": "1"
@@ -252,6 +284,7 @@
       "description": "Giàu có, nhà to.",
       "img": "location_a.jpg",
       "hourly_rental_fee": 150000,
+      "address": "Quận Thanh Khê, phường Hoà Khê",
       "created_at": "2025-03-19 10:00:00",
       "updated_at": "2025-03-19 12:00:00",
       "user_id": "1"
@@ -262,9 +295,32 @@
       "description": "Địa điểm chuyên tổ chức sự kiện ngoài trời.",
       "img": "location_a.jpg",
       "hourly_rental_fee": 500,
+      "address": "Quận Thanh Khê, phường Hoà Khê",
       "created_at": "2025-03-19 10:00:00",
       "updated_at": "2025-03-19 12:00:00",
       "user_id": "user1"
+    },
+    {
+      "id": "b0b0",
+      "img": "assets/img/location/hoinghi.jpg",
+      "name": "Nguyễn Hồng Minh",
+      "description": "Level C1 đạt năng lực từ IELTS 6.5 8.0",
+      "hourly_rental_fee": 50,
+      "address": "13, Phường Thanh Khê Đông, Quận Thanh Khê, Đà Nẵng",
+      "user_id": "1",
+      "created_at": "2025-04-29",
+      "updated_at": "2025-04-29"
+    },
+    {
+      "id": "bbd5",
+      "img": "anhdn.jpg",
+      "name": "Chat gbt",
+      "description": "phim ma",
+      "hourly_rental_fee": 9000,
+      "address": "89 Điện Biên Phủ, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh",
+      "user_id": "1",
+      "created_at": "2025-04-29",
+      "updated_at": "2025-04-29"
     }
   ],
   "provinces": [
