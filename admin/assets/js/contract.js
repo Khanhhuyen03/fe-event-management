@@ -1,10 +1,10 @@
-var ContractAPI = 'http://localhost:3000/contract';
-var CustomerAPI = 'http://localhost:3000/customer';
-var RentalAPI = 'http://localhost:3000/rental';
+var ContractAPI = 'http://localhost:8080/event-management/api/contracts';
+//var CustomerAPI = 'http://localhost:3000/customer';
+var RentalAPI = 'http://localhost:8080/event-management/rentals';
 
 function start() {
-    getData((contract, customer, rental) => {
-        renderContracts(contract, customer, rental);
+    getData((contract, rental) => {
+        renderContracts(contract, rental);
     });
 
     // Khởi tạo modal
@@ -13,9 +13,45 @@ function start() {
 
 start();
 
-function getData(callback) {
-    let token = localStorage.getItem("token"); // Lấy token từ localStorage
+// function getData(callback) {
+//     let token = localStorage.getItem("token"); // Lấy token từ localStorage
 
+//     if (!token) {
+//         console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+//         return;
+//     }
+
+//     Promise.all([
+//         fetch(ContractAPI, {
+//             headers: {
+//                 "Authorization": `Bearer ${token}`,
+//                 "Content-Type": "application/json"
+//             }
+//         }).then(res => res.json()),
+
+//         // fetch(CustomerAPI, {
+//         //     headers: {
+//         //         "Authorization": `Bearer ${token}`,
+//         //         "Content-Type": "application/json"
+//         //     }
+//         // }).then(res => res.json()),
+
+//         fetch(RentalAPI, {
+//             headers: {
+//                 "Authorization": `Bearer ${token}`,
+//                 "Content-Type": "application/json"
+//             }
+//         }).then(res => res.json()),
+//     ])
+//         .then(([contract, rental]) => {
+//             callback(contract, rental);
+//         })
+//         .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
+// }
+
+// Status contract
+function getData(callback) {
+    let token = localStorage.getItem("token");
     if (!token) {
         console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
         return;
@@ -27,37 +63,79 @@ function getData(callback) {
                 "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json"
             }
-        }).then(res => res.json()),
-
-        fetch(CustomerAPI, {
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
-            }
-        }).then(res => res.json()),
-
+        })
+            .then(res => {
+                if (!res.ok) throw new Error(`Lỗi ContractAPI: ${res.status}`);
+                return res.json();
+            }),
         fetch(RentalAPI, {
             headers: {
                 "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json"
             }
-        }).then(res => res.json()),
-    ])
-        .then(([contract, customer, rental]) => {
-            callback(contract, customer, rental);
         })
-        .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
-}
+            .then(res => {
+                if (!res.ok) throw new Error(`Lỗi RentalAPI: ${res.status}`);
+                return res.json();
+            }),
+    ])
+        .then(([contractData, rentalData]) => {
+            // Log phản hồi thô để debug
+            console.log("Phản hồi thô ContractAPI:", contractData);
+            console.log("Phản hồi thô RentalAPI:", rentalData);
 
-// Status contract
+            // Chuẩn hóa dữ liệu hợp đồng
+            let contracts = contractData.result || contractData.data?.items || contractData.data || contractData || [];
+            if (!Array.isArray(contracts)) {
+                contracts = [];
+            }
+
+            // Chuẩn hóa dữ liệu rental
+            let rentals = Array.isArray(rentalData) ? rentalData : rentalData.data || rentalData.result || [];
+            if (!Array.isArray(rentals)) {
+                rentals = [];
+            }
+
+            console.log("Hợp đồng đã xử lý:", contracts);
+            console.log("Rental đã xử lý:", rentals);
+            callback(contracts, rentals);
+        })
+        .catch(error => {
+            console.error("Lỗi khi lấy dữ liệu:", error);
+            alert("Không thể lấy dữ liệu: " + error.message);
+            callback([], []); // Fallback về mảng rỗng
+        });
+}
+// function getData(callback) {
+//     let token = localStorage.getItem("token");
+
+//     if (!token) {
+//         console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+//         return;
+//     }
+
+//     Promise.all([
+//         fetch(ContractAPI, {
+//             headers: {
+//                 "Authorization": `Bearer ${token}`,
+//                 "Content-Type": "application/json"
+//             }
+//         }).then(res => res.json()),
+//     ])
+//         .then(([res]) => {
+//             console.log("Dữ liệu contract từ API:", res);
+//             callback(res.result);
+//         })
+//         .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
+// }
 const ContractStatus = {
-    Draft: 0,
-    DepositPaid: 1,
-    InProgress: 2,
-    WaitingPaid: 3,
-    Completed: 4,
-    Cancel: 5,
-    AdminCancel: 6
+    Draft: "Draft",
+    DepositPaid: "DepositPaid",
+    InProgress: "InProgress",
+    WaitingPaid: "WaitingPaid",
+    Completed: "Completed",
+    Cancel: "Cancel",
+    AdminCancel: "AdminCancel"
 };
 
 function getStatusInfo(status) {
@@ -93,29 +171,130 @@ function getLighterColor(color) {
 }
 
 // Render table data
-function renderContracts(contracts, customers, rentals) {
-    var listContractsBlock = document.querySelector('#list-contact tbody');
-    if (!listContractsBlock) return;
+// function renderContracts(contracts, rentals) {
+//     var listContractsBlock = document.querySelector('#list-contact tbody');
+//     if (!listContractsBlock) return;
 
-    // Hủy DataTables nếu đã khởi tạo
+//     // Hủy DataTables nếu đã khởi tạo
+//     if ($.fn.DataTable.isDataTable('#list-contact')) {
+//         $('#list-contact').DataTable().destroy();
+//     }
+
+//     var htmls = contracts.map(function (contract) {
+//         // var customer = customers.find(c => c.id === contract.customer_id);
+//         // var customerName = customer ? customer.name : "Không xác định";
+
+//         var rental = rentals.find(r => r.id === contract.rental_id);
+//         var totalPrice = rental ? rental.totalPrice.toLocaleString() + " VND" : "0 VND";
+//         var rentalStartTime = rental ? new Date(rental.rentalStartTime).toLocaleDateString() : "N/A";
+//         var rentalEndTime = rental ? new Date(rental.rentalEndTime).toLocaleDateString() : "N/A";
+//         const statusInfo = getStatusInfo(Number(contract.status));
+
+//         return `
+//             <tr class="list-contract-${contract.id}">
+//                 <td>${contract.name}</td>
+//                 <td>Min nè</td>
+//                 <td>${totalPrice}</td>
+//                 <td>
+//                     <span class="status-label" style="color: ${statusInfo.color}; background-color: ${getLighterColor(statusInfo.color)};">
+//                         ${statusInfo.text}
+//                     </span>
+//                 </td>
+//                 <td>${rentalStartTime}</td>
+//                 <td>${rentalEndTime}</td>
+//                 <td>${new Date(contract.created_at).toLocaleDateString()}</td>
+//                 <td class="text-center">
+//                     <div class="action-dropdown">
+//                         <button class="btn btn-light action-btn">...</button>
+//                         <div class="dropdown-content">
+//                             <button class="dropdown-item cancel-btn" data-id="${contract.id}">Hủy hợp đồng</button>
+//                             <button class="dropdown-item update-btn" data-id="${contract.id}">Duyệt hợp đồng</button>
+//                             <button class="dropdown-item detail-btn" data-id="${contract.id}">Xem chi tiết</button>
+//                         </div>
+//                     </div>
+//                 </td>
+//             </tr>
+//         `;
+//     });
+
+//     listContractsBlock.innerHTML = htmls.join('');
+
+//     // Khởi tạo lại DataTables
+//     $('#list-contact').DataTable({
+//         "order": [[6, "desc"]],
+//         "language": {
+//             "search": "Tìm kiếm:",
+//             "lengthMenu": "Hiển thị _MENU_ hợp đồng",
+//             "info": "Hiển thị _START_ đến _END_ của _TOTAL_ hợp đồng",
+//             "infoEmpty": "Không có dữ liệu",
+//             "zeroRecords": "Không tìm thấy kết quả",
+//             "paginate": {
+//                 "first": "Đầu",
+//                 "last": "Cuối",
+//                 "next": "Tiếp",
+//                 "previous": "Trước"
+//             }
+//         }
+//     });
+
+//     // 🛠 Gán sự kiện dùng delegate để dropdown hoạt động trên tất cả các trang
+//     $('#list-contact tbody').on('click', '.action-btn', function (event) {
+//         let dropdown = $(this).next('.dropdown-content');
+//         $('.dropdown-content').not(dropdown).hide(); // Ẩn dropdown khác
+//         dropdown.toggle();
+//         event.stopPropagation();
+//     });
+
+//     // Xử lý sự kiện hủy
+//     $('#list-contact tbody').on('click', '.cancel-btn', function () {
+//         let contractId = $(this).data('id');
+//         handleCancelContract(contractId);
+//     });
+
+//     // Xử lý sự kiện cập nhật (mở modal)
+//     $('#list-contact tbody').on('click', '.update-btn', function () {
+//         let contractId = $(this).data('id');
+//         handleUpdateContract(contractId);
+//     });
+//     //Xử lý sự kiện xem hợp đồng
+//     $('#list-contact tbody').on('click', '.detail-btn', function () {
+//         let contractId = $(this).data('id');
+//         handleDetailContract(contractId);
+//     });
+
+//     // Đóng dropdown khi bấm ra ngoài
+//     $(document).click(function () {
+//         $('.dropdown-content').hide();
+//     });
+// }
+function renderContracts(contracts, rentals) {
+    var listContractsBlock = document.querySelector('#list-contact tbody');
+    if (!listContractsBlock) {
+        console.warn("Không tìm thấy #list-contact tbody trong DOM");
+        return;
+    }
+
     if ($.fn.DataTable.isDataTable('#list-contact')) {
         $('#list-contact').DataTable().destroy();
     }
 
-    var htmls = contracts.map(function (contract) {
-        var customer = customers.find(c => c.id === contract.customer_id);
-        var customerName = customer ? customer.name : "Không xác định";
+    if (!Array.isArray(contracts)) {
+        console.error("contracts không phải mảng:", contracts);
+        listContractsBlock.innerHTML = `<tr><td colspan="8">Không có dữ liệu hợp đồng</td></tr>`;
+        return;
+    }
 
+    var htmls = contracts.map(function (contract) {
         var rental = rentals.find(r => r.id === contract.rental_id);
-        var totalPrice = rental ? rental.total_price.toLocaleString() + " VND" : "0 VND";
-        var rentalStartTime = rental ? new Date(rental.rental_start_time).toLocaleDateString() : "N/A";
-        var rentalEndTime = rental ? new Date(rental.rental_end_time).toLocaleDateString() : "N/A";
-        const statusInfo = getStatusInfo(Number(contract.status));
+        var totalPrice = rental ? rental.totalPrice.toLocaleString() + " VND" : "0 VND";
+        var rentalStartTime = rental ? new Date(rental.rentalStartTime).toLocaleDateString() : "N/A";
+        var rentalEndTime = rental ? new Date(rental.rentalEndTime).toLocaleDateString() : "N/A";
+        const statusInfo = getStatusInfo(contract.status) || { text: "Không xác định", color: "gray" };
 
         return `
             <tr class="list-contract-${contract.id}">
                 <td>${contract.name}</td>
-                <td>${customerName}</td>
+                <td>${contract.customerName}</td>
                 <td>${totalPrice}</td>
                 <td>
                     <span class="status-label" style="color: ${statusInfo.color}; background-color: ${getLighterColor(statusInfo.color)};">
@@ -124,7 +303,7 @@ function renderContracts(contracts, customers, rentals) {
                 </td>
                 <td>${rentalStartTime}</td>
                 <td>${rentalEndTime}</td>
-                <td>${new Date(contract.created_at).toLocaleDateString()}</td>
+                <td>${new Date(contract.created_at || contract.createdAt).toLocaleDateString()}</td>
                 <td class="text-center">
                     <div class="action-dropdown">
                         <button class="btn btn-light action-btn">...</button>
@@ -141,7 +320,6 @@ function renderContracts(contracts, customers, rentals) {
 
     listContractsBlock.innerHTML = htmls.join('');
 
-    // Khởi tạo lại DataTables
     $('#list-contact').DataTable({
         "order": [[6, "desc"]],
         "language": {
@@ -159,36 +337,104 @@ function renderContracts(contracts, customers, rentals) {
         }
     });
 
-    // 🛠 Gán sự kiện dùng delegate để dropdown hoạt động trên tất cả các trang
     $('#list-contact tbody').on('click', '.action-btn', function (event) {
         let dropdown = $(this).next('.dropdown-content');
-        $('.dropdown-content').not(dropdown).hide(); // Ẩn dropdown khác
+        $('.dropdown-content').not(dropdown).hide();
         dropdown.toggle();
         event.stopPropagation();
     });
 
-    // Xử lý sự kiện hủy
     $('#list-contact tbody').on('click', '.cancel-btn', function () {
         let contractId = $(this).data('id');
         handleCancelContract(contractId);
     });
 
-    // Xử lý sự kiện cập nhật (mở modal)
     $('#list-contact tbody').on('click', '.update-btn', function () {
         let contractId = $(this).data('id');
         handleUpdateContract(contractId);
     });
-    //Xử lý sự kiện xem hợp đồng
+
     $('#list-contact tbody').on('click', '.detail-btn', function () {
         let contractId = $(this).data('id');
         handleDetailContract(contractId);
     });
 
-    // Đóng dropdown khi bấm ra ngoài
     $(document).click(function () {
         $('.dropdown-content').hide();
     });
 }
+//render table data
+// function renderContracts(contracts) {
+//     var listContractsBlock = document.querySelector('#list-contact tbody');
+//     if (!listContractsBlock) return;
+
+//     // Hủy DataTables nếu đã khởi tạo
+//     if ($.fn.DataTable.isDataTable('#list-contact')) {
+//         $('#list-contact').DataTable().destroy();
+//     }
+
+//     var htmls = contracts.map(function (contract) {
+
+//         return `
+//             <tr class="list-contract-${contract.id}">
+//                 <td>${contract.name}</td>
+//                 <td>Minh</td>
+//                 <td>5000</td>
+//                 <td>${contract.status}</td>
+//                 <td>10/8</td>
+//                 <td>24/6</td>
+//                 <td>${new Date(contract.createdAt).toLocaleDateString()}</td>
+//                 <td class="text-center">
+//                     <div class="action-dropdown">
+//                         <button class="btn btn-light action-btn">...</button>
+//                         <div class="dropdown-content">
+//                             <button class="dropdown-item delete-btn" data-id="${contract.id}">Xoá</button>
+//                         </div>
+//                     </div>
+//                 </td>
+//             </tr>
+//         `;
+//     });
+
+//     listContractsBlock.innerHTML = htmls.join('');
+
+//     // Khởi tạo lại DataTables
+//     $('#list-contact').DataTable({
+//         "order": [[6, "desc"]],
+//         "language": {
+//             "search": "Tìm kiếm:",
+//             "lengthMenu": "Hiển thị MENU hợp đồng",
+//             "info": "Hiển thị START đến END của TOTAL hợp đồng",
+//             "infoEmpty": "Không có dữ liệu",
+//             "zeroRecords": "Không tìm thấy kết quả",
+//             "paginate": {
+//                 "first": "Đầu",
+//                 "last": "Cuối",
+//                 "next": "Tiếp",
+//                 "previous": "Trước"
+//             }
+//         }
+//     });
+
+//     // 🛠 Gán sự kiện dùng delegate để dropdown hoạt động trên tất cả các trang
+//     $('#list-contact tbody').on('click', '.action-btn', function (event) {
+//         let dropdown = $(this).next('.dropdown-content');
+//         $('.dropdown-content').not(dropdown).hide(); // Ẩn dropdown khác
+//         dropdown.toggle();
+//         event.stopPropagation();
+//     });
+
+//     // Xử lý sự kiện xoá
+//     $('#list-contact tbody').on('click', '.delete-btn', function () {
+//         let contractId = $(this).data('id');
+//         handleDeleteContract(contractId);
+//     });
+
+//     // Đóng dropdown khi bấm ra ngoài
+//     $(document).click(function () {
+//         $('.dropdown-content').hide();
+//     });
+// }
 
 // Khởi tạo modal
 function initializeModal() {
@@ -224,24 +470,36 @@ function updateContractStatus(contractId, status, callback) {
 
     if (!token) {
         console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+        callback(false);
         return;
     }
 
+    // Log dữ liệu gửi đi để debug
+    console.log("Cập nhật trạng thái hợp đồng:", { contractId, status });
+
     fetch(`${ContractAPI}/${contractId}`, {
-        method: "PATCH",
+        method: "PUT",
         headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ status: parseInt(status) })
+        body: JSON.stringify({ status: status }) // Status là chuỗi, không cần parseInt
     })
-        .then(res => res.json())
-        .then(() => {
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Lỗi HTTP: ${res.status}`);
+            }
+            return res.json();
+
+        })
+        .then(data => {
+            console.log("Phản hồi từ API:", data); // Log phản hồi để debug
             callback(true);
         })
         .catch(error => {
             console.error("Lỗi khi cập nhật trạng thái hợp đồng:", error);
-            alert("Lỗi khi cập nhật trạng thái hợp đồng!");
+            alert("Lỗi khi cập nhật trạng thái hợp đồng: " + error.message);
+            console.log("Cập nhật trạng thái hợp đồng 2:", { contractId, status });
             callback(false);
         });
 }
@@ -260,9 +518,10 @@ function handleCancelContract(contractId) {
 }
 //Xem hợp đồng
 function handleDetailContract(contractId) {
-    localStorage.setItem("editContractId", contractId); // Lưu ID vào localStorage
-    window.location.href = "detail_contract.html"; // Chuyển đến trang chi tiết
+    localStorage.setItem("editContractId", contractId);
+    window.location.href = "detail_contract.html";
 }
+
 function watchDetailContract(editContractId) {
     if (!editContractId) {
         console.error("Không có ID hợp đồng để xem chi tiết!");
@@ -271,15 +530,13 @@ function watchDetailContract(editContractId) {
 
     console.log("Xem chi tiết hợp đồng ID:", editContractId);
 
-    // Lấy token từ localStorage
     const token = localStorage.getItem("token");
     if (!token) {
         console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
         return;
     }
 
-    // Gọi API lấy thông tin hợp đồng
-    fetch(`http://localhost:3000/contract/${editContractId}`, {
+    fetch(`http://localhost:8080/event-management/api/contracts/${editContractId}`, { // Đổi endpoint
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -290,59 +547,57 @@ function watchDetailContract(editContractId) {
             if (!response.ok) throw new Error(`Lỗi khi lấy dữ liệu hợp đồng: ${response.status}`);
             return response.json();
         })
-        .then(contract => {
+        .then(data => {
+            // Chuẩn hóa dữ liệu hợp đồng giống getData
+            const contract = data.result || data.data || data || {};
             console.log("Dữ liệu hợp đồng:", contract);
-
-            // Gọi API lấy danh sách khách hàng
-            return fetch('http://localhost:3000/customer', {
+            if (!contract.id) {
+                throw new Error("Dữ liệu hợp đồng không hợp lệ!");
+            }
+            return { contract };
+        })
+        .then(({ contract }) => {
+            return fetch(RentalAPI, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             })
-                .then(response => response.json())
-                .then(customers => ({ contract, customers }));
+                .then(response => {
+                    if (!response.ok) throw new Error(`Lỗi RentalAPI: ${response.status}`);
+                    return response.json();
+                })
+                .then(rentals => {
+                    // Chuẩn hóa rentals giống getData
+                    rentals = Array.isArray(rentals) ? rentals : rentals.data || rentals.result || [];
+                    return { contract, rentals };
+                });
         })
-        .then(({ contract, customers }) => {
-            // Gọi API lấy danh sách rental
-            return fetch('http://localhost:3000/rental', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(response => response.json())
-                .then(rentals => ({ contract, customers, rentals }));
-        })
-        .then(({ contract, customers, rentals }) => {
-            // Tìm khách hàng tương ứng
-            const customer = customers.find(c => c.id === contract.customer_id);
-            const customerName = customer ? customer.name : "Không xác định";
-            const customerPhone = customer ? customer.phone_number : "N/A";
-            const customerAddress = customer ? customer.address : "N/A";
-
-            // Tìm rental tương ứng
+        .then(({ contract, rentals }) => {
+            // const customer = customers.find(c => c.id === contract.customer_id);
+            // const customerName = customer ? customer.name : "Không xác định";
+            // const customerPhone = customer ? customer.phone_number : "N/A";
+            // const customerAddress = customer ? customer.address : "N/A";
+            console.log("tên hợp đồng:", contract.n);
             const rental = rentals.find(r => r.id === contract.rental_id);
-            const totalPrice = rental ? rental.total_price.toLocaleString() + " ₫" : "0 ₫";
-            const rentalStartTime = rental ? new Date(rental.rental_start_time).toLocaleDateString() : "N/A";
-            const rentalEndTime = rental ? new Date(rental.rental_end_time).toLocaleDateString() : "N/A";
+            const totalPrice = rental ? rental.totalPrice.toLocaleString() + " ₫" : "0 ₫";
+            const rentalStartTime = rental ? new Date(rental.rentalStartTime).toLocaleDateString() : "N/A";
+            const rentalEndTime = rental ? new Date(rental.rentalEndTime).toLocaleDateString() : "N/A";
 
-            // Lấy thông tin trạng thái
-            const statusInfo = getStatusInfo(Number(contract.status));
+            // Dùng status dạng chuỗi, thêm fallback
+            const statusInfo = getStatusInfo(contract.status) || { text: "Không xác định", color: "gray" };
 
-            // Cập nhật giao diện
+            // Cập nhật giao diện, giữ nguyên các trường mi đã comment
             document.getElementById("status").textContent = statusInfo.text;
             document.getElementById("name").textContent = contract.name || "Hợp đồng không xác định";
             document.getElementById("RentalStart").textContent = rentalStartTime;
             document.getElementById("RentalEnd").textContent = rentalEndTime;
             document.getElementById("price").textContent = totalPrice;
-            document.getElementById("customerName").textContent = customerName;
-            document.getElementById("phone").textContent = customerPhone;
-            document.getElementById("address").textContent = customerAddress;
+            document.getElementById("customerName").textContent = contract.customerName || "Khách hàng không xác định";
+            document.getElementById("phone").textContent = contract.customerPhone;
+            document.getElementById("address").textContent = contract.eventAddress || "Địa chỉ không xác định";
 
-            // Cập nhật màu sắc cho trạng thái
             const statusElement = document.getElementById("status");
             statusElement.style.color = statusInfo.color;
             statusElement.style.backgroundColor = getLighterColor(statusInfo.color);

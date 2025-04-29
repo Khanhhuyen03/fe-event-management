@@ -82,8 +82,8 @@
     <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
 
     <!-- Main JS File -->
-    <script src="assets/js/main.js"></script>
-    <script src="assets/js/header.js"></script>
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/header.js"></script>
 
     <script>
         let suppliers = [];
@@ -153,7 +153,7 @@
                 let endpoint;
                 if (category === "device") {
                     endpoint = `http://localhost:8080/event-management/devices/${id}`;
-                } else if (category === "service") {
+                } else if (category === "services") {
                     endpoint = `http://localhost:8080/event-management/services/${id}`;
                 } else if (category === "location") {
                     endpoint = `http://localhost:8080/event-management/locations/${id}`;
@@ -191,8 +191,8 @@
                         detailsList.innerHTML = `
                             <li class="list-group-item"><strong>Phí thuê/ngày:</strong> ${(item.hourlyRentalFee || 0).toLocaleString()} VND</li>
                             <li class="list-group-item"><strong>Số lượng:</strong> ${item.quantity || "Không xác định"}</li>
-                            <li class="list-group-item"><strong>Loại thiết bị:</strong> ${item.deviceType_name}</li>
-                            <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getSupplierName(item.userID)}</li>
+                            <li class="list-group-item"><strong>Loại thiết bị:</strong> ${item.device_type_id}</li>
+                            <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getSupplierName(item.userid)}</li>
                             <li class="list-group-item"><strong>Thành phố:</strong> ${item.place}</li>
                         `;
                     } else if (category === "service") {

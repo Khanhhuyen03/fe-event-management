@@ -322,6 +322,7 @@
                 } else {
                     throw new Error("Danh mục không hợp lệ");
                 }
+
                 // Gọi API dữ liệu chính
                 const dataResponse = await fetch(endpoint, {
                     method: "GET",
@@ -333,6 +334,7 @@
                     throw new Error(`Lỗi khi lấy dữ liệu chính: ${dataResponse.statusText}`);
                 }
                 var a = await dataResponse.json();
+
                 if(!(currentCategory === "event")) {
                     var data = a.data.items;
                     a = data;
@@ -371,6 +373,7 @@
                     }))
                     : [{ id: 1, name: data.eventTypeName }];
                 return types;
+
             }else if (currentCategory === "device") {
                 const types = Array.isArray(data)
                     ? [...new Set(data.map(item => item.deviceType_name))].map((name, index) => ({
@@ -457,7 +460,7 @@
             items.forEach((item, index) => {
                 let detailPage = currentCategory === "event" ? "./event-detail.html" : "./item-detail.html";
                 let buttonText = "Xem Chi Tiết";
-                let itemId =  item.id;
+                let itemId = item.id;
                 let hoverInfo = `
                     <div class="row propery-info"><div class="col">Địa điểm</div></div>
                     <div class="row"><div class="col">${item.place || "Không xác định"}</div></div>
@@ -492,6 +495,7 @@
             let filteredItems = allItems;
 
             if (currentTypeId !== null) {
+
                 if(currentCategory === "event"){
                     filteredItems = filteredItems.filter(item => item.eventTypeName === allTypes.find(t => t.id === currentTypeId)?.name);
                 }else if(currentCategory === "device"){

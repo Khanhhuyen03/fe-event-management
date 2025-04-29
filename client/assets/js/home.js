@@ -42,3 +42,24 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
     `;
 });
+
+// Lắng nghe sự kiện khi người dùng nhấn nút
+document.getElementById('generateBtn').addEventListener('click', function () {
+    // Lấy prompt từ input (có thể thay bằng form khác nếu cần)
+    const prompt = document.getElementById('promptInput').value;
+
+    // Gửi POST request đến backend (Spring Boot)
+    fetch('http://localhost:8080/event-management/api/ai/generate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(prompt) // Gửi dữ liệu prompt
+    })
+        .then(response => response.json())  // Chờ backend trả về dữ liệu
+        .then(data => {
+            console.log(data); // Xử lý dữ liệu trả về (ví dụ: hiển thị kết quả lên UI)
+            document.getElementById('result').innerText = data;  // Hiển thị kết quả từ AI
+        })
+        .catch(error => console.error('Error:', error)); // Xử lý lỗi nếu có
+});

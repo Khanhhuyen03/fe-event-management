@@ -2,6 +2,8 @@ const API_BASE = 'http://localhost:8080/event-management';
 const DeviceAPI = `${API_BASE}/devices`;
 const DeviceTypeAPI = `${API_BASE}/deviceType`;
 const UsersAPI = `${API_BASE}/users`;
+const UserAPI_MRG = `${API_BASE}/users/manager`;
+
 function start() {
     getData((devices, deviceTypes, users) => {
         renderDevices(devices, deviceTypes, users)
@@ -13,32 +15,217 @@ function start() {
     }
 }
 start();
+// function getData(callback) {
+//     let token = localStorage.getItem("token"); // Lấy token từ localStorage
+
+//     if (!token) {
+//         console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+//         return;
+//     }
+
+//     Promise.all([
+//         fetch(`${DeviceAPI}/list`).then(res => res.json()),
+
+//         fetch(`${DeviceTypeAPI}/list`).then(res => res.json()),
+
+//         fetch(UsersAPI, {
+//             // method: 'GET',
+//             headers: {
+//                 "Authorization": `Bearer ${token}`,
+//                 "Content-Type": "application/json"
+//             }
+//         }).then(res => res.json()),
+//         fetch(UserAPI_MRG, {
+//             // method: 'GET',
+//             headers: {
+//                 "Authorization": `Bearer ${token}`,
+//                 "Content-Type": "application/json"
+//             }
+//         }).then(res => res.json()),
+//     ])
+//         .then(([devices, deviceTypes, users, usermrg]) => {
+//             devices = devices.data.items;
+//             deviceTypes = deviceTypes.data.items;
+//             users = Array.isArray(users) ? users : users.data || [];//bỏ cái này dô het lỗi manager
+//             usermrg = Array.isArray(usermrg) ? usermrg : usermrg.data || [];//bỏ cái này dô het lỗi manage
+//             callback(devices, deviceTypes, users, usermrg);
+//         })
+//         .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
+// }
+
+// //render table data
+
+
+// function renderDevices(devices, deviceTypes, users) {
+//     var listDevicesBlock = document.querySelector('#list-device tbody');
+//     if (!listDevicesBlock) return;
+
+//     console.log("Devices:", devices);
+//     console.log("Device Types:", deviceTypes);
+//     console.log("Users:", users);
+
+//     if (!devices || devices.length === 0) {
+//         console.warn("Danh sách devices rỗng!");
+//         return;
+//     }
+
+//     // Hủy DataTables nếu đã khởi tạo
+//     if ($.fn.DataTable.isDataTable('#list-device')) {
+//         $('#list-device').DataTable().destroy();
+//     }
+
+//     var htmls = devices.map(function (device) {
+//         // Lấy nhà cung cấp
+//         var supplier = users.find(user => String(user.id) === String(device.userID));
+//         var supplierName = supplier ? `${supplier.last_name} ${supplier.first_name} ` : "Không có nhà cung cấp";
+
+//         return `
+//             <tr class="list-device-${device.id}">
+//                 <td>${device.name || "Không có tên"}</td>
+//                 <td>${device.deviceType_name}</td>
+//                 <td>${device.description || "Không có mô tả"}</td>
+//                 <td>${device.quantity || 0}</td>
+//                 <td>${device.hourlyRentalFee ? device.hourlyRentalFee.toLocaleString() + " VND" : "Không xác định"}</td>
+//                 <td>${device.created_at ? new Date(device.created_at).toLocaleDateString("en-US", { year: "2-digit", month: "2-digit", day: "2-digit" }) : "Không xác định"}</td>
+//                 <td>${device.place || "ko có địa điểm"}</td>
+//                 <td>${supplierName}</td>
+//                 <td class="text-center">
+//                     <div class="action-dropdown">
+//                         <button class="btn btn-light action-btn">...</button>
+//                         <div class="dropdown-content">
+//                             <button class="dropdown-item delete-btn" data-id="${device.id}">Xoá</button>
+//                             <button class="dropdown-item detail-btn" data-id="${device.id}">Xem chi tiết</button>
+//                         </div>
+//                     </div>
+//                 </td>
+//             </tr>
+//         `;
+//     });
+
+//     listDevicesBlock.innerHTML = htmls.join('');
+
+//     if (!listDevicesBlock.innerHTML.trim()) {
+//         console.warn("Không có dữ liệu để hiển thị.");
+//         return;
+//     }
+
+//     // Khởi tạo lại DataTables
+//     var table = $('#list-device').DataTable({
+//         "order": [[5, "desc"]],
+//         "language": {
+//             "search": "Tìm kiếm:",
+//             "lengthMenu": "Hiển thị _MENU_ thiết bị",
+//             "info": "Hiển thị _START_ đến _END_ của _TOTAL_ thiết bị",
+//             "infoEmpty": "Không có dữ liệu",
+//             "zeroRecords": "Không tìm thấy kết quả",
+//             "paginate": {
+//                 "first": "Đầu",
+//                 "last": "Cuối",
+//                 "next": "Tiếp",
+//                 "previous": "Trước"
+//             }
+//         }
+//     });
+
+//     // 🛠 Gán sự kiện dùng delegate để dropdown hoạt động đúng trên mọi trang
+//     $('#list-device tbody').off('click').on('click', '.action-btn', function (event) {
+//         let dropdown = $(this).next('.dropdown-content');
+//         $('.dropdown-content').not(dropdown).hide(); // Ẩn dropdown khác
+//         dropdown.toggle();
+//         event.stopPropagation();
+//     });
+
+//     // Xử lý sự kiện xoá thiết bị
+//     $('#list-device tbody').on('click', '.delete-btn', function () {
+//         let deviceId = $(this).data('id');
+//         handleDeleteDevice(deviceId);
+//     });
+//     // Xử lý thiết bị xem chi tiết
+//     $('#list-device tbody').on('click', '.detail-btn', function () {
+//         let eventId = $(this).data('id');
+//         handleDetailDevice(eventId);
+//     });
+//     // Đóng dropdown khi bấm ra ngoài
+//     $(document).off('click').on('click', function () {
+//         $('.dropdown-content').hide();
+//     });
+// }
+
+
+//Tạo Xoá thiết bị
 function getData(callback) {
     let token = localStorage.getItem("token"); // Lấy token từ localStorage
 
     if (!token) {
         console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+        alert("Vui lòng đăng nhập lại!");
         return;
     }
 
+    // Lấy roleName từ localStorage
+    const user = JSON.parse(localStorage.getItem("user"));
+    const roleName = user?.roleName?.toUpperCase() || "USER";
+    console.log("Role name:", roleName);
+
+    // Chọn API dựa trên roleName
+    const userApiToFetch = roleName === "MANAGER" ? UserAPI_MRG : UsersAPI;
+
+    console.log("DeviceAPI/list:", `${DeviceAPI}/list`);
+    console.log("DeviceTypeAPI/list:", `${DeviceTypeAPI}/list`);
+    console.log("User API được gọi:", userApiToFetch);
+
     Promise.all([
-        fetch(`${DeviceAPI}/list`).then(res => res.json()),
+        // Không gửi token cho DeviceAPI, giữ nguyên như gốc
+        fetch(`${DeviceAPI}/list`).then(res => {
+            if (!res.ok) {
+                return res.text().then(text => {
+                    throw new Error(`Lỗi DeviceAPI: ${res.status} - ${text}`);
+                });
+            }
+            return res.json();
+        }),
 
-        fetch(`${DeviceTypeAPI}/list`).then(res => res.json()),
+        // Không gửi token cho DeviceTypeAPI, giữ nguyên như gốc
+        fetch(`${DeviceTypeAPI}/list`).then(res => {
+            if (!res.ok) {
+                return res.text().then(text => {
+                    throw new Error(`Lỗi DeviceTypeAPI: ${res.status} - ${text}`);
+                });
+            }
+            return res.json();
+        }),
 
-        fetch(UsersAPI, {
+        fetch(userApiToFetch, {
             headers: {
                 "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json"
             }
-        }).then(res => res.json()),
+        }).then(res => {
+            if (!res.ok) {
+                return res.text().then(text => {
+                    throw new Error(`Lỗi User API (${userApiToFetch}): ${res.status} - ${text}`);
+                });
+            }
+            return res.json();
+        }),
     ])
         .then(([devices, deviceTypes, users]) => {
+            devices = devices.data?.items || [];
+            deviceTypes = deviceTypes.data?.items || [];
+            users = Array.isArray(users) ? users : users.data || [];
+
+            console.log("Dữ liệu Devices:", devices);
+            console.log("Dữ liệu DeviceTypes:", deviceTypes);
+            console.log("Dữ liệu Users từ API:", users);
+
             callback(devices, deviceTypes, users);
         })
-        .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
+        .catch(error => {
+            console.error("Lỗi khi lấy dữ liệu:", error);
+            alert("Không thể lấy dữ liệu: " + error.message);
+        });
 }
-//render table data
+
 function renderDevices(devices, deviceTypes, users) {
     var listDevicesBlock = document.querySelector('#list-device tbody');
     if (!listDevicesBlock) return;
@@ -58,22 +245,20 @@ function renderDevices(devices, deviceTypes, users) {
     }
 
     var htmls = devices.map(function (device) {
-        // Lấy loại thiết bị
-        var deviceType = deviceTypes.find(dt => String(dt.id) === String(device.device_types_id));
-        var deviceTypeName = deviceType ? deviceType.name : "Không xác định";
+        // Tìm supplier trực tiếp từ users (không cần kiểm tra roleName)
+        const supplier = users.find(user => String(user.id) === String(device.userID));
+        const supplierName = supplier ? `${supplier.last_name} ${supplier.first_name}` : "Không có nhà cung cấp";
 
-        // Lấy nhà cung cấp
-        var supplier = users.find(user => String(user.id) === String(device.user_id));
-        var supplierName = supplier ? `${supplier.last_name} ${supplier.first_name} ` : "Không có nhà cung cấp";
+        console.log(`Device ID: ${device.id}, userID: ${device.userID}, Supplier:`, supplier);
 
         return `
             <tr class="list-device-${device.id}">
                 <td>${device.name || "Không có tên"}</td>
-                <td>${deviceTypeName}</td>
+                <td>${device.deviceType_name || "Không xác định"}</td>
                 <td>${device.description || "Không có mô tả"}</td>
                 <td>${device.quantity || 0}</td>
                 <td>${device.hourlyRentalFee ? device.hourlyRentalFee.toLocaleString() + " VND" : "Không xác định"}</td>
-                <td>${device.created_at ? new Date(device.created_at).toLocaleDateString("en-US", {year: "2-digit", month: "2-digit", day: "2-digit"}) : "Không xác định"}</td>
+                <td>${device.created_at ? new Date(device.created_at).toLocaleDateString("en-US", { year: "2-digit", month: "2-digit", day: "2-digit" }) : "Không xác định"}</td>
                 <td>${device.place || "ko có địa điểm"}</td>
                 <td>${supplierName}</td>
                 <td class="text-center">
@@ -114,31 +299,28 @@ function renderDevices(devices, deviceTypes, users) {
         }
     });
 
-    // 🛠 Gán sự kiện dùng delegate để dropdown hoạt động đúng trên mọi trang
+    // Gán sự kiện cho dropdown
     $('#list-device tbody').off('click').on('click', '.action-btn', function (event) {
         let dropdown = $(this).next('.dropdown-content');
-        $('.dropdown-content').not(dropdown).hide(); // Ẩn dropdown khác
+        $('.dropdown-content').not(dropdown).hide();
         dropdown.toggle();
         event.stopPropagation();
     });
 
-    // Xử lý sự kiện xoá thiết bị
     $('#list-device tbody').on('click', '.delete-btn', function () {
         let deviceId = $(this).data('id');
         handleDeleteDevice(deviceId);
     });
-     // Xử lý thiết bị xem chi tiết
-     $('#list-device tbody').on('click', '.detail-btn', function () {
+
+    $('#list-device tbody').on('click', '.detail-btn', function () {
         let eventId = $(this).data('id');
         handleDetailDevice(eventId);
     });
-    // Đóng dropdown khi bấm ra ngoài
+
     $(document).off('click').on('click', function () {
         $('.dropdown-content').hide();
     });
 }
-
-//Tạo Xoá thiết bị
 function handleDeleteDevice(id) {
     var options = {
         method: 'DELETE',
@@ -164,96 +346,118 @@ function handleDeleteDevice(id) {
 
 }
 //Xem thiết bị
-function handleDetailDevice(eventId) {
-    localStorage.setItem("editDevicetId", eventId); // Lưu ID vào localStorage
-    window.location.href = "detail_device.html"; // Chuyển đến form cập nhật
+// Xem chi tiết thiết bị
+function handleDetailDevice(id) {
+    localStorage.setItem("editDeviceId", id); // Lưu ID vào localStorage
+    window.location.href = "detail_device.html"; // Chuyển đến trang chi tiết
 }
-function watchDetailDevice(editDevicetId) {
-    if (!editDevicetId) return;
 
-    const imagePreview = document.getElementById("Image"); // Khớp với id trong HTML
+function watchDetailDevice(deviceId) {
+    if (!deviceId) {
+        console.warn("Không có ID thiết bị để hiển thị!");
+        return;
+    }
+
+    const imagePreview = document.getElementById("Image");
     const defaultImagePath = "assets/img/card.jpg";
 
-    //Lấy token từ localStorage
+    // Lấy token từ localStorage
     let token = localStorage.getItem("token");
-
     if (!token) {
         console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
         alert("Vui lòng đăng nhập lại!");
         return;
     }
 
-    // Lấy danh sách loại thiết bị và người dùng
+    // Lấy roleName từ localStorage
+    const user = JSON.parse(localStorage.getItem("user"));
+    const roleName = user?.roleName?.toUpperCase() || "USER";
+    console.log("Role name:", roleName);
+
+    // Chọn API dựa trên roleName
+    const userApiToFetch = roleName === "MANAGER" ? UserAPI_MRG : UsersAPI;
+    console.log("User API được gọi:", userApiToFetch);
+
+    // Lấy danh sách loại thiết bị, người dùng và thông tin thiết bị
     Promise.all([
-        fetch(DeviceTypeAPI, {
-            method: 'GET',
-            headers: {
-               'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+        // Không gửi token cho DeviceTypeAPI, giống như trong getData
+        fetch(`${DeviceTypeAPI}/list`).then(res => {
+            if (!res.ok) {
+                return res.text().then(text => {
+                    throw new Error(`Lỗi DeviceTypeAPI: ${res.status} - ${text}`);
+                });
             }
-        }).then(response => response.json()),
-        fetch(UsersAPI, {
-            method: 'GET',
+            return res.json();
+        }),
+
+        fetch(userApiToFetch, {
             headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
             }
-        }).then(response => response.json())
+        }).then(res => {
+            if (!res.ok) {
+                return res.text().then(text => {
+                    throw new Error(`Lỗi User API (${userApiToFetch}): ${res.status} - ${text}`);
+                });
+            }
+            return res.json();
+        }),
+
+        fetch(`${DeviceAPI}/${deviceId}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => {
+            if (!res.ok) {
+                return res.text().then(text => {
+                    throw new Error(`Lỗi DeviceAPI: ${res.status} - ${text}`);
+                });
+            }
+            return res.json();
+        }),
     ])
-        .then(([deviceTypes, users]) => {
-            // Lấy thông tin thiết bị
-            return fetch(`${DeviceAPI}/${editDevicetId}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(device => ({ device, deviceTypes, users })); // Trả về cả device, deviceTypes và users
-        })
-        .then(({ device, deviceTypes, users }) => {
-            // Tìm tên loại thiết bị từ deviceTypes dựa trên device.device_types_id
-            const deviceType = deviceTypes.find(type => type.id === device.device_types_id);
-            const deviceTypeName = deviceType ? deviceType.name : "Không xác định";
+        .then(([deviceTypes, users, device]) => {
+            // Kiểm tra và xử lý dữ liệu
+            deviceTypes = deviceTypes.data?.items || [];
+            users = Array.isArray(users) ? users : users.data || [];
+            device = device.data || {};
 
-            // Tìm nhà cung cấp từ users dựa trên device.user_id
-            const supplier = users.find(user => user.id === device.user_id);
-            const supplierName = supplier ? `${supplier.last_name} ${supplier.first_name}` : "Không xác định";
+            console.log("Device Types:", deviceTypes);
+            console.log("Users:", users);
+            console.log("Device:", device);
 
-            // Cập nhật các thẻ <div> với dữ liệu thiết bị
+            // Tìm nhà cung cấp trực tiếp từ users (không cần kiểm tra roleName)
+            const supplier = users.find(user => String(user.id) === String(device.userID));
+            const supplierName = supplier ? `${supplier.last_name} ${supplier.first_name}` : "Không có nhà cung cấp";
+            console.log("Supplier:", supplierName);
+
+            // Cập nhật giao diện
             document.getElementById("name").textContent = device.name || "Không có tên";
-            document.getElementById("devicetype").textContent = deviceTypeName;
+            document.getElementById("devicetype").textContent = device.deviceType_name || "Không xác định";
             document.getElementById("description").textContent = device.description || "Không có mô tả";
-            document.getElementById("quantity").textContent = device.quantity || "0";
-            document.getElementById("price").textContent = device.hourly_rental_fee ? `${device.hourly_rental_fee.toLocaleString()} VND` : "Không xác định";
+            document.getElementById("quantity").textContent = device.quantity || 0;
+            document.getElementById("price").textContent = device.hourlyRentalFee ? `${device.hourlyRentalFee.toLocaleString()} VND` : "Không xác định";
             document.getElementById("place").textContent = device.place || "Không có địa điểm";
             document.getElementById("supplier").textContent = supplierName;
 
-            // Hiển thị ảnh thiết bị
-            if (device.img) {
-                try {
-                    const baseApiUrl = 'http://localhost:8080/event-management/api/v1/FileUpload/files/';
-                    const fileName = device.img.split('/').pop();
-                    const imageUrl = `${baseApiUrl}${fileName}`;
-
-                    if (imagePreview) {
-                        imagePreview.src = imageUrl;
-                        imagePreview.onerror = function () {
-                            console.error('Lỗi tải ảnh:', imageUrl);
-                            this.src = defaultImagePath;
-                        };
-                    }
-                } catch (error) {
-                    console.error('Lỗi xử lý ảnh:', error);
-                    if (imagePreview) imagePreview.src = defaultImagePath;
-                }
-            } else {
-                if (imagePreview) imagePreview.src = defaultImagePath;
+            // Xử lý ảnh
+            if (device.img && imagePreview) {
+                const baseApiUrl = 'http://localhost:8080/event-management/api/v1/FileUpload/files/';
+                const fileName = device.img.split('/').pop();
+                const imageUrl = `${baseApiUrl}${fileName}`;
+                imagePreview.src = imageUrl;
+                imagePreview.onerror = () => {
+                    console.error("Lỗi tải ảnh:", imageUrl);
+                    imagePreview.src = defaultImagePath;
+                };
+            } else if (imagePreview) {
+                imagePreview.src = defaultImagePath;
             }
         })
         .catch(error => {
             console.error("Lỗi khi lấy dữ liệu thiết bị:", error);
-            alert("Không thể tải thông tin thiết bị!");
+            alert("Không thể tải thông tin thiết bị: " + error.message);
         });
 }
