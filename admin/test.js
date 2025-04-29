@@ -1,14 +1,14 @@
 
-var EventAPI = 'http://localhost:3000/event';
-var EventTypeAPI = 'http://localhost:3000/event_type';
-var DeviceAPI = 'http://localhost:3000/device';
-var DeviceTypeAPI = 'http://localhost:3000/device_type';
-var ServiceAPI = 'http://localhost:3000/service';
-var RentalAPI = 'http://localhost:3000/rental';
-var DeviceRental = 'http://localhost:3000/device_rental';
-var ServiceRental = 'http://localhost:3000/service_rental';
-var Timeline = 'http://localhost:3000/timeline';
-var UsersAPI = 'http://localhost:3000/user';
+var EventAPI = 'http://localhost:8080/event-management/event';
+var EventTypeAPI = 'http://localhost:8080/event-management/event-type';
+var DeviceAPI = 'http://localhost:8080/event-management/devices/list';
+var DeviceTypeAPI = 'http://localhost:8080/event-management/deviceType/list';
+var ServiceAPI = 'http://localhost:8080/event-management/services/list';
+var RentalAPI = 'http://localhost:8080/event-management/rentals';
+// var DeviceRental = 'http://localhost:3000/device_rental';
+// var ServiceRental = 'http://localhost:3000/service_rental';
+// var Timeline = 'http://localhost:3000/timeline';
+var UsersAPI = 'http://localhost:8080/event-management/users';
 let rentalId;
 function start() {
     getData((events, eventTypes, devices, deviceTypes, services, users) => {
@@ -705,7 +705,7 @@ function updateRental(rentalId, eventId) {
 
     fetch(`${RentalAPI}/${rentalId}`, {
         method: 'PATCH',
-        headers: { 
+        headers: {
             "Content-Type": "application/json",
             'Authorization': `Bearer ${token}`
         },
@@ -733,7 +733,7 @@ function updateDeviceRentals(rentalId, oldDeviceRentals) {
         if (!currentDeviceRentals.some(current => current.device_id === old.device_id)) {
             fetch(`${DeviceRental}/${old.id}`, {
                 method: 'DELETE',
-                headers: { 
+                headers: {
                     "Content-Type": "application/json",
                     'Authorization': `Bearer ${token}`
                 }
@@ -749,7 +749,7 @@ function updateDeviceRentals(rentalId, oldDeviceRentals) {
             if (oldRecord.quantity !== current.quantity) {
                 fetch(`${DeviceRental}/${oldRecord.id}`, {
                     method: 'PATCH',
-                    headers: { 
+                    headers: {
                         "Content-Type": "application/json",
                         'Authorization': `Bearer ${token}`
                     },
@@ -792,7 +792,7 @@ function updateServiceRentals(rentalId, oldServiceRentals) {
         if (!currentServiceRentals.some(current => current.service_id === old.service_id)) {
             fetch(`${ServiceRental}/${old.id}`, {
                 method: 'DELETE',
-                headers: { 
+                headers: {
                     "Content-Type": "application/json",
                     'Authorization': `Bearer ${token}`
                 }
@@ -808,7 +808,7 @@ function updateServiceRentals(rentalId, oldServiceRentals) {
             if (oldRecord.quantity !== current.quantity) {
                 fetch(`${ServiceRental}/${oldRecord.id}`, {
                     method: 'PATCH',
-                    headers: { 
+                    headers: {
                         "Content-Type": "application/json",
                         'Authorization': `Bearer ${token}`
                     },
@@ -851,7 +851,7 @@ function updateTimelines(rentalId, oldTimelines) {
         if (!currentTimelines.some(current => current.time_start === old.time_start && current.description === old.description)) {
             fetch(`${Timeline}/${old.id}`, {
                 method: 'DELETE',
-                headers: { 
+                headers: {
                     "Content-Type": "application/json",
                     'Authorization': `Bearer ${token}`
                 }

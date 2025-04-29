@@ -334,11 +334,16 @@
                 if (!dataResponse.ok) {
                     throw new Error(`Lỗi khi lấy dữ liệu chính: ${dataResponse.statusText}`);
                 }
-                const data = await dataResponse.json();
-                console.log("Dữ liệu API:", data);
+                var a = await dataResponse.json();
+                if (!(currentCategory === "event")) {
+                    var data = a.data.items;
+                    a = data;
+                }
 
-                allTypes = getTypesByCategory(data);
-                allItems = getItemsByCategory(data);
+                console.log("Dữ liệu API:", a);
+
+                allTypes = getTypesByCategory(a);
+                allItems = getItemsByCategory(a);
                 console.log("allTypes:", allTypes);
                 console.log("allItems:", allItems);
 
@@ -368,12 +373,20 @@
                     }))
                     : [{ id: 1, name: data.eventTypeName }];
                 return types;
+            } else if (currentCategory === "device") {
+                const types = Array.isArray(data)
+                    ? [...new Set(data.map(item => item.deviceType_name))].map((name, index) => ({
+                        id: index + 1,
+                        name
+                    }))
+                    : [{ id: 1, name: data.eventTypeName }];
+                return types;
             }
             return [];
         }
 
         function getItemsByCategory(data) {
-            if (currentCategory === "event") {
+            if (!(currentCategory === "")) {
                 return Array.isArray(data) ? data : [data];
             }
             return [];
@@ -481,7 +494,12 @@
             let filteredItems = allItems;
 
             if (currentTypeId !== null) {
-                filteredItems = filteredItems.filter(item => item.eventTypeName === allTypes.find(t => t.id === currentTypeId)?.name);
+                if (currentCategory === "event") {
+                    filteredItems = filteredItems.filter(item => item.eventTypeName === allTypes.find(t => t.id === currentTypeId)?.name);
+                } else if (currentCategory === "device") {
+                    filteredItems = filteredItems.filter(item => item.deviceType_name === allTypes.find(t => t.id === currentTypeId)?.name);
+                }
+
             }
 
             if (cityId) {

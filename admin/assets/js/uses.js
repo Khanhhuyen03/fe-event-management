@@ -62,8 +62,8 @@ function renderUsers(users) {
         return `
             <tr class="list-user-${user.id} " style="max-width: 100px;">
                 <td>${user.email}</td>
-                <td>${user.first_name}</td>
                 <td>${user.last_name}</td>
+                <td>${user.first_name}</td>
                 <td>${user.roleName}</td>
                 <td>${user.phone_number}</td>
                 <td>${user.created_at}</td>
