@@ -312,14 +312,13 @@
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 currentCategory = urlParams.get("category") || "event";
-
                 let endpoint;
                 if (currentCategory === "device") {
-                    endpoint = `http://localhost:8080/event-management/devices/list`;
-                } else if (currentCategory === "services") {
-                    endpoint = `http://localhost:8080/event-management/services/list`;
+                    endpoint = "http://localhost:8080/event-management/devices/list";
+                } else if (currentCategory === "service") {
+                    endpoint = "http://localhost:8080/event-management/services/list";
                 } else if (currentCategory === "location") {
-                    endpoint = `http://localhost:8080/event-management/locations/list`;
+                    endpoint = "http://localhost:8080/event-management/locations/list";
                 } else {
                     throw new Error("Danh mục không hợp lệ");
                 }
@@ -335,11 +334,12 @@
                     throw new Error(`Lỗi khi lấy dữ liệu chính: ${dataResponse.statusText}`);
                 }
                 var a = await dataResponse.json();
-                if (!(currentCategory === "event")) {
+
+                if(!(currentCategory === "event")) {
                     var data = a.data.items;
                     a = data;
                 }
-
+                
                 console.log("Dữ liệu API:", a);
 
                 allTypes = getTypesByCategory(a);
@@ -373,7 +373,8 @@
                     }))
                     : [{ id: 1, name: data.eventTypeName }];
                 return types;
-            } else if (currentCategory === "device") {
+
+            }else if (currentCategory === "device") {
                 const types = Array.isArray(data)
                     ? [...new Set(data.map(item => item.deviceType_name))].map((name, index) => ({
                         id: index + 1,
@@ -494,12 +495,13 @@
             let filteredItems = allItems;
 
             if (currentTypeId !== null) {
-                if (currentCategory === "event") {
+
+                if(currentCategory === "event"){
                     filteredItems = filteredItems.filter(item => item.eventTypeName === allTypes.find(t => t.id === currentTypeId)?.name);
-                } else if (currentCategory === "device") {
+                }else if(currentCategory === "device"){
                     filteredItems = filteredItems.filter(item => item.deviceType_name === allTypes.find(t => t.id === currentTypeId)?.name);
                 }
-
+                
             }
 
             if (cityId) {

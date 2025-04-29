@@ -8,6 +8,10 @@
     <meta name="description" content="">
     <meta name="keywords" content="">
 
+    <!-- Favicons -->
+    <!-- <link href="assets/img/favicon.png" rel="icon"> -->
+    <!-- <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon"> -->
+
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
@@ -37,7 +41,7 @@
 
     <main id="main" class="main">
         <div class="pagetitle">
-            <h1>Quản lý dịch vụ </h1>
+            <h1>Quản lý thiết bị </h1>
         </div><!-- End Page Title -->
 
         <!-- Biểu mẫu thiết bị -->
@@ -46,20 +50,21 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Quản lý dịch vụ</h5>
+                        <h5 class="card-title">Quản lý thiết bị</h5>
                         <div id="create" style="text-align: right; padding-bottom: 8px;">
                             <button type="submit"
-                                onclick="localStorage.removeItem('editServiceId'); window.location.href='service_manage.html';"
+                                onclick="localStorage.removeItem('editDevicetId'); window.location.href='device_manage.html';"
                                 class="btn btn-primary w-auto mx-auto fw-bold shadow">+ Thêm mới</button>
                         </div>
                         <!-- Table with stripped rows -->
-                        <table id="list-service">
+                        <table id="list-device">
                             <thead>
                                 <tr>
-                                    <th>Tên dịch vụ</th>
+                                    <th>Tên thiết bị</th>
+                                    <th>Loại thiết bị</th>
                                     <th>Mô tả</th>
                                     <th>Số lượng</th>
-                                    <th>Tiền công/ngày</th>
+                                    <th>Đơn giá/ngày</th>
                                     <th data-type="date" data-format="MM/DD/YYYY">Ngày tạo</th>
                                     <th>Địa điểm</th>
                                     <th>Hành động</th>
@@ -67,9 +72,10 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>Biểu diễn Xiếc Thú</td>
-                                    <td>Xiếc thú luôn không thể thiếu trong các bữa tiệc hay sự kiện có tham gia của
-                                        các em nhỏ</td>
+                                    <td>Loa Bluetooth Karaoke Mini Havit SK819BT</td>
+                                    <td>Loa</td>
+                                    <td>Thiết kế nhỏ gọn, linh hoạt nhưng vẫn đáp ứng tốt nhu cầu nghe nhạc cũng như
+                                        hát karaoke</td>
                                     <td>5</td>
                                     <th>500000</th>
                                     <td>11/02/2025</td>
@@ -104,7 +110,7 @@
     <!-- Main JS File -->
     <script src="assets/js/main.js"></script>
     <script src="assets/js/header.js"></script>
-    <script src="assets/js/service_s.js"></script>
+    <script src ="assets/js/device.js"></script>
 </body>
 
 </html>

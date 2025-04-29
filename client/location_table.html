@@ -30,6 +30,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
 </head>
 
 <body class="index-page">
@@ -37,7 +38,7 @@
 
     <main id="main" class="main">
         <div class="pagetitle">
-            <h1>Quản lý dịch vụ </h1>
+            <h1>Quản lý địa điểm </h1>
         </div><!-- End Page Title -->
 
         <!-- Biểu mẫu thiết bị -->
@@ -46,34 +47,31 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Quản lý dịch vụ</h5>
+                        <h5 class="card-title">Quản lý địa điểm</h5>
                         <div id="create" style="text-align: right; padding-bottom: 8px;">
                             <button type="submit"
-                                onclick="localStorage.removeItem('editServiceId'); window.location.href='service_manage.html';"
+                                onclick="localStorage.removeItem('editLocationId'); window.location.href='location_manage.html';"
                                 class="btn btn-primary w-auto mx-auto fw-bold shadow">+ Thêm mới</button>
                         </div>
                         <!-- Table with stripped rows -->
-                        <table id="list-service">
+                        <table id="list-place">
                             <thead>
                                 <tr>
-                                    <th>Tên dịch vụ</th>
+                                    <th>Tên địa điểm</th>
                                     <th>Mô tả</th>
-                                    <th>Số lượng</th>
-                                    <th>Tiền công/ngày</th>
+                                    <th>Đơn giá/ngày</th>
                                     <th data-type="date" data-format="MM/DD/YYYY">Ngày tạo</th>
-                                    <th>Địa điểm</th>
                                     <th>Hành động</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>Biểu diễn Xiếc Thú</td>
-                                    <td>Xiếc thú luôn không thể thiếu trong các bữa tiệc hay sự kiện có tham gia của
-                                        các em nhỏ</td>
-                                    <td>5</td>
+                                    <td>Nhà hàng tiệc cưới MIKAZUKI</td>
+                                    <td>Cho dù lựa chọn sảnh tiệc nào: đại sảnh sang trọng ấm cúng, khung cảnh tuyệt
+                                        đẹp tại bãi cỏ, hay một tiệc cưới lãng mạn bên bãi biển và hồ bơi, bạn sẽ
+                                        không phải bận tâm quá nhiều về </td>
                                     <th>500000</th>
                                     <td>11/02/2025</td>
-                                    <th>Đà Nẵng</th>
                                     <td>...</td>
                                 </tr>
                             </tbody>
@@ -104,7 +102,7 @@
     <!-- Main JS File -->
     <script src="assets/js/main.js"></script>
     <script src="assets/js/header.js"></script>
-    <script src="assets/js/service_s.js"></script>
+    <script src ="assets/js/location.js"></script>
 </body>
 
 </html>

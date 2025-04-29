@@ -128,17 +128,17 @@
 
             try {
                 // Lấy danh sách nhà cung cấp
-                const suppliersResponse = await fetch("http://localhost:8080/event-management/users?role=supplier", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
-                    }
-                });
-                if (!suppliersResponse.ok) {
-                    throw new Error(`Lỗi khi lấy danh sách nhà cung cấp: ${suppliersResponse.statusText}`);
-                }
-                suppliers = await suppliersResponse.json();
+                // const suppliersResponse = await fetch("http://localhost:8080/event-management/users?role=supplier", {
+                //     method: "GET",
+                //     headers: {
+                //         "Content-Type": "application/json",
+                //         "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
+                //     }
+                // });
+                // if (!suppliersResponse.ok) {
+                //     throw new Error(`Lỗi khi lấy danh sách nhà cung cấp: ${suppliersResponse.statusText}`);
+                // }
+                // suppliers = await suppliersResponse.json();
 
                 // Lấy danh sách loại thiết bị
                 if (category === "device") {
@@ -168,7 +168,7 @@
                 }
                 var b = await itemResponse.json();
                 const item = b.data;
-
+                
 
                 if (!item) {
                     console.warn(`Không tìm thấy ${category} với id = ${id}`);
