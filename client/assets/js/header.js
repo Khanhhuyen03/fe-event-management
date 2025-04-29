@@ -6,7 +6,7 @@ function loadHeader() {
         .then(response => response.text())
         .then(data => {
             headerContainer.innerHTML = data;
-            updateHeader(); // Cập nhật header sau khi chèn
+            updateHeader();
 
             const logoutBtn = document.getElementById("logout-btn");
             if (logoutBtn) {
@@ -27,27 +27,25 @@ function updateHeader() {
     const userMenu = document.getElementById("user-menu");
     const userAvatar = document.getElementById("user-avatar");
     const userName = document.getElementById("user-name");
-
-    // Lấy các liên kết trong menu
+    const dropdownMenu = document.querySelector(".profile-dropdown");
     const homeLink = document.getElementById("home-link");
     const serviceLink = document.getElementById("service-link");
     const aboutLink = document.getElementById("about-link");
 
-    if (!loginBtn || !userMenu || !userAvatar || !userName || !homeLink || !serviceLink || !aboutLink) {
+    if (!loginBtn || !userMenu || !userAvatar || !userName || !homeLink || !serviceLink || !aboutLink || !dropdownMenu) {
         console.error("Không tìm thấy các phần tử cần thiết trong DOM");
         return;
     }
 
-    // Kiểm tra URL hiện tại để xác định trang đang active
     const currentPath = window.location.pathname;
     console.log("Current path:", currentPath);
 
-    // Xóa lớp active khỏi tất cả các liên kết
+
     homeLink.classList.remove("active");
     serviceLink.classList.remove("active");
     aboutLink.classList.remove("active");
 
-    // Thêm lớp active cho liên kết tương ứng
+
     if (currentPath.includes("home.html")) {
         homeLink.classList.add("active");
     } else if (currentPath.includes("service.html")) {
@@ -56,7 +54,7 @@ function updateHeader() {
         aboutLink.classList.add("active");
     }
 
-    // Cập nhật giao diện đăng nhập/đăng xuất
+
     const token = localStorage.getItem("token");
     let user;
     try {
@@ -73,14 +71,42 @@ function updateHeader() {
         userName.textContent = `${user.last_name || "Unknown"} ${user.first_name || "User"}`;
         userAvatar.src = user.avatar || "/fe-event-management/client/assets/img/avatar/avt.jpg";
         console.log("Đường dẫn ảnh:", userAvatar.src);
+        if (user.role_id === " ") { 
+            dropdownMenu.innerHTML = `
+                <li><a class="dropdown-item d-flex align-items-center" href="account.html"><i class="bi bi-person-circle"></i><span>Thông tin cá nhân</span></a></li>
+                <li><a class="dropdown-item d-flex align-items-center" href="device_table.html"><i class="bi bi-file-earmark-text"></i><span>Quản lý thiết bị</span></a></li>
+                <li><a class="dropdown-item d-flex align-items-center" href="service_table.html"><i class="bi bi-file-earmark-text"></i><span>Quản lý dịch vụ</span></a></li>
+                <li><a class="dropdown-item d-flex align-items-center" href="location_table.html"><i class="bi bi-file-earmark-text"></i><span>Quản lý địa điểm</span></a></li>
+                <li><a class="dropdown-item d-flex align-items-center" href="change_password.html"><i class="bi bi-shield-lock"></i><span>Đổi mật khẩu</span></a></li>
+                <li><a class="dropdown-item d-flex align-items-center logout-btn" href="#" id="logout-btn"><i class="bi bi-box-arrow-right"></i><span>Đăng xuất</span></a></li>
+            `;
+        } else { 
+            dropdownMenu.innerHTML = `
+                <li><a class="dropdown-item d-flex align-items-center" href="account.html"><i class="bi bi-person-circle"></i><span>Thông tin cá nhân</span></a></li>
+                <li><a class="dropdown-item d-flex align-items-center" href="ListContract.html"><i class="bi bi-file-earmark-text"></i><span>Quản lý hợp đồng</span></a></li>
+                <li><a class="dropdown-item d-flex align-items-center" href="invitation.html"><i class="bi bi-envelope"></i><span>Quản lý thư mời</span></a></li>
+                <li><a class="dropdown-item d-flex align-items-center" href="change_password.html"><i class="bi bi-shield-lock"></i><span>Đổi mật khẩu</span></a></li>
+                <li><a class="dropdown-item d-flex align-items-center logout-btn" href="#" id="logout-btn"><i class="bi bi-box-arrow-right"></i><span>Đăng xuất</span></a></li>
+            `;
+        }
+        const newLogoutBtn = document.getElementById("logout-btn");
+        if (newLogoutBtn) {
+            newLogoutBtn.addEventListener("click", function (e) {
+                e.preventDefault();
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                updateHeader(); 
+                window.location.href = "home.html"; 
+            });
+        }
     } else {
         loginBtn.style.display = "inline-block";
         userMenu.style.display = "none";
     }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    loadHeader(); // Tải header động
-});
+// document.addEventListener("DOMContentLoaded", function () {
+//     loadHeader(); 
+// });
 
 window.updateHeader = updateHeader;
