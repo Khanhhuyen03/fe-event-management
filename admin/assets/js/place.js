@@ -270,9 +270,9 @@ function watchDetailLocation(editLocationId) {
             document.getElementById("supplier").textContent = supplierName;
 
             // Xử lý ảnh
-            if (location.img && imagePreview) {
+            if (location.image && imagePreview) {
                 const baseApiUrl = 'http://localhost:8080/event-management/api/v1/FileUpload/files/';
-                const fileName = location.img.split('/').pop();
+                const fileName = location.image.split('/').pop();
                 const imageUrl = `${baseApiUrl}${fileName}`;
                 imagePreview.src = imageUrl;
                 imagePreview.onerror = () => {

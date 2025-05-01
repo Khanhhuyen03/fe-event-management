@@ -319,6 +319,8 @@
                     endpoint = "http://localhost:8080/event-management/services/list";
                 } else if (currentCategory === "location") {
                     endpoint = "http://localhost:8080/event-management/locations/list";
+                } else if (currentCategory === "event") {
+                    endpoint = "http://localhost:8080/event-management/event";
                 } else {
                     throw new Error("Danh mục không hợp lệ");
                 }
@@ -335,11 +337,11 @@
                 }
                 var a = await dataResponse.json();
 
-                if(!(currentCategory === "event")) {
+                if (!(currentCategory === "event")) {
                     var data = a.data.items;
                     a = data;
                 }
-                
+
                 console.log("Dữ liệu API:", a);
 
                 allTypes = getTypesByCategory(a);
@@ -374,7 +376,7 @@
                     : [{ id: 1, name: data.eventTypeName }];
                 return types;
 
-            }else if (currentCategory === "device") {
+            } else if (currentCategory === "device") {
                 const types = Array.isArray(data)
                     ? [...new Set(data.map(item => item.deviceType_name))].map((name, index) => ({
                         id: index + 1,
@@ -387,8 +389,18 @@
         }
 
         function getItemsByCategory(data) {
+            // if (!(currentCategory === "")) {
+            //     return Array.isArray(data) ? data : [data];
+            // }
+            // return [];
             if (!(currentCategory === "")) {
-                return Array.isArray(data) ? data : [data];
+                const items = Array.isArray(data) ? data : [data];
+                // Lọc hoặc sửa các item không có img/image
+                return items.map(item => ({
+                    ...item,
+                    img: item.img || item.image || "", // Đảm bảo luôn có giá trị, mặc định là chuỗi rỗng
+                    image: item.image || item.img || ""
+                }));
             }
             return [];
         }
@@ -459,14 +471,15 @@
 
             items.forEach((item, index) => {
                 let detailPage = currentCategory === "event" ? "./event-detail.html" : "./item-detail.html";
+                let endpoint;
                 let buttonText = "Xem Chi Tiết";
                 let itemId = item.id;
                 let hoverInfo = `
                     <div class="row propery-info"><div class="col">Địa điểm</div></div>
-                    <div class="row"><div class="col">${item.place || "Không xác định"}</div></div>
+                    <div class="row"><div class="col">${item.place || item.address}</div></div>
                 `;
 
-                const imageFileName = item.img ? item.img.split('/').pop() : null;
+                const imageFileName = item.img ? item.img.split('/').pop() : item.image.split('/').pop();
                 const imageUrl = imageFileName ? `${baseImageUrl}${imageFileName}` : '../client/assets/img/events/sk2.jpg';
                 console.log(`Image URL for event ${item.name}:`, imageUrl);
 
@@ -496,12 +509,12 @@
 
             if (currentTypeId !== null) {
 
-                if(currentCategory === "event"){
+                if (currentCategory === "event") {
                     filteredItems = filteredItems.filter(item => item.eventTypeName === allTypes.find(t => t.id === currentTypeId)?.name);
-                }else if(currentCategory === "device"){
+                } else if (currentCategory === "device") {
                     filteredItems = filteredItems.filter(item => item.deviceType_name === allTypes.find(t => t.id === currentTypeId)?.name);
                 }
-                
+
             }
 
             if (cityId) {

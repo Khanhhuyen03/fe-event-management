@@ -506,9 +506,9 @@ function watchDetailService(editServicetId) {
             document.getElementById("supplier").textContent = supplierName;
 
             // Xử lý ảnh
-            if (service.img && imagePreview) {
+            if (service.image && imagePreview) {
                 const baseApiUrl = 'http://localhost:8080/event-management/api/v1/FileUpload/files/';
-                const fileName = service.img.split('/').pop();
+                const fileName = service.image.split('/').pop();
                 const imageUrl = `${baseApiUrl}${fileName}`;
                 imagePreview.src = imageUrl;
                 imagePreview.onerror = () => {

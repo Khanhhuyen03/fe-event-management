@@ -1,4 +1,3 @@
-
 function start() {
     getData((users) => {
         renderBigAvatarProfile(users);
@@ -204,16 +203,23 @@ function updateProfile() {
             return;
         }
 
-        // Tạo object dữ liệu cập nhật
-        const updatedUser = {
+        // Tạo FormData
+        const formData = new FormData();
+
+        // Thêm thông tin user
+        const userData = {
+            email: email,
             last_name: lastname,
             first_name: firstname,
-            phone_number: phone,
-            email: email
+            phone_number: phone
         };
 
-        // Tạo FormData để gửi dữ liệu và file
-        const formData = new FormData();
+        // Thêm user data vào FormData
+        formData.append('user', new Blob([JSON.stringify(userData)], {
+            type: 'application/json'
+        }));
+
+        // Thêm file ảnh nếu có
         if (inputPicture && inputPicture.files[0]) {
             const file = inputPicture.files[0];
             const maxSizeInBytes = 5 * 1024 * 1024; // Giới hạn 5MB
@@ -223,30 +229,50 @@ function updateProfile() {
             }
             formData.append('file', inputPicture.files[0]);
         }
-        formData.append('user', new Blob([JSON.stringify(updatedUser)], {
-            type: 'application/json'
-        }));
 
         // Gửi yêu cầu PATCH
         fetch(`http://localhost:8080/event-management/users/${currentUserId}`, {
             method: 'PATCH',
             headers: {
-                'Authorization': `Bearer ${token}`,
-                // 'Content-Type': 'application/json'
+                'Authorization': `Bearer ${token}`
             },
             body: formData
         })
             .then(response => {
-                if (!response.ok) throw new Error(`Lỗi server: ${response.status}`);
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`Lỗi server: ${response.status} - ${text}`);
+                    });
+                }
                 return response.json();
             })
             .then(data => {
                 console.log("Cập nhật hồ sơ thành công:", data);
-                // Cập nhật localStorage với thông tin mới
-                const updatedUserData = { ...user, ...updatedUser };
-                if (data.avatar) updatedUserData.avatar = data.avatar;
-                localStorage.setItem("user", JSON.stringify(updatedUserData));
-                console.log("hình:", data.avatar);
+                
+                // Cập nhật dữ liệu local
+                const updatedData = {
+                    ...user,
+                    last_name: lastname,
+                    first_name: firstname,
+                    phone_number: phone,
+                    email: email
+                };
+                
+                // Cập nhật avatar nếu có từ server
+                if (data.avatar) {
+                    updatedData.avatar = data.avatar;
+                }
+
+                // Cập nhật localStorage và biến toàn cục
+                localStorage.setItem("user", JSON.stringify(updatedData));
+                console.log("Dữ liệu đã cập nhật:", updatedData);
+
+                // Cập nhật giao diện
+                document.getElementById("nameinfo").textContent = `${updatedData.last_name} ${updatedData.first_name}`;
+                document.getElementById("roleinfo").textContent = updatedData.roleName || 'User';
+                document.getElementById("phoneinfo").textContent = updatedData.phone_number;
+                document.getElementById("emailinfo").textContent = updatedData.email;
+
                 alert("Cập nhật hồ sơ thành công!");
                 window.location.reload();
             })

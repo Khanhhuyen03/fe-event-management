@@ -69,9 +69,30 @@ function updateHeader() {
         loginBtn.style.display = "none";
         userMenu.style.display = "flex";
         userName.textContent = `${user.last_name || "Unknown"} ${user.first_name || "User"}`;
-        userAvatar.src = user.avatar || "/client/assets/img/avatar/avt.jpg";
+        if (userAvatar) {
+            const defaultAvatarPath = "assets/img/default-avatar.png";
+            if (user.avatar) {
+                try {
+                    const baseApiUrl = 'http://localhost:8080/event-management/api/v1/FileUpload/files/';
+                    const fileName = user.avatar.split('/').pop();
+                    const imageUrl = `${baseApiUrl}${fileName}`;
+
+                    userAvatar.src = imageUrl;
+                    userAvatar.onerror = function () {
+                        console.error('Lỗi tải ảnh:', imageUrl);
+                        this.src = defaultAvatarPath;
+                    };
+                } catch (error) {
+                    console.error('Lỗi xử lý ảnh:', error);
+                    userAvatar.src = defaultAvatarPath;
+                }
+            } else {
+                userAvatar.src = defaultAvatarPath;
+            }
+        }
         console.log("Đường dẫn ảnh:", userAvatar.src);
-        if (user.role_id === " ") { 
+        console.log("User:", user);
+        if (user.roleName === "SUPPLIER") {
             dropdownMenu.innerHTML = `
                 <li><a class="dropdown-item d-flex align-items-center" href="account.html"><i class="bi bi-person-circle"></i><span>Thông tin cá nhân</span></a></li>
                 <li><a class="dropdown-item d-flex align-items-center" href="device_table.html"><i class="bi bi-file-earmark-text"></i><span>Quản lý thiết bị</span></a></li>
@@ -80,7 +101,7 @@ function updateHeader() {
                 <li><a class="dropdown-item d-flex align-items-center" href="change_password.html"><i class="bi bi-shield-lock"></i><span>Đổi mật khẩu</span></a></li>
                 <li><a class="dropdown-item d-flex align-items-center logout-btn" href="#" id="logout-btn"><i class="bi bi-box-arrow-right"></i><span>Đăng xuất</span></a></li>
             `;
-        } else { 
+        } else {
             dropdownMenu.innerHTML = `
                 <li><a class="dropdown-item d-flex align-items-center" href="account.html"><i class="bi bi-person-circle"></i><span>Thông tin cá nhân</span></a></li>
                 <li><a class="dropdown-item d-flex align-items-center" href="ListContract.html"><i class="bi bi-file-earmark-text"></i><span>Quản lý hợp đồng</span></a></li>
@@ -95,8 +116,8 @@ function updateHeader() {
                 e.preventDefault();
                 localStorage.removeItem("token");
                 localStorage.removeItem("user");
-                updateHeader(); 
-                window.location.href = "home.html"; 
+                updateHeader();
+                window.location.href = "home.html";
             });
         }
     } else {
@@ -105,8 +126,8 @@ function updateHeader() {
     }
 }
 
-// document.addEventListener("DOMContentLoaded", function () {
-//     loadHeader(); 
-// });
+document.addEventListener("DOMContentLoaded", function () {
+    loadHeader();
+});
 
 window.updateHeader = updateHeader;

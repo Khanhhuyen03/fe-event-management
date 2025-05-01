@@ -48,9 +48,9 @@ function updateUserInfo() {
     userInfo?.classList.remove("d-none");
 
     // Cập nhật avatar (kiểm tra nếu có avatar) cũ nè
-                // if (userAvatar) {
-                //   userAvatar.setAttribute("src", user.avatar || "assets/img/default-avatar.png");
-                // }
+    // if (userAvatar) {
+    //   userAvatar.setAttribute("src", user.avatar || "assets/img/default-avatar.png");
+    // }
     //_____________________________
     // Cập nhật avatar (kiểm tra nếu có avatar) mới
     if (userAvatar) {
@@ -74,7 +74,7 @@ function updateUserInfo() {
         userAvatar.src = defaultAvatarPath;
       }
     }
-     //_____________________________
+    //_____________________________
 
     // Cập nhật tên hiển thị
     const displayName = `${user.last_name || ""} ${user.first_name || ""}`.trim();
@@ -118,7 +118,7 @@ function updateUserInfo() {
   logoutBtn?.addEventListener("click", function () {
     localStorage.removeItem("user");
     localStorage.removeItem("token"); // Xóa cả token
-    window.location.reload(); // Load lại trang để cập nhật UI
+    window.location.href = "./pages-login.html"; // Chuyển hướng về trang login
   });
 }
 function initSidebarToggle() {

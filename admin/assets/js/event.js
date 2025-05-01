@@ -69,7 +69,7 @@ function start() {
                 populateEventTypes(eventTypes);
             }
         });
-
+        setupTimelineTable();
         handleCreateForm();
         if (document.querySelector("#saveEventType")) {
             handleCreateEventType();
@@ -155,7 +155,7 @@ function renderEvents(events, eventTypes) {
                         <td>${event.name}</td>
                         <td>${event.eventTypeName}</td>
                         <td style="width: 40%;">${event.description || "Không có mô tả"}</td>
-                        <td>${event.created_at}</td>
+                        <td>${event.created_at ? new Date(event.created_at).toLocaleDateString("en-US", { year: "2-digit", month: "2-digit", day: "2-digit" }) : "Không xác định"}</td>
                         <td class="text-center">
                             <div class="action-dropdown">
                                 <button class="btn btn-light action-btn">...</button>
@@ -265,60 +265,6 @@ function renderEvents(events, eventTypes) {
         });
 }
 
-// function getData(callback) {
-//     let token = localStorage.getItem("token"); // Lấy token từ localStorage
-
-//     if (!token) {
-//         console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
-//         return;
-//     }
-
-//     Promise.all([
-//         fetch(EventAPI, {
-//             headers: {
-//                 "Authorization": `Bearer ${token}`,
-//                 "Content-Type": "application/json"
-//             }
-//         }).then(res => res.json()),
-
-//         fetch(EventTypeAPI, {
-//             headers: {
-//                 "Authorization": `Bearer ${token}`,
-//                 "Content-Type": "application/json"
-//             }
-//         }).then(res => res.json()),
-//         fetch(DeviceAPI, {
-//             headers: {
-//                 "Authorization": `Bearer ${token}`,
-//                 "Content-Type": "application/json"
-//             }
-//         }).then(res => res.json()),
-
-//         fetch(DeviceTypeAPI, {
-//             headers: {
-//                 "Authorization": `Bearer ${token}`,
-//                 "Content-Type": "application/json"
-//             }
-//         }).then(res => res.json()),
-
-//         fetch(ServiceAPI, {
-//             headers: {
-//                 "Authorization": `Bearer ${token}`,
-//                 "Content-Type": "application/json"
-//             }
-//         }).then(res => res.json()),
-//         fetch(UsersAPI, {
-//             headers: {
-//                 "Authorization": `Bearer ${token}`,
-//                 "Content-Type": "application/json"
-//             }
-//         }).then(res => res.json()),
-
-//     ]).then(([events, eventTypes, devices, deviceTypes, services, users]) => {
-//         callback(events, eventTypes, devices, deviceTypes, services, users);
-//     })
-//         .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
-// }
 function getData(callback) {
     let token = localStorage.getItem("token"); // Lấy token từ localStorage
 
@@ -745,9 +691,17 @@ function loadEditForm(editEventId) {
 }
 //Xoá event
 function handleDeleteEvent(id) {
+    console.log("Xoá sự kiện ID:", id);
+    let token = localStorage.getItem("token"); // Lấy token từ localStorage
+
+    if (!token) {
+        console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+        return;
+    }
     var options = {
         method: 'DELETE',
         headers: {
+            "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
         },
 
@@ -1293,4 +1247,30 @@ function updateServiceTotal(row) {
     let total = price * quantity;
 
     totalInput.value = total.toLocaleString("vi-VN") + " VND";
+}
+//__________________________________Timeline_________________________//
+//Sự kiên thêm dòng tr khi nhấn button thêm timeline
+function setupTimelineTable() {
+    const addButton = document.querySelector("#buttonAddTime");
+    const tbody = document.querySelector("#timeTable tbody");
+
+    if (!addButton || !tbody) return;
+
+    addButton.addEventListener("click", function () {
+        const newRow = document.createElement("tr");
+        newRow.innerHTML = `
+            <td><input type="datetime-local" class="form-control" name="timeline"></td>
+            <td><textarea class="form-control" name="descriptiontime" style="min-width: 500px"></textarea></td>
+            <td class="text-center">
+                <button class="btn btn-outline-danger remove-row">🗑</button>
+            </td>
+        `;
+        tbody.appendChild(newRow);
+    });
+
+    tbody.addEventListener("click", function (event) {
+        if (event.target.classList.contains("remove-row")) {
+            event.target.closest("tr").remove();
+        }
+    });
 }

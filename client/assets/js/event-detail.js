@@ -19,7 +19,7 @@ async function fetchData(url, errorMessage) {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
+                // "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
             }
         });
         if (!response.ok) {
@@ -43,18 +43,39 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     try {
-        // 1. Lấy danh sách nhà cung cấp
-        suppliers = await fetchData(
-            "http://localhost:8080/event-management/users?role=supplier",
-            "Lỗi khi lấy danh sách nhà cung cấp"
-        ) || [];
+        // // 1. Lấy danh sách nhà cung cấp
+        // suppliers = await fetchData(
+        //     "http://localhost:8080/event-management/users?roleName=SUPPLIER",
+        //     "Lỗi khi lấy danh sách nhà cung cấp"
+        // ) || [];
 
-        // 2. Lấy chi tiết sự kiện (tên, mô tả, hình ảnh)
+        //2. Lấy chi tiết sự kiện (tên, mô tả, hình ảnh)
         const event = await fetchData(
-            `http://localhost:8080/event-management/event/${eventId}`,
-            "Lỗi khi tải chi tiết sự kiện"
+            `http://localhost:8080/event-management/event/${eventId}`
         );
-
+        // const event = fetch(`http://localhost:8080/event-management/event/${eventId}`,
+        //     {
+        //         headers: {
+        //             //"Authorization": `Bearer ${token}`,
+        //             "Content-Type": "application/json"
+        //         }
+        //     })
+        //     .then(res => {
+        //         if (!res.ok)
+        //             throw new Error(`Lỗi EventAPI: ${res.status}`); return res.json();
+        //     })
+        //     .then(([event]) => {
+        //         if (!event) {
+        //             document.getElementById("eventName").textContent = "Sự kiện không tồn tại!";
+        //             document.getElementById("eventDescription").textContent = "Vui lòng kiểm tra lại.";
+        //             return;
+        //         }
+        //         callback(event);
+        //     })
+        //     .catch(error => {
+        //         console.error("Lỗi khi lấy dữ liệu:", error);
+        //         alert("Không thể lấy dữ liệu: " + error.message);
+        //     });
         if (!event) {
             document.getElementById("eventName").textContent = "Sự kiện không tồn tại!";
             document.getElementById("eventDescription").textContent = "Vui lòng kiểm tra lại.";
@@ -72,78 +93,78 @@ document.addEventListener("DOMContentLoaded", async function () {
         eventImage.onerror = () => { eventImage.src = "assets/img/default-image.jpg"; };
         eventImage.style.display = "block";
 
-        // 3. Lấy dữ liệu lịch trình
-        const timeline = await fetchData(
-            `http://localhost:8080/event-management/events/${eventId}/timeline`,
-            "Lỗi khi lấy lịch trình"
-        ) || [];
+        // // 3. Lấy dữ liệu lịch trình
+        // const timeline = await fetchData(
+        //     `http://localhost:8080/event-management/timelines/${eventId}`,
+        //     "Lỗi khi lấy lịch trình"
+        // ) || [];
 
-        const timelineElement = document.getElementById("eventTimeline");
-        timelineElement.innerHTML = "";
-        if (timeline.length === 0) {
-            timelineElement.innerHTML = `<li class="list-group-item">Không có thông tin lịch trình</li>`;
-        } else {
-            timeline.forEach(item => {
-                const content = typeof item === 'string' ? item : item.content || "Không xác định";
-                timelineElement.innerHTML += `<li class="list-group-item">${content}</li>`;
-            });
-        }
+        // const timelineElement = document.getElementById("eventTimeline");
+        // timelineElement.innerHTML = "";
+        // if (timeline.length === 0) {
+        //     timelineElement.innerHTML = `<li class="list-group-item">Không có thông tin lịch trình</li>`;
+        // } else {
+        //     timeline.forEach(item => {
+        //         const content = typeof item === 'string' ? item : item.content || "Không xác định";
+        //         timelineElement.innerHTML += `<li class="list-group-item">${content}</li>`;
+        //     });
+        // }
 
-        // 4. Lấy danh sách thiết bị
-        const devices = await fetchData(
-            `http://localhost:8080/event-management/rentals/event/${eventId}/devices`,
-            "Lỗi khi lấy danh sách thiết bị"
-        ) || [];
+        // // 4. Lấy danh sách thiết bị
+        // const devices = await fetchData(
+        //     `http://localhost:8080/event-management/rentals/event/${eventId}/devices`,
+        //     "Lỗi khi lấy danh sách thiết bị"
+        // ) || [];
 
-        const equipmentList = document.getElementById("equipmentList");
-        equipmentList.innerHTML = "";
-        if (devices.length === 0) {
-            equipmentList.innerHTML = "<tr><td colspan='7'>Không có thiết bị</td></tr>";
-        } else {
-            devices.forEach(item => {
-                const deviceImageUrl = item.img ? `${baseImageUrl}${item.img.split('/').pop()}` : "assets/img/default-device.jpg";
-                const totalPrice = (item.quantity || 0) * (item.hourly_salary || 0);
-                equipmentList.innerHTML += `
-                    <tr>
-                        <td><img src="${deviceImageUrl}" onerror="this.src='assets/img/default-device.jpg'" alt="${item.name}" style="max-width: 50px;"></td>
-                        <td>${item.name || "Không xác định"}</td>
-                        <td>${item.description || "Không có mô tả"}</td>
-                        <td>${getSupplierName(item.user_id)}</td>
-                        <td>${item.quantity || 0}</td>
-                        <td>${formatCurrency(item.hourly_salary)}</td>
-                        <td>${formatCurrency(totalPrice)}</td>
-                    </tr>
-                `;
-            });
-        }
+        // const equipmentList = document.getElementById("equipmentList");
+        // equipmentList.innerHTML = "";
+        // if (devices.length === 0) {
+        //     equipmentList.innerHTML = "<tr><td colspan='7'>Không có thiết bị</td></tr>";
+        // } else {
+        //     devices.forEach(item => {
+        //         const deviceImageUrl = item.img ? `${baseImageUrl}${item.img.split('/').pop()}` : "assets/img/default-device.jpg";
+        //         const totalPrice = (item.quantity || 0) * (item.hourly_salary || 0);
+        //         equipmentList.innerHTML += `
+        //             <tr>
+        //                 <td><img src="${deviceImageUrl}" onerror="this.src='assets/img/default-device.jpg'" alt="${item.name}" style="max-width: 50px;"></td>
+        //                 <td>${item.name || "Không xác định"}</td>
+        //                 <td>${item.description || "Không có mô tả"}</td>
+        //                 <td>${getSupplierName(item.user_id)}</td>
+        //                 <td>${item.quantity || 0}</td>
+        //                 <td>${formatCurrency(item.hourly_salary)}</td>
+        //                 <td>${formatCurrency(totalPrice)}</td>
+        //             </tr>
+        //         `;
+        //     });
+        // }
 
-        // 5. Lấy danh sách dịch vụ
-        const services = await fetchData(
-            `http://localhost:8080/event-management/rentals/event/${eventId}/services`,
-            "Lỗi khi lấy danh sách dịch vụ"
-        ) || [];
+        // // 5. Lấy danh sách dịch vụ
+        // const services = await fetchData(
+        //     `http://localhost:8080/event-management/rentals/event/${eventId}/services`,
+        //     "Lỗi khi lấy danh sách dịch vụ"
+        // ) || [];
 
-        const serviceList = document.getElementById("serviceList");
-        serviceList.innerHTML = "";
-        if (services.length === 0) {
-            serviceList.innerHTML = "<tr><td colspan='7'>Không có dịch vụ</td></tr>";
-        } else {
-            services.forEach(item => {
-                const serviceImageUrl = item.image ? `${baseImageUrl}${item.image.split('/').pop()}` : "assets/img/default-service.jpg";
-                const totalPrice = (item.quantity || 0) * (item.hourly_salary || 0);
-                serviceList.innerHTML += `
-                    <tr>
-                        <td><img src="${serviceImageUrl}" onerror="this.src='assets/img/default-service.jpg'" alt="${item.name}" style="max-width: 50px;"></td>
-                        <td>${item.name || "Không xác định"}</td>
-                        <td>${item.description || "Không có mô tả"}</td>
-                        <td>${getSupplierName(item.user_id)}</td>
-                        <td>${item.quantity || 0}</td>
-                        <td>${formatCurrency(item.hourly_salary)}</td>
-                        <td>${formatCurrency(totalPrice)}</td>
-                    </tr>
-                `;
-            });
-        }
+        // const serviceList = document.getElementById("serviceList");
+        // serviceList.innerHTML = "";
+        // if (services.length === 0) {
+        //     serviceList.innerHTML = "<tr><td colspan='7'>Không có dịch vụ</td></tr>";
+        // } else {
+        //     services.forEach(item => {
+        //         const serviceImageUrl = item.image ? `${baseImageUrl}${item.image.split('/').pop()}` : "assets/img/default-service.jpg";
+        //         const totalPrice = (item.quantity || 0) * (item.hourly_salary || 0);
+        //         serviceList.innerHTML += `
+        //             <tr>
+        //                 <td><img src="${serviceImageUrl}" onerror="this.src='assets/img/default-service.jpg'" alt="${item.name}" style="max-width: 50px;"></td>
+        //                 <td>${item.name || "Không xác định"}</td>
+        //                 <td>${item.description || "Không có mô tả"}</td>
+        //                 <td>${getSupplierName(item.user_id)}</td>
+        //                 <td>${item.quantity || 0}</td>
+        //                 <td>${formatCurrency(item.hourly_salary)}</td>
+        //                 <td>${formatCurrency(totalPrice)}</td>
+        //             </tr>
+        //         `;
+        //     });
+        // }
 
         // 7. Kiểm tra nếu cần mở modal sau khi đăng nhập
         if (localStorage.getItem("openContractAfterLogin") === "true") {
