@@ -2,17 +2,18 @@ const BASE_URL = "http://localhost:8080/event-management";
 const DEVICE_API_URL = `${BASE_URL}/devices`;
 const SERVICE_API_URL = `${BASE_URL}/services`;
 const LOCATION_API_URL = `${BASE_URL}/locations`;
-const PROVINCE_API_URL = `${BASE_URL}/provinces`;
-const DISTRICT_API_URL = `${BASE_URL}/districts`;
-const WARD_API_URL = `${BASE_URL}/wards`;
+const PROVINCE_API_URL = 'https://provinces.open-api.vn/api/p'; // API lấy danh sách tỉnh/thành phố
+const DISTRICT_API_URL = 'https://provinces.open-api.vn/api/p/'; // API lấy quận/huyện
+const WARD_API_URL = 'https://provinces.open-api.vn/api/d/'; // API lấy phường/xã
 const RENTAL_API_URL = `${BASE_URL}/rentals`;
-const CUSTOMER_API_URL = `${BASE_URL}/customers`;
 const USER_API_URL = `${BASE_URL}/users`;
-const EVENT_API_URL = `${BASE_URL}/events`;
+const EVENT_API_URL = `${BASE_URL}/event`;
 const TIMELINE_API_URL = `${BASE_URL}/timelines`;
 const DEVICE_RENTAL_API_URL = `${BASE_URL}/device-rentals`;
 const SERVICE_RENTAL_API_URL = `${BASE_URL}/service-rentals`;
 const LOCATION_RENTAL_API_URL = `${BASE_URL}/location-rentals`;
+const CUSTOMER_API_URL = `${BASE_URL}/customers`;
+
 
 let devices = [];
 let services = [];
@@ -62,7 +63,7 @@ function toISODateTime(dateStr, timeStr) {
 async function fetchSupplier(userId) {
     try {
         const user = await fetchData(`${USER_API_URL}/${userId}`);
-        if (user.role_id === 'SUPPLIER') {
+        if (user.roleName === 'SUPPLIER') {
             return user;
         }
         return null;
@@ -100,13 +101,12 @@ function initializeContractForm() {
     });
 }
 
-
 function setupDatePicker(displayId, inputId) {
     const displayInput = document.getElementById(displayId);
     const dateInput = document.getElementById(inputId);
     const calendarIcon = displayInput.nextElementSibling;
 
-    
+
     const today = new Date();
     const minDate = new Date(today);
     minDate.setDate(today.getDate() + 7);
@@ -134,53 +134,239 @@ function setupDatePicker(displayId, inputId) {
     });
 }
 
+// async function loadInitialData() {
+//     try {
+//         // Lấy danh sách thiết bị
+//         const deviceResponse = await fetchData(`${DEVICE_API_URL}/list`);
+//         devices = deviceResponse.data?.items || []; // Gán devices trực tiếp từ dữ liệu trả về
 
+//         console.log("Dữ liệu Devices:", devices);
+
+//         // Kiểm tra nếu devices là mảng trước khi lặp
+//         if (Array.isArray(devices)) {
+//             for (const device of devices) {
+//                 const supplier = await fetchSupplier(device.userID);
+//                 device.supplierName = supplier ? `${supplier.last_name} ${supplier.first_name}` : 'Không xác định';
+//             }
+//         } else {
+//             console.warn("Dữ liệu devices không phải là mảng:", devices);
+//             devices = []; // Đặt lại thành mảng rỗng để tránh lỗi sau này
+//         }
+//     } catch (error) {
+//         console.error(`Lỗi khi tải danh sách thiết bị: ${error.message}`);
+//         devices = []; // Đặt lại thành mảng rỗng nếu có lỗi
+//     }
+
+//     try {
+//         // Lấy danh sách dịch vụ
+//         const serviceResponse = await fetchData(`${SERVICE_API_URL}/list`);
+//         services = serviceResponse.data?.items || []; // Sửa để lấy data.items giống devices
+
+//         console.log("Dữ liệu Services:", services);
+
+//         // Kiểm tra nếu services là mảng trước khi lặp
+//         if (Array.isArray(services)) {
+//             for (const service of services) {
+//                 const supplier = await fetchSupplier(service.userID);
+//                 service.supplierName = supplier ? `${supplier.last_name} ${supplier.first_name}` : 'Không xác định';
+//             }
+//         } else {
+//             console.warn("Dữ liệu services không phải là mảng:", services);
+//             services = []; // Đặt lại thành mảng rỗng để tránh lỗi sau này
+//         }
+//     } catch (error) {
+//         console.error(`Lỗi khi tải danh sách dịch vụ: ${error.message}`);
+//         services = []; // Đặt lại thành mảng rỗng nếu có lỗi
+//     }
+
+//     try {
+//         // Lấy danh sách địa điểm
+//         const locationResponse = await fetchData(`${LOCATION_API_URL}/list`);
+//         locations = locationResponse.data?.items || []; // Sửa để lấy data.items giống devices
+
+//         console.log("Dữ liệu Locations:", locations);
+
+//         // Kiểm tra nếu locations là mảng trước khi lặp
+//         if (Array.isArray(locations)) {
+//             for (const location of locations) {
+//                 const supplier = await fetchSupplier(location.userID);
+//                 location.supplierName = supplier ? `${supplier.last_name} ${supplier.first_name}` : 'Không xác định';
+//             }
+//         } else {
+//             console.warn("Dữ liệu locations không phải là mảng:", locations);
+//             locations = []; // Đặt lại thành mảng rỗng để tránh lỗi sau này
+//         }
+//     } catch (error) {
+//         console.error(`Lỗi khi tải danh sách địa điểm: ${error.message}`);
+//         locations = []; // Đặt lại thành mảng rỗng nếu có lỗi
+//     }
+
+//     try {
+//         // Lấy danh sách tỉnh/thành phố
+//         provinces = await fetchData(PROVINCE_API_URL);
+//         const provinceSelect = document.getElementById('province');
+//         provinceSelect.innerHTML = '<option value="">Tỉnh/Thành phố</option>';
+//         if (Array.isArray(provinces)) {
+//             provinces.forEach(prov => {
+//                 const option = document.createElement('option');
+//                 option.value = prov.code;
+//                 option.textContent = prov.name;
+//                 provinceSelect.appendChild(option);
+//             });
+//         } else {
+//             console.warn("Dữ liệu provinces không phải là mảng:", provinces);
+//             provinces = [];
+//         }
+//     } catch (error) {
+//         console.error(`Lỗi khi tải danh sách tỉnh/thành: ${error.message}`);
+//         provinces = [];
+//     }
+
+//     try {
+//         // Lấy danh sách sự kiện
+//         events = await fetchData(EVENT_API_URL);
+//         const contractTypeSelect = document.getElementById('contractType');
+//         contractTypeSelect.innerHTML = '<option value="">Chọn loại sự kiện</option>';
+//         if (Array.isArray(events)) {
+//             events.forEach(event => {
+//                 const option = document.createElement('option');
+//                 option.value = event.id;
+//                 option.textContent = event.name;
+//                 contractTypeSelect.appendChild(option);
+//             });
+//         } else {
+//             console.warn("Dữ liệu events không phải là mảng:", events);
+//             events = [];
+//         }
+//     } catch (error) {
+//         console.error(`Lỗi khi tải danh sách sự kiện: ${error.message}`);
+//         events = [];
+//     }
+// }
+// Hàm loadInitialData
+function fetchJSONP(url, callbackName) {
+    return new Promise((resolve, reject) => {
+        // Tạo tên callback duy nhất
+        const callbackId = 'jsonp_callback_' + Math.round(100000 * Math.random());
+
+        // Gán callback vào window
+        window[callbackId] = function (data) {
+            delete window[callbackId]; // Xóa callback sau khi dùng
+            document.body.removeChild(script); // Xóa thẻ script
+            resolve(data);
+        };
+
+        // Tạo thẻ script để gọi API
+        const script = document.createElement('script');
+        script.src = `${url}${url.includes('?') ? '&' : '?'}callback=${callbackId}`;
+        script.onerror = () => {
+            delete window[callbackId];
+            document.body.removeChild(script);
+            reject(new Error('Lỗi khi tải dữ liệu qua JSONP'));
+        };
+        document.body.appendChild(script);
+    });
+}
+
+// Cập nhật hàm loadInitialData để dùng JSONP
 async function loadInitialData() {
     try {
-        devices = await fetchData(DEVICE_API_URL);
-        for (const device of devices) {
-            const supplier = await fetchSupplier(device.user_id);
-            device.supplierName = supplier ? `${supplier.first_name} ${supplier.last_name}` : 'Không xác định';
+        // Lấy danh sách thiết bị
+        const deviceResponse = await fetchData(`${DEVICE_API_URL}/list`);
+        devices = deviceResponse.data?.items || [];
+        console.log("Dữ liệu Devices:", devices);
+
+        if (Array.isArray(devices)) {
+            for (const device of devices) {
+                const supplier = await fetchSupplier(device.userID);
+                device.supplierName = supplier ? `${supplier.last_name} ${supplier.first_name}` : 'Không xác định';
+            }
+        } else {
+            console.warn("Dữ liệu devices không phải là mảng:", devices);
+            devices = [];
         }
     } catch (error) {
         console.error(`Lỗi khi tải danh sách thiết bị: ${error.message}`);
+        devices = [];
     }
 
     try {
-        services = await fetchData(SERVICE_API_URL);
-        for (const service of services) {
-            const supplier = await fetchSupplier(service.user_id);
-            service.supplierName = supplier ? `${supplier.first_name} ${supplier.last_name}` : 'Không xác định';
+        // Lấy danh sách dịch vụ
+        const serviceResponse = await fetchData(`${SERVICE_API_URL}/list`);
+        services = serviceResponse.data?.items || [];
+        console.log("Dữ liệu Services:", services);
+
+        if (Array.isArray(services)) {
+            for (const service of services) {
+                const supplier = await fetchSupplier(service.userID);
+                service.supplierName = supplier ? `${supplier.last_name} ${supplier.first_name}` : 'Không xác định';
+            }
+        } else {
+            console.warn("Dữ liệu services không phải là mảng:", services);
+            services = [];
         }
     } catch (error) {
         console.error(`Lỗi khi tải danh sách dịch vụ: ${error.message}`);
+        services = [];
     }
 
     try {
-        locations = await fetchData(LOCATION_API_URL);
-        for (const location of locations) {
-            const supplier = await fetchSupplier(location.user_id);
-            location.supplierName = supplier ? `${supplier.first_name} ${supplier.last_name}` : 'Không xác định';
+        // Lấy danh sách địa điểm
+        const locationResponse = await fetchData(`${LOCATION_API_URL}/list`);
+        locations = locationResponse.data?.items || [];
+        console.log("Dữ liệu Locations:", locations);
+
+        if (Array.isArray(locations)) {
+            for (const location of locations) {
+                const supplier = await fetchSupplier(location.userID);
+                location.supplierName = supplier ? `${supplier.last_name} ${supplier.first_name}` : 'Không xác định';
+            }
+        } else {
+            console.warn("Dữ liệu locations không phải là mảng:", locations);
+            locations = [];
         }
     } catch (error) {
         console.error(`Lỗi khi tải danh sách địa điểm: ${error.message}`);
+        locations = [];
     }
 
     try {
-        provinces = await fetchData(PROVINCE_API_URL);
+        // Lấy danh sách tỉnh/thành phố
+        const provinceResponse = await fetch(PROVINCE_API_URL);
+        if (!provinceResponse.ok) {
+            throw new Error(`HTTP error! status: ${provinceResponse.status}`);
+        }
+        provinces = await provinceResponse.json();
+        console.log("Dữ liệu Provinces:", provinces);
+
         const provinceSelect = document.getElementById('province');
-        provinces.forEach(prov => {
-            const option = document.createElement('option');
-            option.value = prov.id;
-            option.textContent = prov.name;
-            provinceSelect.appendChild(option);
-        });
-    } catch (error) {
-        console.error(`Lỗi khi tải danh sách tỉnh/thành: ${error.message}`);
-    }
+        if (!provinceSelect) {
+            console.error("Không tìm thấy phần tử với ID 'province'");
+            return;
+        }
 
-    try {
-        events = await fetchData(EVENT_API_URL);
+        // Xóa các option hiện có
+        provinceSelect.innerHTML = '<option value="">Tỉnh/Thành phố</option>';
+
+        // Thêm các tỉnh thành vào select
+        if (Array.isArray(provinces)) {
+            provinces.forEach(prov => {
+                const option = document.createElement('option');
+                option.value = prov.code;
+                option.textContent = prov.name;
+                provinceSelect.appendChild(option);
+            });
+            console.log("Số lượng tỉnh/thành phố đã thêm vào dropdown:", provinceSelect.options.length - 1);
+        } else {
+            console.warn("Dữ liệu provinces không phải là mảng:", provinces);
+            provinces = [];
+        }
+
+        // Lấy danh sách sự kiện
+        const eventResponse = await fetchData(EVENT_API_URL);
+        events = Array.isArray(eventResponse) ? eventResponse : [];
+        console.log("Dữ liệu Events:", events);
+
         const contractTypeSelect = document.getElementById('contractType');
         contractTypeSelect.innerHTML = '<option value="">Chọn loại sự kiện</option>';
         events.forEach(event => {
@@ -190,11 +376,86 @@ async function loadInitialData() {
             contractTypeSelect.appendChild(option);
         });
     } catch (error) {
-        console.error(`Lỗi khi tải danh sách sự kiện: ${error.message}`);
+        console.error(`Lỗi khi tải dữ liệu tỉnh/thành phố hoặc sự kiện: ${error.message}`);
+        provinces = [];
+        events = [];
     }
+
+    // Thiết lập sự kiện lắng nghe cho dropdown
+    setupEventListeners();
 }
 
+async function updateDistricts() {
+    const provinceId = document.getElementById('province').value;
+    const districtSelect = document.getElementById('district');
+    districtSelect.innerHTML = '<option value="">Quận/Huyện</option>';
 
+    if (provinceId) {
+        try {
+            const districtResponse = await fetch(`${DISTRICT_API_URL}${provinceId}?depth=2`);
+            if (!districtResponse.ok) {
+                throw new Error(`HTTP error! status: ${districtResponse.status}`);
+            }
+            const districtData = await districtResponse.json();
+            const filteredDistricts = districtData.districts || [];
+            console.log(`Dữ liệu Quận/Huyện cho provinceId ${provinceId}:`, filteredDistricts);
+
+            filteredDistricts.forEach(district => {
+                const option = document.createElement('option');
+                option.value = district.code;
+                option.textContent = district.name;
+                districtSelect.appendChild(option);
+            });
+            console.log("Số lượng quận/huyện đã thêm:", districtSelect.options.length - 1);
+        } catch (error) {
+            console.error(`Lỗi khi lấy quận/huyện: ${error.message}`);
+        }
+    }
+
+    updateWards();
+}
+
+async function updateWards() {
+    const districtId = document.getElementById('district').value;
+    const wardSelect = document.getElementById('ward');
+    wardSelect.innerHTML = '<option value="">Xã/Phường</option>';
+
+    if (districtId) {
+        try {
+            const wardResponse = await fetch(`${WARD_API_URL}${districtId}?depth=2`);
+            if (!wardResponse.ok) {
+                throw new Error(`HTTP error! status: ${wardResponse.status}`);
+            }
+            const wardData = await wardResponse.json();
+            const filteredWards = wardData.wards || [];
+            console.log(`Dữ liệu Phường/Xã cho districtId ${districtId}:`, filteredWards);
+
+            filteredWards.forEach(ward => {
+                const option = document.createElement('option');
+                option.value = ward.code;
+                option.textContent = ward.name;
+                wardSelect.appendChild(option);
+            });
+            console.log("Số lượng phường/xã đã thêm:", wardSelect.options.length - 1);
+        } catch (error) {
+            console.error(`Lỗi khi lấy xã/phường: ${error.message}`);
+        }
+    }
+}
+function setupEventListeners() {
+    const provinceSelect = document.getElementById('province');
+    const districtSelect = document.getElementById('district');
+
+    // Khi chọn tỉnh/thành phố, cập nhật quận/huyện
+    provinceSelect.addEventListener('change', updateDistricts);
+
+    // Khi chọn quận/huyện, cập nhật phường/xã
+    districtSelect.addEventListener('change', updateWards);
+
+    // Thêm sự kiện cho contractType
+    const contractTypeSelect = document.getElementById('contractType');
+    contractTypeSelect.addEventListener('change', updateContractName);
+}
 async function openItemSelectionModal(type) {
     currentSelectionType = type;
     selectedItems = [];
@@ -220,17 +481,35 @@ async function openItemSelectionModal(type) {
         if (!items || items.length === 0) {
             throw new Error(`Không có dữ liệu ${type}`);
         }
-        items.forEach(item => {
+
+        for (const item of items) {
+            const supplier = await fetchSupplier(item.userID);
+
+            let priceLabel = "Giá: ";
+            let priceValue = "Không xác định";
+            if (type === "device") {
+                priceValue = item.hourlyRentalFee
+                    ? item.hourlyRentalFee.toLocaleString() + " VND"
+                    : "Không xác định";
+            } else if (type === "service") {
+                priceValue = item.hourly_salary
+                    ? item.hourly_salary.toLocaleString() + " VND"
+                    : "Không xác định";
+            } else if (type === "location") {
+                priceValue = item.hourly_rental_fee
+                    ? item.hourly_rental_fee.toLocaleString() + " VND"
+                    : "Không xác định";
+            }
+
             const card = document.createElement("div");
             card.className = "col-md-4 item-card";
             card.innerHTML = `
                 <div class="card">
-                    <img src="${item.img || item.image || 'assets/img/default.jpg'}" class="card-img-top" alt="${item.name}">
+                    <img src="assets/img/default.jpg" class="card-img-top" alt="${item.name}">
                     <div class="card-body">
                         <h5 class="card-title">${item.name}</h5>
-                        <p class="card-text">${item.description || "Không có mô tả"}</p>
-                        <p class="card-text">Giá: ${(item.hourly_salary || item.hourly_rental_fee || 0).toLocaleString()} VNĐ</p>
-                        <p class="card-text">Nhà cung cấp: ${item.supplierName || "Không xác định"}</p>
+                        <p class="card-text">${priceLabel}${priceValue}</p>
+                        <p class="card-text">Nhà cung cấp: ${item.supplierName}</p>
                         <p class="card-text">Địa điểm: ${item.place || "Không xác định"}</p>
                         <input type="number" class="form-control quantity-input" value="1" min="1" style="display: none;">
                     </div>
@@ -238,7 +517,28 @@ async function openItemSelectionModal(type) {
             `;
             card.addEventListener("click", () => toggleItemSelection(item, card));
             itemContainer.appendChild(card);
-        });
+
+            // Cập nhật ảnh cho thẻ <img> trong card
+            const imgElement = card.querySelector(".card-img-top");
+            const defaultImagePath = "";
+            if (item.image) {
+                try {
+                    const baseApiUrl = 'http://localhost:8080/event-management/api/v1/FileUpload/files/';
+                    const fileName = item.image.includes('/') ? item.image.split('/').pop() : item.image;
+                    const imageUrl = `${baseApiUrl}${fileName}`;
+                    imgElement.src = imageUrl;
+                    imgElement.onerror = function () {
+                        console.error('Lỗi tải ảnh:', imageUrl);
+                        this.src = defaultImagePath;
+                    };
+                } catch (error) {
+                    console.error('Lỗi xử lý ảnh:', error);
+                    imgElement.src = defaultImagePath;
+                }
+            } else {
+                imgElement.src = defaultImagePath;
+            }
+        }
 
         const modal = new bootstrap.Modal(document.getElementById("itemSelectionModal"), {});
         modal.show();
@@ -247,7 +547,6 @@ async function openItemSelectionModal(type) {
         itemContainer.innerHTML = "<p>Lỗi tải dữ liệu! Vui lòng thử lại.</p>";
     }
 }
-
 
 function toggleItemSelection(item, card) {
     const quantityInput = card.querySelector(".quantity-input");
@@ -313,13 +612,13 @@ async function preloadEvent(eventData) {
     deviceTableBody.innerHTML = "";
     if (event.device && event.device.length > 0) {
         for (const item of event.device) {
-            const supplier = await fetchSupplier(item.user_id);
+            const supplier = await fetchSupplier(item.userID);
             const device = {
                 id: item.id || Date.now().toString(),
                 name: item.name,
                 description: item.description || "Không có mô tả",
                 supplierName: supplier ? `${supplier.first_name} ${supplier.last_name}` : "Không xác định",
-                hourly_salary: item.hourly_salary || 0,
+                hourlyRentalFee: item.hourlyRentalFee || 0,
                 img: item.img || item.image || "assets/img/default.jpg",
                 place: item.place || "Không xác định"
             };
@@ -329,7 +628,7 @@ async function preloadEvent(eventData) {
 
     if (event.service && event.service.length > 0) {
         for (const item of event.service) {
-            const supplier = await fetchSupplier(item.user_id);
+            const supplier = await fetchSupplier(item.userID);
             const service = {
                 id: item.id || Date.now().toString(),
                 name: item.name,
@@ -345,7 +644,7 @@ async function preloadEvent(eventData) {
 
     if (event.location && event.location.length > 0) {
         for (const item of event.location) {
-            const supplier = await fetchSupplier(item.user_id);
+            const supplier = await fetchSupplier(item.userID);
             const location = {
                 id: item.id || Date.now().toString(),
                 name: item.name,
@@ -382,8 +681,8 @@ async function preloadItem(item) {
     const { category, ...itemData } = item;
 
     let supplierName = 'Không xác định';
-    if (itemData.user_id) {
-        const supplier = await fetchSupplier(itemData.user_id);
+    if (itemData.userID) {
+        const supplier = await fetchSupplier(itemData.userID);
         supplierName = supplier ? `${supplier.first_name} ${supplier.last_name}` : 'Không xác định';
     }
 
@@ -410,45 +709,7 @@ async function preloadItem(item) {
     updateTotalCost();
 }
 
-async function updateDistricts() {
-    const provinceId = document.getElementById('province').value;
-    const districtSelect = document.getElementById('district');
-    districtSelect.innerHTML = '<option value="">Quận/Huyện</option>';
-    if (provinceId) {
-        try {
-            const districts = await fetchData(`${DISTRICT_API_URL}?provinceId=${provinceId}`);
-            districts.forEach(district => {
-                const option = document.createElement('option');
-                option.value = district.id;
-                option.textContent = district.name;
-                districtSelect.appendChild(option);
-            });
-        } catch (error) {
-            console.error(`Lỗi khi lấy quận/huyện: ${error.message}`);
-        }
-    }
-}
-
-async function updateWards() {
-    const districtId = document.getElementById('district').value;
-    const wardSelect = document.getElementById('ward');
-    wardSelect.innerHTML = '<option value="">Xã/Phường</option>';
-    if (districtId) {
-        try {
-            const wards = await fetchData(`${WARD_API_URL}?districtId=${districtId}`);
-            wards.forEach(ward => {
-                const option = document.createElement('option');
-                option.value = ward.id;
-                option.textContent = ward.name;
-                wardSelect.appendChild(option);
-            });
-        } catch (error) {
-            console.error(`Lỗi khi lấy xã/phường: ${error.message}`);
-        }
-    }
-}
-
-
+// Hàm cập nhật quận/huyện
 function updateContractName() {
     const eventId = document.getElementById('contractType').value;
     const contractNameInput = document.getElementById('contractName');
@@ -508,30 +769,62 @@ function validateAndUpdateDates() {
 }
 
 // Thêm thiết bị vào bảng
+const baseApiUrl = 'http://localhost:8080/event-management/api/v1/FileUpload/files/';
+const defaultImagePath = 'assets/img/default.jpg';
+
 function addDeviceToTable(device, quantity = 1) {
     const row = document.createElement('tr');
-    const total = (device.hourly_salary || 0) * quantity;
-    row.dataset.deviceId = device.id; 
+    const total = (device.hourlyRentalFee || 0) * quantity;
+    row.dataset.deviceId = device.id;
+
+    // Xử lý URL ảnh
+    let imageUrl = defaultImagePath;
+    if (device.img || device.image) {
+        try {
+            const fileName = (device.img || device.image).includes('/')
+                ? (device.img || device.image).split('/').pop()
+                : (device.img || device.image);
+            imageUrl = `${baseApiUrl}${fileName}`;
+        } catch (error) {
+            console.error('Lỗi xử lý ảnh thiết bị:', error);
+            imageUrl = defaultImagePath;
+        }
+    }
+
     row.innerHTML = `
-        <td><img src="${device.img || device.image || 'assets/img/default.jpg'}" alt="${device.name}" width="50"></td>
+        <td><img src="${imageUrl}" alt="${device.name}" width="50" onerror="this.src='${defaultImagePath}'"></td>
         <td>${device.name}</td>
         <td>${device.description || 'Không có mô tả'}</td>
         <td>${device.supplierName || 'Không xác định'}</td>
         <td><input type="number" class="form-control" value="${quantity}" min="1" style="width: 80px;" onchange="updateRowCost(this)"></td>
-        <td>${(device.hourly_salary || 0).toLocaleString()} VNĐ</td>
+        <td>${(device.hourlyRentalFee || 0).toLocaleString()} VNĐ</td>
         <td>${total.toLocaleString()} VNĐ</td>
         <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Xóa</button></td>
     `;
     document.getElementById('deviceTableBody').appendChild(row);
 }
 
+
 // Thêm dịch vụ vào bảng
 function addServiceToTable(service, quantity = 1) {
     const row = document.createElement('tr');
     const total = (service.hourly_salary || 0) * quantity;
-    row.dataset.serviceId = service.id; 
+    row.dataset.serviceId = service.id;
+
+    // Xử lý URL ảnh
+    let imageUrl = defaultImagePath;
+    if (service.image || service.img) {
+        try {
+            const fileName = (service.image || service.img).split('/').pop();
+            imageUrl = `${baseApiUrl}${fileName}`;
+        } catch (error) {
+            console.error('Lỗi xử lý ảnh dịch vụ:', error);
+            imageUrl = defaultImagePath;
+        }
+    }
+
     row.innerHTML = `
-        <td><img src="${service.image || service.img || 'assets/img/default.jpg'}" alt="${service.name}" width="50"></td>
+        <td><img src="${imageUrl}" alt="${service.name}" width="50" onerror="this.src='${defaultImagePath}'"></td>
         <td>${service.name}</td>
         <td>${service.description || 'Không có mô tả'}</td>
         <td>${service.supplierName || 'Không xác định'}</td>
@@ -542,8 +835,8 @@ function addServiceToTable(service, quantity = 1) {
     `;
     document.getElementById('serviceTableBody').appendChild(row);
 }
-
 // Thêm địa điểm vào bảng
+
 function addLocationToTable(location) {
     const startDate = document.getElementById('startDateDisplay').value;
     const endDate = document.getElementById('endDateDisplay').value;
@@ -555,9 +848,22 @@ function addLocationToTable(location) {
         diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
     }
     const row = document.createElement('tr');
-    row.dataset.locationId = location.id; 
+    row.dataset.locationId = location.id;
+
+    // Xử lý URL ảnh
+    let imageUrl = defaultImagePath;
+    if (location.img || location.image) {
+        try {
+            const fileName = (location.img || location.image).split('/').pop();
+            imageUrl = `${baseApiUrl}${fileName}`;
+        } catch (error) {
+            console.error('Lỗi xử lý ảnh địa điểm:', error);
+            imageUrl = defaultImagePath;
+        }
+    }
+
     row.innerHTML = `
-        <td><img src="${location.img || location.image || 'assets/img/default.jpg'}" alt="${location.name}" width="50"></td>
+        <td><img src="${imageUrl}" alt="${location.name}" width="50" onerror="this.src='${defaultImagePath}'"></td>
         <td>${location.name}</td>
         <td>${location.supplierName || 'Không xác định'}</td>
         <td>${startDate || 'Chưa xác định'}</td>
@@ -569,7 +875,6 @@ function addLocationToTable(location) {
     `;
     document.getElementById('locationTableBody').appendChild(row);
 }
-
 // Cập nhật chi phí hàng
 function updateRowCost(input) {
     const row = input.closest('tr');
@@ -701,7 +1006,7 @@ async function saveContract() {
             console.log('Khách hàng mới đã được lưu:', customerResponse);
         }
 
-        rental.user_id = customerId;
+        rental.userId = customerId;
 
         const rentalResponse = await fetchData(RENTAL_API_URL, 'POST', rental);
         console.log('Hợp đồng đã được lưu:', rentalResponse);

@@ -71,7 +71,7 @@ function renderUsers(users) {
                 <td>${user.last_name}</td>
                 <td>${user.roleName}</td>
                 <td>${user.phone_number}</td>
-                <td>${user.created_at}</td>
+                 <td>${user.created_at ? new Date(user.created_at).toLocaleDateString("en-US", { year: "2-digit", month: "2-digit", day: "2-digit" }) : "Không xác định"}</td>
                 <td class="text-center">
                     <div class="action-dropdown">
                         <button class="btn btn-light action-btn">...</button>
@@ -136,9 +136,16 @@ function renderUsers(users) {
 }
 // xóa user
 function handleDeleteUser(id) {
+    let token = localStorage.getItem("token"); // Lấy token từ localStorage
+
+    if (!token) {
+        console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+        return;
+    }
     var options = {
         method: 'DELETE',
         headers: {
+            "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
         },
 

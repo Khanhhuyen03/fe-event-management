@@ -70,9 +70,11 @@ function handleLogin(data) {
                     first_name: body.user?.first_name,
                     avatar: body.user?.avatar,
                     phone_number: body.user?.phone_number,
+                    roleName: body.user?.roleName // Lưu role_id 
                 })
             );
             console.log("User info saved to localStorage:", body.user);
+            console.log("avatar:", body.user?.avatar); // Kiểm tra roleName
         } else {
             console.error("No user data in response");
         }

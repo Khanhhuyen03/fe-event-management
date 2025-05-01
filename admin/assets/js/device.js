@@ -313,8 +313,8 @@ function renderDevices(devices, deviceTypes, users) {
     });
 
     $('#list-device tbody').on('click', '.detail-btn', function () {
-        let eventId = $(this).data('id');
-        handleDetailDevice(eventId);
+        let deviceId = $(this).data('id');
+        handleDetailDevice(deviceId);
     });
 
     $(document).off('click').on('click', function () {
@@ -322,9 +322,16 @@ function renderDevices(devices, deviceTypes, users) {
     });
 }
 function handleDeleteDevice(id) {
+    let token = localStorage.getItem("token"); // Lấy token từ localStorage
+
+    if (!token) {
+        console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+        return;
+    }
     var options = {
         method: 'DELETE',
         headers: {
+            "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
         },
 
@@ -352,8 +359,9 @@ function handleDetailDevice(id) {
     window.location.href = "detail_device.html"; // Chuyển đến trang chi tiết
 }
 
-function watchDetailDevice(deviceId) {
-    if (!deviceId) {
+function watchDetailDevice(editDevicetId) {
+    console.log("ID thiết bị:", editDevicetId);
+    if (!editDevicetId) {
         console.warn("Không có ID thiết bị để hiển thị!");
         return;
     }
@@ -404,9 +412,9 @@ function watchDetailDevice(deviceId) {
             return res.json();
         }),
 
-        fetch(`${DeviceAPI}/${deviceId}`, {
+        fetch(`${DeviceAPI}/${editDevicetId}`, {
             headers: {
-                "Authorization": `Bearer ${token}`,
+                //"Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json"
             }
         }).then(res => {
@@ -443,9 +451,9 @@ function watchDetailDevice(deviceId) {
             document.getElementById("supplier").textContent = supplierName;
 
             // Xử lý ảnh
-            if (device.img && imagePreview) {
+            if (device.image && imagePreview) {
                 const baseApiUrl = 'http://localhost:8080/event-management/api/v1/FileUpload/files/';
-                const fileName = device.img.split('/').pop();
+                const fileName = device.image.split('/').pop();
                 const imageUrl = `${baseApiUrl}${fileName}`;
                 imagePreview.src = imageUrl;
                 imagePreview.onerror = () => {

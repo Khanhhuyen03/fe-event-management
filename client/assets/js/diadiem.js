@@ -1,7 +1,8 @@
-var LocationAPI = 'http://localhost:8080/event-management/locations'; // Có thể thêm ?user_id=${user.id} nếu API hỗ trợ
-var ProvinceAPI = 'https://provinces.open-api.vn/api/p/';
-var DistrictAPI = 'https://provinces.open-api.vn/api/p/{province_code}?depth=2';
-var WardAPI = 'https://provinces.open-api.vn/api/d/{district_code}?depth=2';
+// Định nghĩa các API endpoint
+var LocationAPI = 'http://localhost:8080/event-management/locations'; // API quản lý địa điểm
+var ProvinceAPI = 'https://provinces.open-api.vn/api/p'; // API lấy danh sách tỉnh/thành phố
+var DistrictAPI = 'https://provinces.open-api.vn/api/p/'; // API lấy quận/huyện
+var WardAPI = 'https://provinces.open-api.vn/api/d/'; // API lấy phường/xã
 
 // Lấy thông tin user từ localStorage
 const token = localStorage.getItem("token");
@@ -13,6 +14,8 @@ try {
     console.error("Dữ liệu user không hợp lệ:", e);
     user = null;
 }
+
+// Hàm khởi động ứng dụng
 function start() {
     getData((locations, provinces, districts, wards) => {
         renderLocation(locations);
@@ -28,34 +31,10 @@ function start() {
     if (document.querySelector('#selectCity')) {
         setupEventListeners();
     }
-
-
 }
 start();
-// function getData(callback) {
-//     if (!token || !user) {
-//         console.error("Không tìm thấy token hoặc user, vui lòng đăng nhập lại!");
-//         // Có thể chuyển hướng đến trang đăng nhập nếu cần
-//         // window.location.href = "login.html";
-//         return;
-//     }
 
-//     Promise.all([
-//         fetch(`${LocationAPI}/list`).then(res => {
-//             if (!res.ok) {
-//                 return res.text().then(text => {
-//                     throw new Error(`Lỗi DeviceAPI: ${res.status} - ${text}`);
-//                 });
-//             }
-//             return res.json();
-//         }),
-//     ])
-//         .then(([locations]) => {
-//             locations = locations.data?.items || [];
-//             callback(locations);
-//         })
-//         .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
-// }
+// Hàm lấy dữ liệu từ API
 function getData(callback) {
     if (!token || !user) {
         console.error("Không tìm thấy token hoặc user, vui lòng đăng nhập lại!");
@@ -64,7 +43,12 @@ function getData(callback) {
 
     Promise.all([
         // Lấy danh sách locations
-        fetch(`${LocationAPI}/list`).then(res => {
+        fetch(`${LocationAPI}/list`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        }).then(res => {
             if (!res.ok) {
                 return res.text().then(text => {
                     throw new Error(`Lỗi LocationAPI: ${res.status} - ${text}`);
@@ -84,7 +68,7 @@ function getData(callback) {
     ])
         .then(([locations, provinces]) => {
             locations = locations.data?.items || [];
-            provinces = provinces || []; // Đảm bảo provinces không undefined
+            provinces = provinces || [];
 
             // Lấy tất cả quận/huyện từ các tỉnh/thành phố
             const districtPromises = provinces.map(province =>
@@ -100,14 +84,13 @@ function getData(callback) {
 
             return Promise.all(districtPromises)
                 .then(districtResponses => {
-                    // Lấy tất cả quận/huyện và gán ID tỉnh tương ứng
                     const districts = [];
                     districtResponses.forEach((response, index) => {
                         const province = provinces[index];
                         const districtList = response.districts || [];
                         districtList.forEach(district => {
-                            district.province_id = province.code; // Gán province_id để lọc sau này
-                            district.id = district.code; // Đảm bảo có trường id
+                            district.province_id = province.code;
+                            district.id = district.code;
                             districts.push(district);
                         });
                     });
@@ -125,30 +108,28 @@ function getData(callback) {
                     );
 
                     return Promise.all(wardPromises).then(wardResponses => {
-                        // Lấy tất cả phường/xã và gán ID quận/huyện tương ứng
                         const wards = [];
                         wardResponses.forEach((response, index) => {
                             const district = districts[index];
                             const wardList = response.wards || [];
                             wardList.forEach(ward => {
-                                ward.district_id = district.code; // Gán district_id để lọc sau này
-                                ward.id = ward.code; // Đảm bảo có trường id
+                                ward.district_id = district.code;
+                                ward.id = ward.code;
                                 wards.push(ward);
                             });
                         });
 
-                        // Gọi callback với tất cả dữ liệu
                         callback(locations, provinces, districts, wards);
                     });
                 });
         })
         .catch(error => {
             console.error("Lỗi khi lấy dữ liệu:", error);
-            // Gọi callback với dữ liệu mặc định để tránh crash
             callback([], [], [], []);
         });
 }
 
+// Hàm hiển thị danh sách địa điểm
 function renderLocation(locations) {
     var listLocationBlock = document.querySelector('#list-place tbody');
     if (!listLocationBlock) return;
@@ -159,7 +140,6 @@ function renderLocation(locations) {
         return;
     }
 
-    // Lọc địa điểm của user hiện tại
     const userLocations = locations.filter(location => String(location.userID) === String(user.id));
     if (userLocations.length === 0) {
         console.warn("Không có địa điểm nào thuộc về user hiện tại!");
@@ -167,7 +147,6 @@ function renderLocation(locations) {
         return;
     }
 
-    // Hủy DataTables nếu đã khởi tạo
     if ($.fn.DataTable.isDataTable('#list-place')) {
         $('#list-place').DataTable().destroy();
     }
@@ -178,7 +157,7 @@ function renderLocation(locations) {
                 <td>${location.name || "Không có tên"}</td>
                 <td style="width: 40%;">${location.description || 'Không có mô tả'}</td>
                 <td>${location.hourly_rental_fee ? location.hourly_rental_fee.toLocaleString() + " VND" : '0 VND'}</td>
-                <td>${location.created_at || "Không xác định"}</td>
+                <td>${location.created_at ? new Date(location.created_at).toLocaleDateString("en-US", { year: "2-digit", month: "2-digit", day: "2-digit" }) : "Không xác định"}</td>
                 <td>${location.address}</td>
                 <td class="text-center">
                     <div class="action-dropdown">
@@ -194,12 +173,11 @@ function renderLocation(locations) {
 
     listLocationBlock.innerHTML = htmls.join('');
 
-    // Khởi tạo lại DataTables
     $('#list-place').DataTable({
         "order": [[3, "desc"]],
         "language": {
             "search": "Tìm kiếm:",
-            "lengthMenu": "", // Bạn có thể thêm lại "Hiển thị _MENU_ địa điểm" nếu muốn
+            "lengthMenu": "",
             "info": "Hiển thị _START_ đến _END_ của _TOTAL_ địa điểm",
             "infoEmpty": "Không có dữ liệu",
             "zeroRecords": "Không tìm thấy kết quả",
@@ -212,7 +190,6 @@ function renderLocation(locations) {
         }
     });
 
-    // Gán sự kiện dùng delegate để dropdown hoạt động trên tất cả các trang
     $('#list-place tbody').off('click').on('click', '.action-btn', function (event) {
         let dropdown = $(this).next('.dropdown-content');
         $('.dropdown-content').not(dropdown).hide();
@@ -220,18 +197,17 @@ function renderLocation(locations) {
         event.stopPropagation();
     });
 
-    // Xử lý sự kiện xóa
     $('#list-place tbody').off('click', '.update-btn').on('click', '.update-btn', function () {
         let locationId = $(this).data('id');
         handleUpdateLocation(locationId);
     });
 
-    // Đóng dropdown khi bấm ra ngoài
     $(document).off('click').on('click', function () {
         $('.dropdown-content').hide();
     });
 }
 
+// Hàm xử lý form tạo hoặc chỉnh sửa địa điểm
 function handleCreateForm() {
     const createBtn = document.querySelector('#create');
     if (!createBtn) return;
@@ -239,7 +215,7 @@ function handleCreateForm() {
     const editLocationId = localStorage.getItem("editLocationId");
 
     if (editLocationId) {
-        loadEditForm(editLocationId); // Gọi hàm cập nhật nếu đang chỉnh sửa
+        loadEditForm(editLocationId);
         return;
     }
 
@@ -266,7 +242,6 @@ function handleCreateForm() {
             return;
         }
 
-        // Lấy thông tin người dùng từ localStorage
         const user = JSON.parse(localStorage.getItem("user"));
         const userId = user ? user.id : null;
 
@@ -275,46 +250,50 @@ function handleCreateForm() {
             return;
         }
 
-        // Lấy tên thay vì ID từ dropdown
         const city = cityElement.options[cityElement.selectedIndex]?.text;
         const district = districtElement.options[districtElement.selectedIndex]?.text;
         const ward = wardElement.options[wardElement.selectedIndex]?.text;
 
-        // Tạo chuỗi address từ street, ward, district, city
         const address = `${street}, ${ward}, ${district}, ${city}`.trim();
 
-        // Create object containing location info
         const locationData = {
-            img: pictureInput.files[0].name, // Lưu tên file ảnh, giống hàm của sự kiện
+            // img: pictureInput.files[0].name,
             name: name,
             description: description,
             hourly_rental_fee: parseFloat(price),
             address: address,
-            user_id: userId,
-            created_at: new Date().toISOString().split('T')[0], // YYYY-MM-DD
-            updated_at: new Date().toISOString().split('T')[0]
+            userID: userId
         };
 
-        // Tạo địa điểm
-        createLocation(locationData, function (locationResponse) {
+        // Create FormData
+        const formData = new FormData();
+
+        // Append file with key 'file'
+        formData.append('file', pictureInput.files[0]);
+
+        // Append service data as JSON string with key 'service'
+        formData.append('service', new Blob([JSON.stringify(locationData)], {
+            type: 'application/json'
+        }));
+
+        createLocation(formData, function (locationResponse) {
             console.log("Location vừa tạo có ID:", locationResponse.id);
             console.log("Đã tạo địa điểm thành công:", locationResponse);
             alert("Tạo địa điểm thành công!");
-            window.location.href = "location_table.html"; // Chuyển hướng sau khi tạo thành công
+            window.location.href = "location_table.html";
         });
     };
 }
-function createLocation(locationData, callback) {
+
+// Hàm tạo địa điểm mới
+function createLocation(formData, callback) {
     const token = localStorage.getItem("token");
     if (!token) return alert("Vui lòng đăng nhập lại!");
 
-    fetch(LocationAPI, {
+    fetch(`${LocationAPI}/new`, {
         method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json' // Thêm Content-Type cho JSON
-        },
-        body: JSON.stringify(locationData) // Chuyển locationData thành JSON string
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
     })
         .then(response => {
             if (!response.ok) throw new Error("Lỗi server: " + response.status);
@@ -325,119 +304,34 @@ function createLocation(locationData, callback) {
         })
         .catch(error => alert(`Lỗi tạo địa điểm: ${error.message}`));
 }
-// Thêm địa điểm
-function handleCreateForm() {
-    const createBtn = document.querySelector('#create');
-    if (!createBtn) return;
 
-    const editLocationId = localStorage.getItem("editLocationId");
-
-    if (editLocationId) {
-        loadEditForm(editLocationId); // Gọi hàm cập nhật nếu đang chỉnh sửa
-        return;
-    }
-
-    createBtn.onclick = function (event) {
-        event.preventDefault();
-
-        const pictureInput = document.querySelector('input[name="picture"]');
-        const name = document.querySelector('input[name="name"]').value;
-        const description = document.querySelector('input[name="description"]').value;
-        const price = document.querySelector('input[name="price"]').value;
-        const cityElement = document.querySelector('select[name="selectCity"]');
-        const districtElement = document.querySelector('select[name="selectDistrict"]');
-        const wardElement = document.querySelector('select[name="selectWard"]');
-        const street = document.querySelector('input[name="inputStreet"]').value;
-
-        // Validation
-        if (!name || !price || !cityElement?.value || !districtElement?.value || !wardElement?.value || !street) {
-            alert("Vui lòng nhập đầy đủ thông tin: tên địa điểm, giá, tỉnh/thành, quận/huyện, phường/xã và số nhà, tên đường!");
-            return;
-        }
-
-        if (!pictureInput || !pictureInput.files || pictureInput.files.length === 0) {
-            alert("Vui lòng chọn ảnh cho địa điểm!");
-            return;
-        }
-
-        // Lấy thông tin người dùng từ localStorage
-        const user = JSON.parse(localStorage.getItem("user"));
-        const userId = user ? user.id : null;
-
-        if (!userId) {
-            alert("Không tìm thấy thông tin người dùng, vui lòng đăng nhập lại!");
-            return;
-        }
-
-        // Lấy tên thay vì ID từ dropdown
-        const city = cityElement.options[cityElement.selectedIndex]?.text;
-        const district = districtElement.options[districtElement.selectedIndex]?.text;
-        const ward = wardElement.options[wardElement.selectedIndex]?.text;
-
-        // Tạo chuỗi address từ street, ward, district, city
-        const address = `${street}, ${ward}, ${district}, ${city}`.trim();
-
-        // Create object containing location info
-        const locationData = {
-            name: name,
-            description: description,
-            hourly_rental_fee: parseFloat(price), // Đổi tên để khớp với schema backend
-            address: address, // Chuỗi địa chỉ nối từ street, ward, district, city
-            user_id: userId, // Thêm trường user_id
-            created_at: new Date().toISOString().split('T')[0], // Thêm ngày tạo
-            updated_at: new Date().toISOString().split('T')[0] // Thêm ngày cập nhật
-        };
-
-        // Create FormData
-        const formData = new FormData();
-        formData.append('file', pictureInput.files[0]);
-        formData.append('location', new Blob([JSON.stringify(locationData)], {
-            type: 'application/json'
-        }));
-
-        createLocation(formData, function (locationResponse) {
-            console.log("Location vừa tạo có ID:", locationResponse.id);
-            console.log("Đã tạo địa điểm thành công:", locationResponse);
-            alert("Tạo địa điểm thành công!");
-            window.location.href = "location_table.html"; // Chuyển hướng sau khi tạo thành công
-        });
-    };
-}
-function createLocation(formData, callback) {
-    const token = localStorage.getItem("token");
-    if (!token) return alert("Vui lòng đăng nhập lại!");
-
-    fetch(LocationAPI, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formData
-    })
-        .then(response => {
-            if (!response.ok) throw new Error("Lỗi server");
-            return response.json();
-        })
-        .then(data => {
-            callback(data.result || data);
-        })
-        .catch(error => alert(`Lỗi tạo địa điểm: ${error.message}`));
-}
-
+// Hàm điền dữ liệu tỉnh/thành phố vào dropdown
 function populateCities(provinces) {
-    const select = document.querySelector('#selectCity');
-    if (!select) return;
-    select.innerHTML = `<option value="">Chọn một tùy chọn</option>`;
+    const citySelect = document.querySelector('select[name="selectCity"]');
+    const currentValue = citySelect.value; // Lưu giá trị hiện tại của dropdown
+
+    // Xóa các tùy chọn cũ
+    citySelect.innerHTML = '<option value="">Chọn một tùy chọn</option>';
+
+    // Thêm các tùy chọn mới
     provinces.forEach(province => {
         const option = document.createElement('option');
-        option.value = province.code;
-        option.textContent = province.name;
-        select.appendChild(option);
+        option.value = province.code; // Giả sử province có code
+        option.text = province.name;
+        citySelect.appendChild(option);
     });
+
+    // Khôi phục giá trị đã chọn nếu có
+    if (currentValue) {
+        citySelect.value = currentValue;
+    }
 }
 
+// Hàm điền dữ liệu quận/huyện vào dropdown
 function populateDistricts(districts) {
     const select = document.querySelector('#selectDistrict');
     if (!select) return;
-    select.innerHTML = `<option value="">Chọn một tùy chọn</option>`;
+    select.innerHTML = `<option value="">Chọn quận/huyện</option>`;
     districts.forEach(district => {
         const option = document.createElement('option');
         option.value = district.code;
@@ -446,10 +340,11 @@ function populateDistricts(districts) {
     });
 }
 
+// Hàm điền dữ liệu phường/xã vào dropdown
 function populateWards(wards) {
     const select = document.querySelector('#selectWard');
     if (!select) return;
-    select.innerHTML = `<option value="">Chọn một tùy chọn</option>`;
+    select.innerHTML = `<option value="">Chọn phường/xã</option>`;
     wards.forEach(ward => {
         const option = document.createElement('option');
         option.value = ward.code;
@@ -458,6 +353,7 @@ function populateWards(wards) {
     });
 }
 
+// Hàm thiết lập các sự kiện lắng nghe cho dropdown
 function setupEventListeners() {
     const selectCity = document.getElementById("selectCity");
     const selectDistrict = document.getElementById("selectDistrict");
@@ -467,16 +363,12 @@ function setupEventListeners() {
     selectCity.addEventListener("change", function () {
         const provinceId = this.value;
         if (provinceId) {
-            fetch(DistrictAPI.replace('{province_code}', provinceId))
-                .then(res => {
-                    if (!res.ok) throw new Error("Lỗi lấy quận/huyện");
-                    return res.json();
-                })
+            fetch(`${DistrictAPI}${provinceId}?depth=2`)
+                .then(res => res.json())
                 .then(data => {
                     const districts = data.districts || [];
-                    districts.forEach(district => district.code = district.code.toString());
                     populateDistricts(districts);
-                    document.getElementById("selectDistrict").dispatchEvent(new Event("change"));
+                    populateWards([]); // Reset phường/xã khi đổi quận/huyện
                 })
                 .catch(error => {
                     console.error("Lỗi lấy quận/huyện:", error);
@@ -492,14 +384,10 @@ function setupEventListeners() {
     selectDistrict.addEventListener("change", function () {
         const districtId = this.value;
         if (districtId) {
-            fetch(WardAPI.replace('{district_code}', districtId))
-                .then(res => {
-                    if (!res.ok) throw new Error("Lỗi lấy phường/xã");
-                    return res.json();
-                })
+            fetch(`${WardAPI}${districtId}?depth=2`)
+                .then(res => res.json())
                 .then(data => {
                     const wards = data.wards || [];
-                    wards.forEach(ward => ward.code = ward.code.toString());
                     populateWards(wards);
                 })
                 .catch(error => {
@@ -512,20 +400,21 @@ function setupEventListeners() {
     });
 }
 
+// Hàm xử lý cập nhật địa điểm
 function handleUpdateLocation(locationId) {
-    localStorage.setItem("editLocationId", locationId); // Lưu ID vào localStorage
-    window.location.href = "location_manage.html"; // Chuyển đến trang form
+    localStorage.setItem("editLocationId", locationId);
+    window.location.href = "location_manage.html";
 }
-//Cập nhât địa điểm
+
+// Hàm tải form chỉnh sửa địa điểm
 function loadEditForm(editLocationId) {
     if (!editLocationId) return;
 
     console.log("Chỉnh sửa địa điểm ID:", editLocationId);
     const inputPicture = document.querySelector('input[name="picture"]');
     const imagePreview = document.getElementById("image");
-    const defaultImagePath = "assets/img/location/place.jpg"; // Ảnh mặc định mới
+    const defaultImagePath = "assets/img/location/place.jpg";
 
-    // Lấy token từ localStorage
     let token = localStorage.getItem("token");
     if (!token) {
         console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
@@ -533,140 +422,91 @@ function loadEditForm(editLocationId) {
         return;
     }
 
-    // Hàm fetch với timeout
-    const fetchWithTimeout = (url, options, timeout = 10000) => {
-        return Promise.race([
-            fetch(url, options),
-            new Promise((_, reject) =>
-                setTimeout(() => reject(new Error("Yêu cầu API timeout")), timeout)
-            )
-        ]);
-    };
+    // Fetch provinces first
+    fetch(ProvinceAPI)
+        .then(res => res.json())
+        .then(provinces => {
+            populateCities(provinces);
 
-    // Hàm để lấy dữ liệu tỉnh/thành, quận/huyện, phường/xã
-    const fetchAddressData = () => {
-        return Promise.all([
-            fetchWithTimeout(ProvinceAPI, {
+            // Then fetch location data
+            return fetch(`${LocationAPI}/${editLocationId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
-            }).then(response => response.json()),
-            fetchWithTimeout(DistrictAPI, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            }).then(response => response.json()),
-            fetchWithTimeout(WardAPI, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            }).then(response => response.json())
-        ]).catch(error => {
-            console.error("Lỗi khi lấy dữ liệu địa chỉ:", error);
-            throw error; // Ném lỗi để xử lý ở cấp cao hơn
-        });
-    };
-
-    // Lấy danh sách tỉnh/thành, quận/huyện, phường/xã
-    fetchAddressData()
-        .then(([cities, districts, wards]) => {
-            console.log('Dữ liệu địa chỉ:', { cities, districts, wards });
-
-            const selectCity = document.querySelector('select[name="selectCity"]');
-            const selectDistrict = document.querySelector('select[name="selectDistrict"]');
-            const selectWard = document.querySelector('select[name="selectWard"]');
-
-            // Điền danh sách tỉnh/thành
-            selectCity.innerHTML = '<option value="">Chọn tỉnh/thành</option>';
-            if (Array.isArray(cities)) {
-                cities.forEach(city => {
-                    const option = document.createElement("option");
-                    option.value = city.id;
-                    option.textContent = city.name;
-                    selectCity.appendChild(option);
-                });
-            }
-
-            // Điền danh sách quận/huyện
-            selectDistrict.innerHTML = '<option value="">Chọn quận/huyện</option>';
-            if (Array.isArray(districts)) {
-                districts.forEach(district => {
-                    const option = document.createElement("option");
-                    option.value = district.id;
-                    option.textContent = district.name;
-                    selectDistrict.appendChild(option);
-                });
-            }
-
-            // Điền danh sách phường/xã
-            selectWard.innerHTML = '<option value="">Chọn phường/xã</option>';
-            if (Array.isArray(wards)) {
-                wards.forEach(ward => {
-                    const option = document.createElement("option");
-                    option.value = ward.id;
-                    option.textContent = ward.name;
-                    selectWard.appendChild(option);
-                });
-            }
-
-            // Lấy thông tin địa điểm
-            return fetchWithTimeout(`${LocationAPI}/${editLocationId}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            }).then(response => {
-                if (!response.ok) throw new Error("Lỗi khi lấy thông tin địa điểm");
-                return response.json();
             });
         })
-        .then(location => {
+        .then(response => response.json())
+        .then(async locationData => {
+            const location = locationData.data;
             console.log('Dữ liệu địa điểm:', location);
 
-            // Điền dữ liệu vào form
+            // Fill basic information
             document.querySelector('input[name="name"]').value = location.name || "";
             document.querySelector('input[name="description"]').value = location.description || "";
             document.querySelector('input[name="price"]').value = location.hourly_rental_fee || "";
 
-            // Tách chuỗi address
-            const addressParts = location.address ? location.address.split(', ') : [];
-            const street = addressParts.length >= 4 ? addressParts[0] : "";
-            const ward = addressParts.length >= 3 ? addressParts[1] : "";
-            const district = addressParts.length >= 2 ? addressParts[2] : "";
-            const city = addressParts.length >= 1 ? addressParts[3] : "";
+            // Process address
+            const addressParts = location.address ? location.address.split(', ').map(part => part.trim()) : [];
+            console.log('Các phần của địa chỉ:', addressParts);
 
-            // Điền giá trị vào các select và input
-            document.querySelector('input[name="inputStreet"]').value = street || "";
+            const city = addressParts[addressParts.length - 1];
+            const district = addressParts[addressParts.length - 2] || "";
+            const ward = addressParts[addressParts.length - 3] || "";
+            const street = addressParts[0] || "";
 
-            const selectCity = document.querySelector('select[name="selectCity"]');
-            const selectDistrict = document.querySelector('select[name="selectDistrict"]');
-            const selectWard = document.querySelector('select[name="selectWard"]');
+            // Fill street
+            document.querySelector('input[name="inputStreet"]').value = street;
 
-            const cityOption = Array.from(selectCity.options).find(option => option.textContent === city);
-            if (cityOption) selectCity.value = cityOption.value;
+            // Select city and load related data
+            const citySelect = document.querySelector('select[name="selectCity"]');
+            const cityOptions = Array.from(citySelect.options);
+            console.log('Tùy chọn tỉnh/thành phố trong dropdown:', cityOptions.map(option => option.text)); // Debug
+            const cityOption = cityOptions.find(option => option.text === city);
 
-            const districtOption = Array.from(selectDistrict.options).find(option => option.textContent === district);
-            if (districtOption) selectDistrict.value = districtOption.value;
+            if (cityOption) {
+                cityOption.selected = true;
 
-            const wardOption = Array.from(selectWard.options).find(option => option.textContent === ward);
-            if (wardOption) selectWard.value = wardOption.value;
+                // Load districts
+                const districtResponse = await fetch(`${DistrictAPI}${cityOption.value}?depth=2`);
+                const districtData = await districtResponse.json();
+                const districts = districtData.districts || [];
+                populateDistricts(districts);
 
-            // Xử lý hiển thị ảnh
-            if (location.img && imagePreview) {
+                // Select district and load wards
+                const districtSelect = document.querySelector('select[name="selectDistrict"]');
+                const districtOptions = Array.from(districtSelect.options);
+                const districtOption = districtOptions.find(option => option.text === district);
+
+                if (districtOption) {
+                    districtOption.selected = true;
+
+                    // Load wards
+                    const wardResponse = await fetch(`${WardAPI}${districtOption.value}?depth=2`);
+                    const wardData = await wardResponse.json();
+                    const wards = wardData.wards || [];
+                    populateWards(wards);
+
+                    // Select ward
+                    const wardSelect = document.querySelector('select[name="selectWard"]');
+                    const wardOptions = Array.from(wardSelect.options);
+                    const wardOption = wardOptions.find(option => option.text === ward);
+                    if (wardOption) {
+                        wardOption.selected = true;
+                    }
+                }
+                else {
+                    console.error('Không tìm thấy tỉnh/thành phố trong dropdown:', city);
+                }
+            }
+
+            // Handle image
+            if (location.image && imagePreview) {
                 try {
-                    const baseApiUrl = 'http://localhost:8080/location-management/api/v1/FileUpload/files/';
-                    const fileName = location.img.split('/').pop();
+                    const baseApiUrl = 'http://localhost:8080/event-management/api/v1/FileUpload/files/';
+                    const fileName = location.image.split('/').pop();
                     const imageUrl = `${baseApiUrl}${fileName}`;
-
-                    console.log('URL ảnh:', imageUrl);
-
                     imagePreview.src = imageUrl;
                     imagePreview.style.maxWidth = '500px';
                     imagePreview.style.height = '400px';
@@ -684,7 +524,7 @@ function loadEditForm(editLocationId) {
                 if (imagePreview) imagePreview.src = defaultImagePath;
             }
 
-            // Đổi nút "Lưu" thành "Cập nhật"
+            // Handle update button
             const createButton = document.querySelector("#create");
             if (createButton) {
                 createButton.textContent = "Cập nhật";
@@ -695,33 +535,27 @@ function loadEditForm(editLocationId) {
                     const inputName = document.querySelector('input[name="name"]').value;
                     const inputDescription = document.querySelector('input[name="description"]').value;
                     const inputPrice = document.querySelector('input[name="price"]').value;
+                    const street = document.querySelector('input[name="inputStreet"]').value;
                     const cityElement = document.querySelector('select[name="selectCity"]');
                     const districtElement = document.querySelector('select[name="selectDistrict"]');
                     const wardElement = document.querySelector('select[name="selectWard"]');
-                    const street = document.querySelector('input[name="inputStreet"]').value;
 
-                    // Validation
                     if (!inputName || !inputPrice || !cityElement?.value || !districtElement?.value || !wardElement?.value || !street) {
-                        alert("Vui lòng nhập đầy đủ thông tin: tên địa điểm, giá, tỉnh/thành, quận/huyện, phường/xã và số nhà, tên đường!");
+                        alert("Vui lòng nhập đầy đủ thông tin!");
                         return;
                     }
 
-                    // Lấy tên thay vì ID từ dropdown
-                    const city = cityElement.options[cityElement.selectedIndex]?.text;
-                    const district = districtElement.options[districtElement.selectedIndex]?.text;
-                    const ward = wardElement.options[wardElement.selectedIndex]?.text;
+                    const selectedCity = cityElement.options[cityElement.selectedIndex].text;
+                    const selectedDistrict = districtElement.options[districtElement.selectedIndex].text;
+                    const selectedWard = wardElement.options[wardElement.selectedIndex].text;
 
-                    // Tạo chuỗi address
-                    const address = `${street}, ${ward}, ${district}, ${city}`.trim();
+                    const address = `${street}, ${selectedWard}, ${selectedDistrict}, ${selectedCity}`.trim();
 
                     const updatedLocation = {
                         name: inputName,
                         description: inputDescription,
                         hourly_rental_fee: parseFloat(inputPrice) || 0,
-                        address: address,
-                        user_id: location.user_id,
-                        created_at: location.created_at,
-                        updated_at: new Date().toISOString().split('T')[0]
+                        address: address
                     };
 
                     // Tạo FormData
@@ -733,8 +567,7 @@ function loadEditForm(editLocationId) {
                         type: 'application/json'
                     }));
 
-                    // Gửi yêu cầu cập nhật
-                    fetchWithTimeout(`${LocationAPI}/${editLocationId}`, {
+                    fetch(`${LocationAPI}/${editLocationId}`, {
                         method: 'PATCH',
                         headers: { 'Authorization': `Bearer ${token}` },
                         body: formData
@@ -744,8 +577,7 @@ function loadEditForm(editLocationId) {
                             return response.json();
                         })
                         .then(data => {
-                            const locationResponse = data.result || data;
-                            console.log("Đã cập nhật địa điểm thành công:", locationResponse);
+                            console.log("Đã cập nhật địa điểm thành công:", data);
                             alert("Cập nhật địa điểm thành công!");
                             window.location.href = "location_table.html";
                         })
@@ -757,8 +589,8 @@ function loadEditForm(editLocationId) {
             }
         })
         .catch(error => {
-            console.error('Lỗi khi tải dữ liệu:', error);
-            // alert(`Lỗi khi tải dữ liệu: ${error.message}`);
-            if (imagePreview) imagePreview.src = defaultImagePath; // Đảm bảo ảnh mặc định được hiển thị
+            console.error('Lỗi:', error);
+            // alert('Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.');
+            if (imagePreview) imagePreview.src = defaultImagePath;
         });
 }
