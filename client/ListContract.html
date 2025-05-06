@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,13 +9,176 @@
     <link href="./assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/fe-event-management/client/assets/css/main.css">
     <link href="assets/css/main.css" rel="stylesheet">
-    <link href="assets/css/ListContract.css" rel="stylesheet">
-</head>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
+        .header {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .header .logo h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .header .logo span {
+            color: #718355;
+        }
+
+        .navmenu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+
+        .navmenu ul li {
+            margin-right: 20px;
+        }
+
+        .navmenu ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .navmenu ul li a:hover {
+            color: #718355;
+        }
+
+        .content {
+            margin-top: 80px;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .content h2 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .filter-bar select,
+        .filter-bar input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .filter-bar .search-btn {
+            background-color: #718355;
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .filter-bar .search-btn:hover {
+            background-color: #5a6268;
+        }
+
+        .filter-bar .reset-btn {
+            background-color: #718355;
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .filter-bar .reset-btn:hover {
+            background-color: #5a6268;
+        }
+
+        .table {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .table th,
+        .table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .table th {
+            background-color: #f1f1f1;
+        }
+
+        .table .btn {
+            margin: 0 5px;
+            color: #333;
+            border: solid 2px #d3d7da;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .table .btn:hover {
+            background-color: #d3d7da;
+        }
+
+        .table .btn i {
+            margin-right: 5px;
+        }
+
+        .pagination {
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+            min-width: 300px;
+            background-color: #28a745;
+            color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        #footer {
+            background-color: #e6f0e6;
+            padding: 20px 0;
+            text-align: center;
+            width: 100%;
+        }
+
+        #footer .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
 <body>
-    <div id="header"></div>
+    <header id="header"></header>
     <div class="content container">
         <h2>DANH SÁCH HỢP ĐỒNG</h2>
+        <div class="toast" id="successToast">Thanh toán thành công!</div>
         <div class="filter-bar">
             <div>
                 <input type="text" id="tenHopDong" placeholder="Nhập tên hợp đồng" class="form-control d-inline-block"
@@ -24,15 +186,15 @@
                 <select id="trangThai">
                     <option value="">Tất cả</option>
                     <option value="draft">Bản Nháp</option>
-                    <option value="deposit_paid">Đã đặt cọc</option>
-                    <option value="inprogress">Đang thực hiện</option>
-                    <option value="waiting_paid">Chờ thanh toán</option>
-                    <option value="completed">Hoàn thành</option>
+                    <option value="deposit_paid">Đã Đặt Cọc</option>
+                    <option value="inprogress">Đang Thực Hiện</option>
+                    <option value="waiting_paid">Chờ Thanh Toán</option>
+                    <option value="completed">Hoàn Thành</option>
                 </select>
             </div>
             <div>
-                <button class="search-btn" onclick="timKiemHopDong()">Tìm kiếm</button>
-                <button class="reset-btn" onclick="xoaBoLoc()">Xóa bộ lọc</button>
+                <button class="search-btn" onclick="searchContracts()">Tìm kiếm</button>
+                <button class="reset-btn" onclick="resetFilters()">Xóa bộ lọc</button>
             </div>
         </div>
         <table class="table table-bordered">
@@ -56,19 +218,194 @@
     <!-- Scroll Top -->
     <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
             class="bi bi-arrow-up-short"></i></a>
-
     <!-- Preloader -->
     <div id="preloader"></div>
 
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="/fe-event-management/client/assets/vendor/aos/aos.js"></script>
     <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
     <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
     <script src="assets/js/main.js"></script>
-    <script src="../client/assets/js/header.js"></script>
-    <script src="../client/assets/js/ListContract.js"></script>
+    <script src="assets/js/header.js"></script>
+    <script>
+        const CONTRACT_API_URL = "https://67eabf6734bcedd95f647797.mockapi.io/Contract";
 
-    
+        const contractsPerPage = 10;
+        let currentPage = 1;
+        let contractList = [];
+
+        function getToken() {
+            return localStorage.getItem("token");
+        }
+
+        function formatCurrency(value) {
+            return value.toLocaleString('vi-VN') + " ₫";
+        }
+
+        function formatDate(date) {
+            return date || '';
+        }
+
+        function formatStatus(status) {
+            switch (status) {
+                case "draft": return '<span class="badge bg-success">Bản Nháp</span>';
+                case "deposit_paid": return '<span class="badge bg-info">Đã Đặt Cọc</span>';
+                case "inprogress": return '<span class="badge bg-warning">Đang Thực Hiện</span>';
+                case "waiting_paid": return '<span class="badge bg-primary">Chờ Thanh Toán</span>';
+                case "completed": return '<span class="badge bg-dark">Hoàn Thành</span>';
+                default: return '<span class="badge bg-secondary">Không Xác Định</span>';
+            }
+        }
+
+        async function fetchData(url, method = "GET", data = null) {
+            const token = getToken();
+            const options = {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            };
+            if (token) options.headers["Authorization"] = `Bearer ${token}`;
+            if (data) options.body = JSON.stringify(data);
+
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                throw new Error(`${method} failed! Status: ${response.status}`);
+            }
+            return response.json();
+        }
+
+        async function fetchContractList() {
+            try {
+                contractList = await fetchData(CONTRACT_API_URL);
+                return contractList.map(contract => ({
+                    id: contract.id,
+                    contractName: contract.name,
+                    value: contract.total_price || 0,
+                    validity: {
+                        startDate: contract.rental_start_time,
+                        endDate: contract.rental_end_time
+                    },
+                    status: contract.status || 'draft'
+                }));
+            } catch (error) {
+                alert(`Lỗi khi lấy danh sách hợp đồng: ${error.message}`);
+                return [];
+            }
+        }
+
+        function displayContractList(list, page) {
+            const start = (page - 1) * contractsPerPage;
+            const end = start + contractsPerPage;
+            const displayList = list.slice(start, end);
+
+            const contractTable = document.getElementById("danhSachHopDong");
+            contractTable.innerHTML = "";
+
+            displayList.forEach((contract, index) => {
+                const stt = start + index + 1;
+                let actionButtons = `
+                    <button class="btn btn-sm" onclick="viewDetails('${contract.id}')"><i class="fas fa-eye"></i> Chi Tiết</button>
+                `;
+                if (contract.status === "draft") {
+                    actionButtons += `
+                        <button class="btn btn-sm" onclick="makePayment('${contract.id}')"><i class="fas fa-money-bill-wave"></i> Đặt Cọc</button>
+                    `;
+                } else {
+                    actionButtons += `
+                        <button class="btn btn-sm" onclick="makePayment('${contract.id}')"><i class="fas fa-money-bill-wave"></i> Thanh Toán</button>
+                    `;
+                }
+
+                const row = `
+                    <tr>
+                        <td>${stt}</td>
+                        <td>${contract.contractName}</td>
+                        <td>${formatCurrency(contract.value)}</td>
+                        <td>${formatDate(contract.validity.startDate)} - ${formatDate(contract.validity.endDate)}</td>
+                        <td>${formatStatus(contract.status)}</td>
+                        <td>${actionButtons}</td>
+                    </tr>
+                `;
+                contractTable.innerHTML += row;
+            });
+
+            updatePagination(list.length);
+        }
+
+        function updatePagination(totalContracts) {
+            const totalPages = Math.ceil(totalContracts / contractsPerPage);
+            const pagination = document.getElementById("phanTrang");
+            pagination.innerHTML = "";
+
+            for (let i = 1; i <= totalPages; i++) {
+                const li = document.createElement("li");
+                li.className = "page-item" + (i === currentPage ? " active" : "");
+                li.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i})">${i}</a>`;
+                pagination.appendChild(li);
+            }
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            const filteredList = filterContractList();
+            displayContractList(filteredList, currentPage);
+        }
+
+        function filterContractList() {
+            const contractName = document.getElementById("tenHopDong").value.toLowerCase();
+            const status = document.getElementById("trangThai").value;
+
+            return contractList.filter(contract => {
+                const matchesName = contractName === "" || contract.contractName.toLowerCase().includes(contractName);
+                const matchesStatus = status === "" || contract.status === status;
+                return matchesName && matchesStatus;
+            });
+        }
+
+        function searchContracts() {
+            currentPage = 1;
+            const filteredList = filterContractList();
+            displayContractList(filteredList, currentPage);
+        }
+
+        function resetFilters() {
+            document.getElementById("tenHopDong").value = "";
+            document.getElementById("trangThai").value = "";
+            currentPage = 1;
+            fetchContractList().then(list => {
+                displayContractList(list, currentPage);
+            });
+        }
+
+        function viewDetails(contractId) {
+            window.location.href = `contract_detail.html?id=${contractId}`;
+        }
+
+        function makePayment(contractId) {
+            window.location.href = `payment.html?id=${contractId}`;
+        }
+
+        function showToast() {
+            const toast = document.getElementById("successToast");
+            toast.style.display = "block";
+            setTimeout(() => {
+                toast.style.display = "none";
+            }, 3000);
+        }
+
+        window.onload = async function () {
+            const list = await fetchContractList();
+            displayContractList(list, currentPage);
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get("payment") === "success") {
+                // Làm mới danh sách hợp đồng để cập nhật trạng thái
+                contractList = await fetchContractList();
+                displayContractList(contractList, currentPage);
+                showToast();
+            }
+        };
+    </script>
 </body>
-
 </html>

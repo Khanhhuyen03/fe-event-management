@@ -2,6 +2,16 @@ body {
     background-color: #e9f5db;
 }
 
+.btn-back {
+    background-color: transparent;
+    font-size: 20px;
+    transition: transform 0.2s;
+}
+
+.btn-back:hover {
+    transform: scale(1.1);
+}
+
 .container {
     background-color: #718355;
     border-radius: 8px;
@@ -61,6 +71,7 @@ h2 {
     align-items: center;
     padding: 0 12px;
 }
+
 #alertBox {
     position: fixed;
     top: 20px;
@@ -69,6 +80,7 @@ h2 {
     min-width: 250px;
     text-align: center;
 }
+
 .auth-form {
     transition: all 0.3s ease;
 }
@@ -83,6 +95,7 @@ h2 {
     justify-content: center;
     margin-bottom: 20px;
 }
+
 .verification-input {
     width: 40px;
     height: 40px;

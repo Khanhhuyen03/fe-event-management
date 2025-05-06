@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Hợp Đồng</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/contractDetail.css">
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@7.5.0/build/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="mx-auto max-w-7xl px-4 py-8">
+        <h2 class="text-center text-3xl font-bold text-[#0f172a] underline underline-offset-4 mb-6">CHI TIẾT HỢP ĐỒNG</h2>
+
+        <div id="contractDetail" class="bg-white p-6 rounded-lg shadow">
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold">Trạng thái/thao tác</h3>
+                <div class="flex justify-between items-center mt-2">
+                    <span id="contractStatus" class="text-black"></span>
+                    <div class="space-x-2">
+                        <button id="depositBtn" class="bg-blue-500 text-white px-4 py-2 rounded hidden">Đặt cọc</button>
+                        <button id="payBtn" class="bg-blue-500 text-white px-4 py-2 rounded hidden">Thanh toán</button>
+                        <button id="cancelBtn" class="bg-red-500 text-white px-4 py-2 rounded hidden">Hủy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold">Thông tin hợp đồng</h3>
+                <div class="border p-4 rounded">
+                    <p><strong>Tên hợp đồng:</strong> <span id="contractName" class="text-black"></span></p>
+                    <div>
+                        <p><strong>Thời hạn hợp đồng:</strong></p>
+                        <p><strong>Ngày bắt đầu:</strong> <span id="startDate" class="text-black"></span></p>
+                        <p><strong>Ngày kết thúc:</strong> <span id="endDate" class="text-black"></span></p>
+                    </div>
+                    <p><strong>Giá trị hợp đồng:</strong> <span id="totalPrice" class="text-2xl font-bold text-black"></span></p>
+                    <div>
+                        <p><strong>Thông tin khách hàng:</strong></p>
+                        <p><strong>Tên khách hàng:</strong> <span id="customerName" class="text-black"></span></p>
+                        <p><strong>Số điện thoại:</strong> <span id="customerPhone" class="text-black"></span></p>
+                        <p><strong>Địa chỉ:</strong> <span id="customerAddress" class="text-black"></span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold">Các dịch vụ trong hợp đồng</h3>
+                <div class="space-y-4">
+                    <div id="devicesTable" class="border p-4 rounded hidden"></div>
+                    <div id="humanResourcesTable" class="border p-4 rounded hidden"></div>
+                    <div id="locationsTable" class="border p-4 rounded hidden"></div>
+                </div>
+            </div>
+
+            <div class="mb-6" id="timelineSection" style="display: none;">
+                <h3 class="text-lg font-semibold">Lịch trình dự kiến của sự kiện</h3>
+                <div class="border p-4 rounded" id="timelineList"></div>
+            </div>
+
+            <div class="mb-6">
+                <button id="viewContractBtn" class="bg-green-500 text-white px-4 py-2 rounded">Bản thảo văn bản hợp đồng</button>
+                <div id="contractHtml" class="mt-4 border p-4 rounded hidden"></div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold">Tải lên bản hợp đồng đã ký</h3>
+                <input type="file" id="uploadSignedContract" accept="image/*,application/pdf" class="mt-2">
+                <div id="uploadedContractPreview" class="mt-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./assets/js/contractDetail.js"></script>
+</body>
+</html>
