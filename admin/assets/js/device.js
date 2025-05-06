@@ -322,28 +322,22 @@ function renderDevices(devices, deviceTypes, users) {
     });
 }
 function handleDeleteDevice(id) {
-    let token = localStorage.getItem("token"); // Lấy token từ localStorage
-
-    if (!token) {
-        console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
-        return;
-    }
     var options = {
         method: 'DELETE',
         headers: {
-            "Authorization": `Bearer ${token}`,
+            "Authorization": `Bearer ${localStorage.getItem("token")}`, // Thêm token vào header
             "Content-Type": "application/json",
         },
 
     };
-    fetch(DeviceAPI + '/' + id, options)
+    fetch(`${DeviceAPI}/${id}`, options)
         .then(function (respone) {
             return respone.json();
         })
         .then(function () {
-            var listUser = document.querySelector('.list-device-' + id)
-            if (listUser) {
-                listUser.remove();
+            var listDevice = document.querySelector(`.list-device-${id}`)
+            if (listDevice) {
+                listDevice.remove();
             }
             alert("Xoá thiết bị thành công!");
         })
@@ -352,8 +346,55 @@ function handleDeleteDevice(id) {
         });
 
 }
+// function handleDeleteDevice(id) {
+//     console.log("Xoá sự kiện ID:", id);
+//     let token = localStorage.getItem("token"); // Lấy token từ localStorage
+
+//     if (!token) {
+//         console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+//         alert("Vui lòng đăng nhập lại!");
+//         return;
+//     }
+
+//     var options = {
+//         method: 'DELETE',
+//         headers: {
+//             "Authorization": `Bearer ${token}`,
+//             "Content-Type": "application/json"
+//         }
+//     };
+
+//     fetch(`${DeviceAPI}/${id}`, options)
+//         // .then(response => {
+//         //     if (!response.ok) {
+//         //         return response.text().then(text => {
+//         //             throw new Error(`Lỗi khi xoá thiết bị: ${response.status} - ${text}`);
+//         //         });
+//         //     }
+//         //     // Nếu API trả về 204 No Content, không cần parse JSON
+//         //     return response.status === 204 ? {} : response.json();
+//         // })
+//         .then(response => {
+//             if (!response.ok) {
+//                 throw new Error(`Lỗi khi xoá dịch vụ: ${response.status}`);
+//             }
+//             return response.json();
+//         })
+//         .then(() => {
+//             var listDevice = document.querySelector(`.list-device-${id}`);
+//             if (listDevice) {
+//                 listDevice.remove();
+//             }
+//             alert("Xoá thiết bị thành công!");
+//         })
+//         .catch(error => {
+//             console.error("Lỗi khi xoá thiết bị:", error);
+//             alert("Xoá không thành công: " + error.message);
+//         });
+// }
 //Xem thiết bị
 // Xem chi tiết thiết bị
+
 function handleDetailDevice(id) {
     localStorage.setItem("editDeviceId", id); // Lưu ID vào localStorage
     window.location.href = "detail_device.html"; // Chuyển đến trang chi tiết

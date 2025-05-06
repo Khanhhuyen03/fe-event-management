@@ -1,4 +1,4 @@
-const CONTRACT_API_URL = "https://67eabf6734bcedd95f647797.mockapi.io/Contract";
+const CONTRACT_API_URL = "http://localhost:8080/event-management/api/contracts";
 
 const contractsPerPage = 10;
 let currentPage = 1;
@@ -24,7 +24,7 @@ function formatStatus(status) {
         case "inprogress": return '<span class="badge bg-warning">Đang Thực Hiện</span>';
         case "waiting_paid": return '<span class="badge bg-primary">Chờ Thanh Toán</span>';
         case "completed": return '<span class="badge bg-dark">Đã Hoàn Thành</span>';
-       // default: return '<span class="badge bg-secondary">Unknown</span>';
+        // default: return '<span class="badge bg-secondary">Unknown</span>';
     }
 }
 

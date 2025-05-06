@@ -9,10 +9,11 @@ const RENTAL_API_URL = `${BASE_URL}/rentals`;
 const USER_API_URL = `${BASE_URL}/users`;
 const EVENT_API_URL = `${BASE_URL}/event`;
 const TIMELINE_API_URL = `${BASE_URL}/timelines`;
-const DEVICE_RENTAL_API_URL = `${BASE_URL}/device-rentals`;
-const SERVICE_RENTAL_API_URL = `${BASE_URL}/service-rentals`;
+const DEVICE_RENTAL_API_URL = `${BASE_URL}/api/device-rentals`;
+const SERVICE_RENTAL_API_URL = `${BASE_URL}/api/service-rentals`;
 const LOCATION_RENTAL_API_URL = `${BASE_URL}/location-rentals`;
-const CUSTOMER_API_URL = `${BASE_URL}/customers`;
+const CUSTOMER_API_URL = `${BASE_URL}/api/customers`;
+const CONTRACT_API_URL = `${BASE_URL}/api/contracts`;
 
 
 let devices = [];
@@ -835,8 +836,8 @@ function addServiceToTable(service, quantity = 1) {
     `;
     document.getElementById('serviceTableBody').appendChild(row);
 }
-// Thêm địa điểm vào bảng
 
+// Thêm địa điểm vào bảng
 function addLocationToTable(location) {
     const startDate = document.getElementById('startDateDisplay').value;
     const endDate = document.getElementById('endDateDisplay').value;
@@ -953,9 +954,9 @@ async function saveContract() {
     const customer = {
         name: customerName,
         phone_number: phoneNumber,
-        address: getFullAddress(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        address: getFullAddress()
+        // create_at: new Date().toISOString(),
+        // update_at: new Date().toISOString()
     };
 
     const rental = {
@@ -969,7 +970,7 @@ async function saveContract() {
         rental_end_time: toISODate(document.getElementById('endDateDisplay').value),
         total_price: parseInt(document.getElementById('totalCost').textContent.replace(/[^0-9]/g, '')),
         event_id: eventId,
-        updated_at: new Date().toISOString()
+        // updated_at: new Date().toISOString()
     };
 
     const deviceRentals = Array.from(document.getElementById('deviceTableBody').children).map(row => ({
@@ -1011,6 +1012,18 @@ async function saveContract() {
         const rentalResponse = await fetchData(RENTAL_API_URL, 'POST', rental);
         console.log('Hợp đồng đã được lưu:', rentalResponse);
 
+        const contract = {
+            rental_id: rentalResponse.id,
+            name: document.getElementById('contractName').value,
+            payment_intent_id: null, // Giá trị mặc định vì không có thông tin thanh toán
+            customer_id: customerId,
+            status: 'draft', // Trạng thái mặc định là 'draft'
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+        const contractResponse = await fetchData(CONTRACT_API_URL, 'POST', contract);
+        console.log('Hợp đồng đã được lưu vào bảng contract:', contractResponse);
+
         for (const deviceRental of deviceRentals) {
             await fetchData(DEVICE_RENTAL_API_URL, 'POST', {
                 ...deviceRental,
@@ -1039,16 +1052,29 @@ async function saveContract() {
             });
         }
 
+        // if (window.parent) {
+        //     window.parent.postMessage({
+        //         type: 'newContract',
+        //         contract: {
+        //             id: rentalResponse.id,
+        //             name: document.getElementById('contractName').value,
+        //             total_price: rentalResponse.total_price,
+        //             rental_start_time: rentalResponse.rental_start_time,
+        //             rental_end_time: rentalResponse.rental_end_time,
+        //             status: 'draft'
+        //         }
+        //     }, '*');
+        // }
         if (window.parent) {
             window.parent.postMessage({
                 type: 'newContract',
                 contract: {
-                    id: rentalResponse.id,
-                    name: document.getElementById('contractName').value,
+                    id: contractResponse.id, // Sử dụng id từ contractResponse
+                    name: contract.name,
                     total_price: rentalResponse.total_price,
                     rental_start_time: rentalResponse.rental_start_time,
                     rental_end_time: rentalResponse.rental_end_time,
-                    status: 'draft'
+                    status: contract.status
                 }
             }, '*');
         }
@@ -1057,6 +1083,12 @@ async function saveContract() {
     } catch (error) {
         console.error(`Lỗi khi lưu dữ liệu: ${error.message}`);
     }
+    console.log("Customer payload:", JSON.stringify(customer));
+    console.log("Rental payload:", JSON.stringify(rental));
+    console.log("Device Rentals payload:", JSON.stringify(deviceRentals));
+    console.log("Service Rentals payload:", JSON.stringify(serviceRentals));
+    console.log("Location Rentals payload:", JSON.stringify(locationRentals));
+    console.log("Timelines payload:", JSON.stringify(timelines));
 }
 
 // Cập nhật ngày địa điểm
