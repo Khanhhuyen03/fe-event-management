@@ -1,12 +1,4 @@
-/* sử dụng biến :root dễ dàng thay đổi giao diện toàn bộ trang */
-/* :root {
-    --default-font: "Roboto", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    font chữ mặc định cho toàn bộ web
-    --heading-font: "Raleway", sans-serif;
-    font chữ cho tiêu đề h1, h2,..
-    --nav-font: "Poppins", sans-serif;
-    font chữ cho menu điều hướng
-} */
+
 :root {
     --default-font: "Roboto", "Arial", sans-serif;
     --heading-font: "Merriweather", serif;

@@ -5,24 +5,17 @@
                 <img src="assets/img/logo/logo1.png" alt="Logo">
             </div>
             <div class="col-lg-4 col-md-6 d-flex">
-               
                 <div>
                     <h3>Liên hệ</h3>
-                        <div class="mb-2">
-                            <i class="bi bi-telephone icon"></i><strong>Số điện thoại:</strong> <span>0123456789</span><br>
-                        </div>
-                        <div>
-                            <i class="fa-regular fa-envelope icon"></i><strong>Email:</strong> <span>myevent@gmail.com</span><br>
-                        </div>
+                    <div class="mb-2">
+                        <i class="bi bi-telephone icon"></i><strong>Số điện thoại:</strong> <span>0123456789</span><br>
+                    </div>
+                    <div>
+                        <i class="fa-regular fa-envelope icon"></i><strong>Email:</strong>
+                        <span>myevent@gmail.com</span><br>
+                    </div>
                 </div>
             </div>
-            <!-- <div class="col-lg-3 col-md-6 d-flex">
-                <i class="bi bi-geo-alt icon"></i>
-                <div class="address">
-                    <h4>Địa chỉ</h4>
-                    <p>Việt Nam</p>
-                </div>
-            </div> -->
             <div class="col-lg-4 col-md-6">
                 <h3>Theo dõi chúng tôi</h3>
                 <div class="social-links d-flex">
@@ -37,4 +30,108 @@
     <div class="container copyright text-center mt-4">
         <p>© <span>Copyright</span> <strong class="px-1 sitename">Myevent</strong> <span>All Rights Reserved</span></p>
     </div>
+    <a href="tel:0913186829" class="call-now-button" id="callBtn">
+        <div class="call-icon"><i class="bi bi-telephone-fill"></i></div>
+    </a>
+    <style>
+        .call-now-button {
+            position: fixed;
+            bottom: 40px;
+            left: 30px;
+            background: linear-gradient(to right, #ff3c3c, #ff6b6b);
+            border-radius: 50%;
+            padding: 15px;
+            z-index: 9999;
+            text-decoration: none;
+            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.3);
+            animation: fadeIn 0.8s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .call-icon {
+            width: 30px; 
+            height: 30px;
+            background-color: red;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        .call-icon i {
+            font-size: 20px;
+            color: white;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 30px rgba(255, 0, 0, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+    </style>
+
+    <script>
+        const callBtn = document.getElementById('callBtn');
+
+        // Kiểm tra xem callBtn có tồn tại không
+        if (!callBtn) {
+            console.error('Error: Element with ID "callBtn" not found.');
+        } else {
+            // Thêm hiệu ứng shake khi trang tải
+            document.addEventListener("DOMContentLoaded", function () {
+                callBtn.classList.add('shake');
+                setTimeout(() => callBtn.classList.remove('shake'), 1000);
+            });
+
+            // Hiển thị/ẩn nút khi cuộn
+            window.addEventListener('scroll', function () {
+                if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
+                    callBtn.style.display = 'block';
+                } else {
+                    callBtn.style.display = 'none';
+                }
+            });
+
+            // Hàm xử lý gọi điện
+            function makeCall() {
+                window.location.href = 'tel:0123456789';
+                callBtn.classList.add('shake');
+                setTimeout(() => callBtn.classList.remove('shake'), 1000);
+            }
+        }
+    </script>
 </footer>
