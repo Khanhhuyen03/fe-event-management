@@ -1,28 +1,48 @@
-<footer class="footer light-background">
-    <div class="container">
-        <div class="row gy-3">
-            <div class="col-lg-4 col-md-6 d-flex">
-                <img src="assets/img/logo/logo1.png" alt="Logo">
+<footer class="footer light-background" style="background: var(--background-color); color: var(--default-color);">
+    <div class="container py-5">
+        <div class="row gy-4 align-items-start">
+            
+            <div class="col-lg-4 col-md-6 text-center text-md-start d-none d-md-block">
+                <img src="assets/img/logo/logo1.png" alt="MyEvent Logo" style="max-width: 150px; margin-bottom: 20px;">
+                <p style="font-family: var(--default-font); font-size: 0.9rem; color: var(--default-color);">MyEvent -
+                    Chuyên tổ chức sự kiện chuyên nghiệp tại Việt Nam, mang đến trải nghiệm ấn tượng và sáng tạo.</p>
             </div>
-            <div class="col-lg-4 col-md-6 d-flex">
-                <div>
-                    <h3>Liên hệ</h3>
-                    <div class="mb-2">
-                        <i class="bi bi-telephone icon"></i><strong>Số điện thoại:</strong> <span>0123456789</span><br>
-                    </div>
-                    <div>
-                        <i class="fa-regular fa-envelope icon"></i><strong>Email:</strong>
-                        <span>myevent@gmail.com</span><br>
-                    </div>
-                </div>
+            
+            <div class="col-lg-4 col-md-6 text-center text-md-start contact-info">
+                <h3 style="font-family: var(--heading-font); font-size: 1.5rem; font-weight: 700; color: var(--heading-color); margin-bottom: 20px;">
+                    Liên Hệ</h3>
+                <p style="font-family: var(--default-font); font-size: 0.9rem; color: var(--default-color); margin-bottom: 10px;">
+                    <i class="bi bi-telephone me-2" style="color: var(--accent-color);"></i>
+                    <strong>Số điện thoại:</strong> <a href="tel:0123456789"
+                        style="color: var(--default-color); text-decoration: none;">0123456789</a>
+                </p>
+                <p style="font-family: var(--default-font); font-size: 0.9rem; color: var(--default-color); margin-bottom: 10px;">
+                    <i class="fa-regular fa-envelope me-2" style="color: var(--accent-color);"></i>
+                    <strong>Email:</strong> <a href="mailto:myevent@gmail.com"
+                        style="color: var(--default-color); text-decoration: none;">myevent@gmail.com</a>
+                </p>
+                <p style="font-family: var(--default-font); font-size: 0.9rem; color: var(--default-color);">
+                    <i class="bi bi-geo-alt me-2" style="color: var(--accent-color);"></i>
+                    <strong>Địa chỉ:</strong> 123 Đường Sự Kiện, TP. Hồ Chí Minh
+                </p>
             </div>
-            <div class="col-lg-4 col-md-6">
-                <h3>Theo dõi chúng tôi</h3>
-                <div class="social-links d-flex">
-                    <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
-                    <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+            <!-- ẩn khi ở mobile-->
+            <div class="col-lg-4 col-md-12 text-center text-md-start d-none d-md-block">
+                <h3 style="font-family: var(--heading-font); font-size: 1.5rem; font-weight: 700; color: var(--heading-color); margin-bottom: 20px;">
+                    Theo Dõi Chúng Tôi</h3>
+                <div class="social-links d-flex justify-content-center justify-content-md-start">
+                    <a href="#" class="twitter mx-2"
+                        style="color: var(--nav-color); font-size: 1.5rem; font-family: var(--nav-font); transition: color 0.3s;"><i
+                            class="bi bi-twitter-x"></i></a>
+                    <a href="#" class="facebook mx-2"
+                        style="color: var(--nav-color); font-size: 1.5rem; font-family: var(--nav-font); transition: color 0.3s;"><i
+                            class="bi bi-facebook"></i></a>
+                    <a href="#" class="instagram mx-2"
+                        style="color: var(--nav-color); font-size: 1.5rem; font-family: var(--nav-font); transition: color 0.3s;"><i
+                            class="bi bi-instagram"></i></a>
+                    <a href="#" class="linkedin mx-2"
+                        style="color: var(--nav-color); font-size: 1.5rem; font-family: var(--nav-font); transition: color 0.3s;"><i
+                            class="bi bi-linkedin"></i></a>
                 </div>
             </div>
         </div>
@@ -30,6 +50,15 @@
     <div class="container copyright text-center mt-4">
         <p>© <span>Copyright</span> <strong class="px-1 sitename">Myevent</strong> <span>All Rights Reserved</span></p>
     </div>
+    <!-- Thêm Chatbot-->
+    <div class="chatbot-container">
+        <a href="./chatbox.html" class="chatbot-button" id="chatBtn">
+            <div class="chatbot-icon">
+                <img src="https://cdn-icons-png.flaticon.com/512/5948/5948551.png" alt="Chat Icon">
+            </div>
+        </a>
+    </div>
+    <!-- CTA-->
     <a href="tel:0913186829" class="call-now-button" id="callBtn">
         <div class="call-icon"><i class="bi bi-telephone-fill"></i></div>
     </a>
@@ -38,12 +67,11 @@
             position: fixed;
             bottom: 40px;
             left: 30px;
-            background: linear-gradient(to right, #ff3c3c, #ff6b6b);
+            background: #ea6b6b;
             border-radius: 50%;
             padding: 15px;
             z-index: 9999;
             text-decoration: none;
-            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.3);
             animation: fadeIn 0.8s ease-in-out;
             display: flex;
             align-items: center;
@@ -51,9 +79,9 @@
         }
 
         .call-icon {
-            width: 30px; 
+            width: 30px;
             height: 30px;
-            background-color: red;
+            background-color: #d60000;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -64,19 +92,26 @@
         }
 
         .call-icon i {
-            font-size: 20px;
-            color: white;
+            font-size: 16px;
+            color: #fff;
+        }
+
+        .call-now-button:hover {
+            transform: scale(1.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         @keyframes pulse {
             0% {
-                box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4);
+                box-shadow: 0 0 0 0 rgba(214, 0, 0, 0.5);
             }
+
             50% {
-                box-shadow: 0 0 0 30px rgba(255, 0, 0, 0);
+                box-shadow: 0 0 0 30px rgba(214, 0, 0, 0);
             }
+
             100% {
-                box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+                box-shadow: 0 0 0 0 rgba(214, 0, 0, 0);
             }
         }
 
@@ -85,6 +120,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -96,28 +132,93 @@
         }
 
         @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
+            0% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            50% {
+                transform: translateX(5px);
+            }
+
+            75% {
+                transform: translateX(-5px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .social-links a:hover {
+            color: var(--nav-hover-color) !important;
+        }
+
+        .copyright p {
+            font-family: var(--default-font);
+            font-size: 0.9rem;
+            color: var(--default-color);
+        }
+
+        .copyright .sitename {
+            color: var(--accent-color);
+        }
+
+        /* CSS cho Chatbot */
+        .chatbot-container {
+            position: fixed;
+            bottom: 130px;
+            left: 25px;
+            z-index: 10000;
+        }
+
+        .chatbot-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .chatbot-button:hover {
+            transform: scale(1.1);
+        }
+
+        .chatbot-icon img {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+        }
+
+        @media (max-width: 768px) {
+            .footer .row {
+                text-align: center;
+            }
+
+            .footer .contact-info {
+                margin: 0 auto;
+                max-width: 300px;
+            }
+
+            .footer .copyright {
+                margin-top: 20px;
+            }
         }
     </style>
-
     <script>
         const callBtn = document.getElementById('callBtn');
 
-        // Kiểm tra xem callBtn có tồn tại không
         if (!callBtn) {
             console.error('Error: Element with ID "callBtn" not found.');
         } else {
-            // Thêm hiệu ứng shake khi trang tải
             document.addEventListener("DOMContentLoaded", function () {
                 callBtn.classList.add('shake');
                 setTimeout(() => callBtn.classList.remove('shake'), 1000);
             });
 
-            // Hiển thị/ẩn nút khi cuộn
             window.addEventListener('scroll', function () {
                 if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
                     callBtn.style.display = 'block';
@@ -126,12 +227,13 @@
                 }
             });
 
-            // Hàm xử lý gọi điện
             function makeCall() {
                 window.location.href = 'tel:0123456789';
                 callBtn.classList.add('shake');
                 setTimeout(() => callBtn.classList.remove('shake'), 1000);
             }
+
+            callBtn.addEventListener('click', makeCall);
         }
     </script>
 </footer>

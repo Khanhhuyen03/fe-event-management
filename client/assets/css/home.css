@@ -148,34 +148,6 @@
 }
 
 /*--------------------------------------------------------------
-# ChatBox Section
---------------------------------------------------------------*/
-.chatbot-container {
-  position: fixed;
-  bottom: 130px; 
-  left: 25px;
-  z-index: 10000; 
-}
-
-.chatbot-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  transition: transform 0.3s ease;
-}
-
-.chatbot-button:hover {
-  transform: scale(1.1); 
-}
-
-.chatbot-icon img {
-  width: 70px; 
-  height: 70px;
-  object-fit: contain;
-}
-
-/*--------------------------------------------------------------
 # Services Section
 --------------------------------------------------------------*/
 .services {

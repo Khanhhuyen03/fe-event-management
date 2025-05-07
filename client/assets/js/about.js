@@ -26,7 +26,7 @@ function displayAdmins(admins) {
 
     admins.forEach(admin => {
         const adminCard = `
-            <div class="col-lg-3 col-md-6" data-aos="fade-up">
+            <div class="col-custom" data-aos="fade-up">
                 <div class="member">
                     <div class="pic"><img src="${admin.image}" class="img-fluid" alt="${admin.name}"></div>
                     <div class="member-info">
@@ -42,5 +42,55 @@ function displayAdmins(admins) {
             </div>
         `;
         eventContainer.innerHTML += adminCard;
+    });    
+}
+
+// Initialize AOS
+AOS.init({
+    duration: 1000,
+    once: true
+});
+
+// Initialize Swiper for Video Carousel
+new Swiper('.video-carousel', {
+    loop: true,
+    autoplay: {
+        delay: 5000,
+        disableOnInteraction: false
+    },
+    navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev'
+    },
+    pagination: {
+        el: '.swiper-pagination',
+        clickable: true
+    },
+    slidesPerView: 1,
+    spaceBetween: 20
+});
+
+// Call Now Button
+const callBtn = document.getElementById('callBtn');
+if (callBtn) {
+    document.addEventListener("DOMContentLoaded", function () {
+        callBtn.classList.add('shake');
+        setTimeout(() => callBtn.classList.remove('shake'), 1000);
     });
+
+    window.addEventListener('scroll', function () {
+        if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
+            callBtn.style.display = 'block';
+        } else {
+            callBtn.style.display = 'none';
+        }
+    });
+
+    callBtn.addEventListener('click', function () {
+        window.location.href = 'tel:0123456789';
+        callBtn.classList.add('shake');
+        setTimeout(() => callBtn.classList.remove('shake'), 1000);
+    });
+} else {
+    console.error('Error: Element with ID "callBtn" not found.');
 }
