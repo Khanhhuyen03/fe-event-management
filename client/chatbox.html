@@ -110,7 +110,8 @@
             max-width: 75%;
             position: relative;
             animation: slideIn 0.3s ease;
-            margin-right: auto; /* Align all messages to the left */
+            margin-right: auto;
+            /* Align all messages to the left */
         }
 
         @keyframes slideIn {
@@ -257,6 +258,38 @@
                 padding: 12px;
             }
         }
+
+        .event-type-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-start;
+            /* Căn trái để phù hợp với tin nhắn */
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .event-type-btn {
+            background: linear-gradient(to right, #4caf50, #388e3c);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: var(--default-font);
+            font-size: 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .event-type-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .event-type-btn:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
     </style>
 </head>
 
@@ -282,7 +315,7 @@
         </div>
     </div>
 
-    <main class="chat-container" data-aos="fade-up">
+    <!-- <main class="chat-container" data-aos="fade-up">
         <h1 class="chat-title">Hỗ Trợ Tổ Chức Sự Kiện</h1>
         <p class="chat-subtitle">MyEvent - Chuyên nghiệp & Sáng tạo</p>
         <div class="chat-box" id="chat-box">
@@ -290,6 +323,24 @@
                 <span class="sender">MyEvent Bot</span>
                 Xin chào! Tôi là trợ lý hỗ trợ tổ chức sự kiện của bạn. Bạn đang cần hỗ trợ về loại sự kiện nào? Ví dụ:
                 hội nghị, đám cưới, khai trương, hoặc sự kiện ngoài trời.
+                <div class="timestamp"></div>
+            </div>
+        </div>
+        <div class="typing-indicator" id="typing-indicator">MyEvent Bot đang trả lời...</div>
+        <div class="chat-input">
+            <textarea rows="2" id="chat-input" placeholder="Nội dung bạn nhập sẽ hiển thị ở đây..."></textarea>
+            <button id="send-btn">Gửi</button>
+            <button class="mic-btn" id="mic-btn"><i class="bi bi-mic-fill"></i></button>
+        </div>
+    </main> -->
+    <main class="chat-container" data-aos="fade-up">
+        <h1 class="chat-title">Hỗ Trợ Tổ Chức Sự Kiện</h1>
+        <p class="chat-subtitle">MyEvent - Chuyên nghiệp & Sáng tạo</p>
+        <div class="chat-box" id="chat-box">
+            <div class="chat-message bot">
+                <span class="sender">MyEvent Bot</span>
+                Xin chào! Tôi là trợ lý hỗ trợ tổ chức sự kiện của bạn. Bạn đang cần hỗ trợ về loại sự kiện nào?
+                Đây là các loại sự kiện mà công ty chúng tôi hỗ trợ. Bạn hãy cho tôi biết nhé!
                 <div class="timestamp"></div>
             </div>
         </div>
@@ -307,121 +358,9 @@
     <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
     <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
     <script src="assets/js/main.js"></script>
+    <script src="/client/assets/js/header.js"></script>
     <script src="/fe-event-management/client/assets/js/header.js"></script>
-    <script>
-        AOS.init({
-            duration: 800,
-            once: true
-        });
-
-        // Chat functionality
-        const chatBox = document.getElementById('chat-box');
-        const chatInput = document.getElementById('chat-input');
-        const sendBtn = document.getElementById('send-btn');
-        const typingIndicator = document.getElementById('typing-indicator');
-
-        // Mock API endpoint (replace with your actual API)
-        const API_URL = 'https://api.myevent.com/chat'; // Placeholder
-
-        // Function to add message to chat box
-        function addMessage(content, isBot = false) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `chat-message ${isBot ? 'bot' : 'user'}`;
-            messageDiv.innerHTML = `
-                <span class="sender">${isBot ? 'MyEvent Bot' : 'Bạn'}</span>
-                ${content}
-                <div class="timestamp">${new Date().toLocaleTimeString('vi-VN')}</div>
-            `;
-            chatBox.appendChild(messageDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        // Function to simulate API call
-        async function sendMessageToAPI(message) {
-            try {
-                // Show typing indicator
-                typingIndicator.classList.add('active');
-                sendBtn.disabled = true;
-
-                // Mock API response (replace with actual fetch)
-                const response = await new Promise(resolve => {
-                    setTimeout(() => {
-                        resolve({
-                            ok: true,
-                            json: () => Promise.resolve({
-                                reply: `Đã nhận yêu cầu về "${message}". Bạn muốn tôi hỗ trợ cụ thể về khía cạnh nào? (Ví dụ: lập kế hoạch, tìm địa điểm, quản lý khách mời)`
-                            })
-                        });
-                    }, 1000);
-                });
-
-                if (!response.ok) throw new Error('API request failed');
-
-                const data = await response.json();
-                addMessage(data.reply, true);
-            } catch (error) {
-                addMessage('Xin lỗi, có lỗi xảy ra. Vui lòng thử lại!', true);
-                console.error('Error:', error);
-            } finally {
-                typingIndicator.classList.remove('active');
-                sendBtn.disabled = false;
-            }
-        }
-
-        // Handle send button click
-        sendBtn.addEventListener('click', () => {
-            const message = chatInput.value.trim();
-            if (message) {
-                addMessage(message);
-                sendMessageToAPI(message);
-                chatInput.value = '';
-                chatInput.style.height = 'auto';
-            }
-        });
-
-        // Handle Enter key press
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendBtn.click();
-            }
-        });
-
-        // Auto-resize textarea
-        chatInput.addEventListener('input', () => {
-            chatInput.style.height = 'auto';
-            chatInput.style.height = `${chatInput.scrollHeight}px`;
-        });
-
-        // Basic speech recognition (if supported)
-        const micBtn = document.getElementById('mic-btn');
-        if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'vi-VN';
-            recognition.interimResults = false;
-
-            micBtn.addEventListener('click', () => {
-                recognition.start();
-                micBtn.style.background = 'linear-gradient(to right, #d32f2f, #b71c1c)';
-            });
-
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                chatInput.value = transcript;
-                micBtn.style.background = 'linear-gradient(to right, #0288d1, #0277bd)';
-                sendBtn.click();
-            };
-
-            recognition.onerror = () => {
-                micBtn.style.background = 'linear-gradient(to right, #0288d1, #0277bd)';
-                addMessage('Không thể nhận diện giọng nói. Vui lòng thử lại!', true);
-            };
-        } else {
-            micBtn.disabled = true;
-            micBtn.style.background = '#d1d5db';
-        }
-    </script>
+    <script src="assets/js/chatAI.js"></script>
 </body>
 
 </html>

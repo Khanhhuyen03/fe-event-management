@@ -44,10 +44,19 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     try {
         // // 1. Lấy danh sách nhà cung cấp
-        // suppliers = await fetchData(
-        //     "http://localhost:8080/event-management/users?roleName=SUPPLIER",
-        //     "Lỗi khi lấy danh sách nhà cung cấp"
-        // ) || [];
+        rentalId = await fetchData(
+            `http://localhost:8080/event-management/rentals/event/${eventId}`,
+            "Lỗi khi lấy danh sách rental"
+        )
+            .then(rentals => {
+                if (Array.isArray(rentals) && rentals.length > 0) {
+                    rentalId = rentals[0].id; // Lấy rentalId từ rental đầu tiên
+                    console.log("Rental ID:", rentalId);
+                    return rentalId;
+                } else {
+                    throw new Error("Không tìm thấy rental cho sự kiện này.");
+                }
+            }) || [];
 
         //2. Lấy chi tiết sự kiện (tên, mô tả, hình ảnh)
         const event = await fetchData(
@@ -72,33 +81,51 @@ document.addEventListener("DOMContentLoaded", async function () {
         eventImage.style.display = "block";
 
         // 3. Lấy dữ liệu lịch trình
-        const timeline = await fetchData(
-            `http://localhost:8080/event-management/timelines/${eventId}`,
+        var timeline = await fetchData(
+            `http://localhost:8080/event-management/timelines/rental/${rentalId}`,
             "Lỗi khi lấy lịch trình"
         );
-
+        timeline = timeline.data;
         console.log("Timeline data:", timeline);
         const timelineElement = document.getElementById("eventTimeline");
         timelineElement.innerHTML = "";
         if (!Array.isArray(timeline) || timeline.length === 0) {
             if (timeline && timeline.message) {
                 timelineElement.innerHTML = `<li class="list-group-item text-danger">${timeline.message}</li>`;
-            } else {
+            }
+            else {
                 timelineElement.innerHTML = `<li class="list-group-item">Không có thông tin lịch trình</li>`;
             }
-        } else {
+
+        }
+        else {
             timeline.forEach(item => {
                 const content = typeof item === 'string' ? item : item.description || "Không xác định";
-                timelineElement.innerHTML += `<li class="list-group-item">${content}</li>`;
+                const timeStart = item.time_start ? new Date(item.time_start) : null;
+                const formattedTime = timeStart ? timeStart.toLocaleString('vi-VN', {
+                    // dateStyle: 'short',
+                    timeStyle: 'short'
+                }) : "Không xác định";
+
+                timelineElement.innerHTML += `
+                        <li class="list-group-item border-0 p-3 mb-3 shadow-sm rounded d-flex align-items-start gap-3" style="background-color: #fdfdfd;">
+                            <div class="mt-1" style="width: 10px; height: 10px; background-color: #87986A; border-radius: 50%; flex-shrink: 0;"></div>
+                            <div class="flex-grow-1" style="display: flex;">
+                                <div class="fw-bold mb-1" style="color:rgb(60, 71, 40);">${formattedTime} </div>
+                                <div class="text-dark"> : ${content}</div>
+                            </div>
+                        </li>
+                    `;
             });
         }
 
         // 4. Lấy danh sách thiết bị
-        const devices = await fetchData(
-            `http://localhost:8080/event-management/api/device-rentals/${eventId}`,
+        var devices = await fetchData(
+            `http://localhost:8080/event-management/api/device-rentals/rental/${rentalId}`,
             "Lỗi khi lấy danh sách thiết bị"
         );
 
+        devices = devices.result;
         console.log("Devices data:", devices);
         const equipmentList = document.getElementById("equipmentList");
         equipmentList.innerHTML = "";
@@ -111,27 +138,28 @@ document.addEventListener("DOMContentLoaded", async function () {
         } else {
             devices.forEach(item => {
                 const deviceImageUrl = item.image ? `${baseImageUrl}${item.image.split('/').pop()}` : "assets/img/default-device.jpg";
-                const totalPrice = (item.quantity || 0) * (item.hourlyRentalFee || 0);
+                // const totalPrice = (item.quantity || 0) * (item.pricePerDay || 0);
                 equipmentList.innerHTML += `
                     <tr>
-                        <td><img src="${deviceImageUrl}" onerror="this.src='assets/img/default-device.jpg'" alt="${item.name}" style="max-width: 50px;"></td>
-                        <td>${item.name || "Không xác định"}</td>
-                        <td>${item.description || "Không có mô tả"}</td>
-                        <td>${getSupplierName(item.user_id)}</td>
+                        <td><img src="${deviceImageUrl}" onerror="this.src='assets/img/default-device.jpg'" alt="${item.deviceName || item.name} " style="max-width: 50px;"></td>
+                        <td>${item.deviceName || item.name}</td>
+                        <td>${item.deviceTypeName || "Không có mô tả"}</td>
+                        <td>${item.supplierName}</td>
                         <td>${item.quantity || 0}</td>
-                        <td>${formatCurrency(item.hourlyRentalFee)}</td>
-                        <td>${formatCurrency(totalPrice)}</td>
+                        <td>${formatCurrency(item.pricePerDay)}</td>
+                        <td>${formatCurrency(item.totalPrice)}</td>
                     </tr>
                 `;
             });
         }
 
         // 5. Lấy danh sách dịch vụ
-        const services = await fetchData(
-            `http://localhost:8080/event-management/api/service-rentals/${eventId}`,
+        var services = await fetchData(
+            `http://localhost:8080/event-management/api/service-rentals/rental/${rentalId}`,
             "Lỗi khi lấy danh sách dịch vụ"
         );
 
+        services = services.result;
         console.log("Services data:", services);
         const serviceList = document.getElementById("serviceList");
         serviceList.innerHTML = "";
@@ -147,13 +175,12 @@ document.addEventListener("DOMContentLoaded", async function () {
                 const totalPrice = (item.quantity || 0) * (item.hourly_salary || 0);
                 serviceList.innerHTML += `
                     <tr>
-                        <td><img src="${serviceImageUrl}" onerror="this.src='assets/img/default-service.jpg'" alt="${item.name}" style="max-width: 50px;"></td>
-                        <td>${item.name || "Không xác định"}</td>
-                        <td>${item.description || "Không có mô tả"}</td>
-                        <td>${getSupplierName(item.user_id)}</td>
+                        <td><img src="${serviceImageUrl}" onerror="this.src='assets/img/default-service.jpg'" alt="${item.serviceName}" style="max-width: 50px;"></td>
+                        <td>${item.serviceName || "Không xác định"}</td>
+                        <td>${item.supplierName}</td>
                         <td>${item.quantity || 0}</td>
-                        <td>${formatCurrency(item.hourly_salary)}</td>
-                        <td>${formatCurrency(totalPrice)}</td>
+                        <td>${formatCurrency(item.pricePerDay)}</td>
+                        <td>${formatCurrency(item.totalPrice)}</td>
                     </tr>
                 `;
             });
@@ -186,6 +213,87 @@ function checkLoginAndOpenContract() {
     }
 }
 
+// function openContractModal() {
+//     console.log("Mở modal hợp đồng");
+//     const urlParams = new URLSearchParams(window.location.search);
+//     const eventId = urlParams.get("id");
+
+//     const iframe = document.getElementById("contractIframe");
+//     if (!iframe) {
+//         console.error("Không tìm thấy iframe!");
+//         return;
+//     }
+//     iframe.src = "contract.html";
+
+//     const modalElement = document.getElementById("iframeModal");
+//     if (!modalElement) {
+//         console.error("Không tìm thấy modal!");
+//         return;
+//     }
+//     const modal = new bootstrap.Modal(modalElement, {});
+//     modal.show();
+
+//     // Gửi dữ liệu sự kiện đến contract.html
+//     iframe.onload = async () => {
+//         try {
+//             const event = await fetchData(
+//                 `http://localhost:8080/event-management/event/${eventId}`,
+//                 "Lỗi khi tải chi tiết sự kiện"
+//             );
+//             rentalId = await fetchData(
+//                 `http://localhost:8080/event-management/rentals/event/${eventId}`,
+//                 "Lỗi khi lấy danh sách rental"
+//             )
+//                 .then(rentals => {
+//                     if (Array.isArray(rentals) && rentals.length > 0) {
+//                         rentalId = rentals[0].id; // Lấy rentalId từ rental đầu tiên
+//                         console.log("Rental ID:", rentalId);
+//                         return rentalId;
+//                     } else {
+//                         throw new Error("Không tìm thấy rental cho sự kiện này.");
+//                     }
+//                 }) || [];
+//             if (event) {
+//                 iframe.contentWindow.postMessage({
+//                     type: "preloadEvent",
+//                     event: {
+//                         id: eventId,
+//                         name: event.name,
+//                         description: event.description,
+//                         img: event.img,
+//                         device: await fetchData(
+//                             `http://localhost:8080/event-management/api/device-rentals/rental/${rentalId}`,
+//                             "Lỗi khi lấy thiết bị"
+//                         ) || [],
+//                         service: await fetchData(
+//                             `http://localhost:8080/event-management/api/service-rentals/rental/${rentalId}`,
+//                             "Lỗi khi lấy dịch vụ"
+//                         ) || [],
+//                         // locations: await fetchData(
+//                         //     `http://localhost:8080/event-management/rentals/event/${eventId}/locations`,
+//                         //     "Lỗi khi lấy địa điểm"
+//                         // ) || [],
+//                         timeline: await fetchData(
+//                             `http://localhost:8080/event-management/timeline/rental/${rentalId}`,
+//                             "Lỗi khi lấy timeline"
+//                         ) || []
+//                     }
+
+//                 }, "*");
+//             }
+//         } catch (error) {
+//             console.error("Lỗi khi gửi dữ liệu sự kiện đến iframe:", error);
+//         }
+//     };
+
+//     window.addEventListener("message", function closeModal(event) {
+//         if (event.data === "closeIframe") {
+//             console.log("Nhận tín hiệu đóng modal");
+//             modal.hide();
+//             window.removeEventListener("message", closeModal);
+//         }
+//     }, { once: true });
+// }
 function openContractModal() {
     console.log("Mở modal hợp đồng");
     const urlParams = new URLSearchParams(window.location.search);
@@ -213,6 +321,37 @@ function openContractModal() {
                 `http://localhost:8080/event-management/event/${eventId}`,
                 "Lỗi khi tải chi tiết sự kiện"
             );
+
+            const rentals = await fetchData(
+                `http://localhost:8080/event-management/rentals/event/${eventId}`,
+                "Lỗi khi lấy danh sách rental"
+            );
+            console.log("Rentals:", rentals);
+            let rentalId;
+            if (Array.isArray(rentals) && rentals.length > 0) {
+                rentalId = rentals[0].id;
+                console.log("Rental ID:", rentalId);
+            } else {
+                throw new Error("Không tìm thấy rental cho sự kiện này.");
+            }
+
+            const devices = await fetchData(
+                `http://localhost:8080/event-management/api/device-rentals/rental/${rentalId}`,
+                "Lỗi khi lấy thiết bị"
+            );
+            const services = await fetchData(
+                `http://localhost:8080/event-management/api/service-rentals/rental/${rentalId}`,
+                "Lỗi khi lấy dịch vụ"
+            );
+            const timeline = await fetchData(
+                `http://localhost:8080/event-management/timelines/rental/${rentalId}`,
+                "Lỗi khi lấy timeline"
+            );
+
+            console.log("API Devices:", devices);
+            console.log("API Services:", services);
+            console.log("API Timeline:", timeline);
+
             if (event) {
                 iframe.contentWindow.postMessage({
                     type: "preloadEvent",
@@ -221,25 +360,13 @@ function openContractModal() {
                         name: event.name,
                         description: event.description,
                         img: event.img,
-                        device: await fetchData(
-                            `http://localhost:8080/event-management/rentals/event/${eventId}/devices`,
-                            "Lỗi khi lấy thiết bị"
-                        ) || [],
-                        service: await fetchData(
-                            `http://localhost:8080/event-management/rentals/event/${eventId}/services`,
-                            "Lỗi khi lấy dịch vụ"
-                        ) || [],
-                        locations: await fetchData(
-                            `http://localhost:8080/event-management/rentals/event/${eventId}/locations`,
-                            "Lỗi khi lấy địa điểm"
-                        ) || [],
-                        timeline: await fetchData(
-                            `http://localhost:8080/event-management/events/${eventId}/timeline`,
-                            "Lỗi khi lấy timeline"
-                        ) || []
+                        device: devices.result || [], // Truy cập result
+                        service: services.result || [], // Truy cập result
+                        timeline: timeline.data || [] // Truy cập data
                     }
                 }, "*");
             }
+            console.log("Đã gửi dữ liệu đến iframe", eventId, event.name, devices, services, timeline);
         } catch (error) {
             console.error("Lỗi khi gửi dữ liệu sự kiện đến iframe:", error);
         }

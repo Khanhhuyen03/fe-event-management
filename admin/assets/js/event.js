@@ -1021,7 +1021,7 @@ function loadEditForm(editEventId) {
 
                     console.log("Đã cập nhật sự kiện thành công:", eventResponse);
                     alert("Cập nhật sự kiện thành công!");
-                    // window.location.href = "table-event.html";
+                    window.location.href = "table-event.html";
                 } catch (error) {
                     console.error('Lỗi cập nhật sự kiện:', error);
                     alert(`Lỗi cập nhật sự kiện: ${error.message}`);
@@ -1574,7 +1574,10 @@ function setupTimelineTable() {
     addButton.addEventListener("click", function () {
         const newRow = document.createElement("tr");
         newRow.innerHTML = `
-            <td><input type="datetime-local" class="form-control" name="timeline"></td>
+             <td>
+            <input type="date" class="form-control" name="timelineDate" >
+            <input type="time" class="form-control" name="timelineTime" >
+        </td>
             <td><textarea class="form-control" name="descriptiontime" style="min-width: 500px"></textarea></td>
             <td class="text-center">
                 <button class="btn btn-outline-danger remove-row">🗑</button>
@@ -1590,14 +1593,62 @@ function setupTimelineTable() {
     });
 }
 
+// function addTimelineRow(timeline) {
+//     const tbody = document.querySelector("#timeTable tbody");
+//     const date = timeline.time_start ? new Date(timeline.time_start) : null;
+//     const formattedTime = date && !isNaN(date)
+//         ? new Date(date.getTime() - (7 * 60 * 60 * 1000)).toISOString().slice(0, 16)  // Trừ 7 tiếng
+//         : "";
+//     const newRow = document.createElement("tr");
+//     newRow.innerHTML = `
+//         <td><input type="datetime-local" class="form-control" name="timeline" value="${formattedTime}"></td>
+//         <td><textarea class="form-control" name="descriptiontime" style="min-width: 500px">${timeline.description || ""}</textarea></td>
+//         <td class="text-center">
+//             <button class="btn btn-outline-danger remove-row">🗑</button>
+//         </td>
+//     `;
+//     tbody.appendChild(newRow);
+// }
+// function toISODateTime(dateStr, timeStr) {
+//     if (!dateStr || !timeStr) return '';
+//     const [day, month, year] = dateStr.includes('/') ? dateStr.split('/') : dateStr.split('-');
+//     const date = new Date(`${year}-${month}-${day}`);
+//     if (isNaN(date)) return '';
+//     const [hours, minutes] = timeStr.split(':').map(Number);
+//     if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+//         return '';
+//     }
+//     date.setHours(hours, minutes);
+//     return date.toISOString();
+// }
+function toISODateTime(dateStr, timeStr) {
+    if (!dateStr || !timeStr) return '';
+
+    // dateStr expected format: "YYYY-MM-DD"
+    // timeStr expected format: "HH:MM"
+    const dateTimeStr = `${dateStr}T${timeStr}`;
+    const date = new Date(dateTimeStr);
+
+    if (isNaN(date)) return '';
+
+    return date.toISOString();
+}
+
 function addTimelineRow(timeline) {
     const tbody = document.querySelector("#timeTable tbody");
-    const formattedTime = timeline.time_start
-        ? new Date(timeline.time_start).toISOString().slice(0, 16)
+    const date = timeline.time_start ? new Date(timeline.time_start) : null;
+    const formattedDate = date && !isNaN(date)
+        ? `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+        : "";
+    const formattedTime = date && !isNaN(date)
+        ? `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
         : "";
     const newRow = document.createElement("tr");
     newRow.innerHTML = `
-        <td><input type="datetime-local" class="form-control" name="timeline" value="${formattedTime}"></td>
+        <td>
+            <input type="date" class="form-control" name="timelineDate" value="${formattedDate}" placeholder="DD/MM/YYYY">
+            <input type="time" class="form-control" name="timelineTime" value="${formattedTime}">
+        </td>
         <td><textarea class="form-control" name="descriptiontime" style="min-width: 500px">${timeline.description || ""}</textarea></td>
         <td class="text-center">
             <button class="btn btn-outline-danger remove-row">🗑</button>
@@ -1607,6 +1658,7 @@ function addTimelineRow(timeline) {
 }
 //_______xử lý rental, devicerental, servicerental, timeline_____________//
 // Hàm xử lý khi nhấn nút "Lưu"
+
 function createRentalWithEventId(eventId) {
     if (!eventId) {
         alert("ID sự kiện không hợp lệ!");
@@ -1881,35 +1933,100 @@ function createServiceRental(data) {
 }
 
 //timline
+// function handleTimelines(rentalId) {
+//     const timelineRows = document.querySelectorAll("#timeTable tbody tr");
+//     const promises = [];
+
+//     timelineRows.forEach(row => {
+//         const timeline = row.querySelector('input[name="timeline"]').value;
+//         const description = row.querySelector('textarea[name="descriptiontime"]').value;
+
+//         if (timeline && description) {
+//             // Tạo đối tượng Date từ giá trị nhập vào và trừ 7 tiếng
+//             const inputDate = new Date(timeline);
+//             const adjustedDate = new Date(inputDate.getTime() - (7 * 60 * 60 * 1000)); // Trừ 7 tiếng
+
+//             const timelineData = {
+//                 rental_id: rentalId,
+//                 time_start: adjustedDate.toISOString(), // Lưu thời gian đã điều chỉnh
+//                 description: description
+//             };
+
+//             promises.push(
+//                 createTimeline(timelineData)
+//                     .then(() => console.log(`Timeline với time_start ${timeline} tạo thành công`))
+//                     .catch(error => console.error(`Lỗi khi tạo timeline với time_start ${timeline}:`, error))
+//             );
+//         } else {
+//             console.warn("Dữ liệu không hợp lệ:", { timeline, description });
+//         }
+//     });
+
+//     return Promise.all(promises);
+// }
 function handleTimelines(rentalId) {
     const timelineRows = document.querySelectorAll("#timeTable tbody tr");
     const promises = [];
-
     timelineRows.forEach(row => {
-        const timeline = row.querySelector('input[name="timeline"]').value;
+        const date = row.querySelector('input[name="timelineDate"]').value;
+        const time = row.querySelector('input[name="timelineTime"]').value;
         const description = row.querySelector('textarea[name="descriptiontime"]').value;
-
-        if (timeline && description) {
+        if (date && time && description) {
+            const time_start = toISODateTime(date, time);
+            if (!time_start) {
+                console.warn("Thời gian không hợp lệ:", { date, time });
+                return;
+            }
             const timelineData = {
                 rental_id: rentalId,
-                time_start: timeline,
-                description: description,
+                time_start: time_start,
+                description: description
             };
-
+            console.log("Timeline payload:", JSON.stringify(timelineData));
             promises.push(
                 createTimeline(timelineData)
-                    .then(() => console.log(`Timeline với time_start ${timeline} tạo thành công`))
-                    .catch(error => console.error(`Lỗi khi tạo timeline với time_start ${timeline}:`, error))
+                    .then(() => console.log(`Timeline với time_start ${date} ${time} tạo thành công`))
+                    .catch(error => console.error(`Lỗi khi tạo timeline với time_start ${date} ${time}:`, error))
             );
         } else {
-            console.warn("Dữ liệu không hợp lệ:", { timeline, description });
+            console.warn("Dữ liệu không hợp lệ:", { date, time, description });
         }
     });
-
     return Promise.all(promises);
 }
-
 // Sửa hàm createTimeline để trả về Promise
+// function createTimeline(data) {
+//     const token = localStorage.getItem("token");
+//     if (!token) {
+//         console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+//         throw new Error("Không tìm thấy token");
+//     }
+
+//     return fetch(`${Timeline}/new`, {
+//         method: 'POST',
+//         headers: {
+//             "Content-Type": "application/json",
+//             'Authorization': `Bearer ${token}`
+//         },
+//         body: JSON.stringify(data)
+//     })
+//         .then(response => {
+//             if (!response.ok) {
+//                 return response.json().then(err => {
+//                     throw new Error(err.message || "Lỗi khi tạo timeline");
+//                 });
+//             }
+//             return response.json();
+//         })
+//         .then(data => {
+//             console.log("Timeline created successfully:", data);
+//             return data;
+//         })
+//         .catch(error => {
+//             console.error("Error creating timeline:", error);
+//             throw error;
+//         });
+// }
 function createTimeline(data) {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -1942,7 +2059,6 @@ function createTimeline(data) {
             throw error;
         });
 }
-
 //_________________Updated rental ,devicerental, servicerental, timelien_______//
 // Hàm cập nhật rental
 function updateRental(rentalId, eventId) {
@@ -2012,8 +2128,8 @@ function updateDeviceRentals(rentalId, oldDeviceRentals) {
 
     const currentRows = document.querySelectorAll("#deviceTable tbody tr");
     const currentDeviceRentals = Array.from(currentRows).map(row => ({
-        deviceId: row.querySelector('select[name="devicetype"]').value || row.querySelector('select[ name="devicename"]').value,
-        quantity: parseInt(row.querySelector('input[name="quantitydevice"]').value) || 1,
+        deviceId: row.querySelector('select[name="devicename"]').value,
+        quantity: parseInt(row.querySelector('input[name="quantitydevice"]').value) || 1
     }));
     console.log("currentRows:", currentDeviceRentals.deviceId);
     console.log("currentDeviceRentals:", currentDeviceRentals);
@@ -2075,6 +2191,17 @@ function updateServiceRentals(rentalId, oldServiceRentals) {
         return Promise.reject("Invalid oldServiceRentals");
     }
 
+    // // Xóa các bản ghi không còn trong form
+    // oldServiceRentals.forEach(old => {
+    //     if (!currentServiceRentals.some(current => current.serviceId === old.id)) {
+    //         fetch(`${ServiceRental}/${old.id}`, {
+    //             method: 'DELETE',
+    //             headers: { "Content-Type": "application/json" }
+    //         })
+    //             .catch(error => console.error("Lỗi khi xóa service_rental:", error));
+    //     }
+    // });
+
     const currentRows = document.querySelectorAll("#serviceTable tbody tr");
     const currentServiceRentals = Array.from(currentRows).map(row => ({
         serviceId: row.querySelector('select[name="servicename"]')?.value,
@@ -2122,11 +2249,20 @@ function updateTimelines(rentalId, oldTimelines) {
         return Promise.reject("Invalid oldTimelines");
     }
 
+    // const currentRows = document.querySelectorAll("#timeTable tbody tr");
+    // const currentTimelines = Array.from(currentRows).map(row => ({
+    //     time_start: row.querySelector('input[name="timeline"]').value,
+    //     description: row.querySelector('textarea[name="descriptiontime"]').value
+    // }));
     const currentRows = document.querySelectorAll("#timeTable tbody tr");
-    const currentTimelines = Array.from(currentRows).map(row => ({
-        time_start: row.querySelector('input[name="timeline"]').value,
-        description: row.querySelector('textarea[name="descriptiontime"]').value
-    }));
+    const currentTimelines = Array.from(currentRows).map(row => {
+        const date = row.querySelector('input[name="timelineDate"]').value;
+        const time = row.querySelector('input[name="timelineTime"]').value;
+        return {
+            time_start: toISODateTime(date, time), // Tính time_start cho từng hàng
+            description: row.querySelector('textarea[name="descriptiontime"]').value
+        };
+    });
     console.log("currentTimelines:", currentTimelines);
     // Xóa các bản ghi không còn trong form
     oldTimelines.forEach(old => {
