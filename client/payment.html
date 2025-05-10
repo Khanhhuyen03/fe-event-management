@@ -181,7 +181,7 @@
                 <input type="text" id="contractName" readonly>
                 <label>Giá Trị Hợp Đồng:</label>
                 <input type="text" id="contractValue" readonly>
-                <label id="depositLabel" style="display: none;">Số Tiền Đã Đặt Cọc (30%):</label>
+                <label id="depositLabel" style="display: none;">Số Tiền Đã Đặt Cọc (10%):</label>
                 <input type="text" id="depositAmount" readonly style="display: none;">
                 <label id="amountLabel"></label>
                 <input type="text" id="amount" readonly>
@@ -281,11 +281,11 @@
         }
 
         function calculateDepositAmount(totalValue) {
-            return totalValue * 0.3; // 30% giá trị hợp đồng
+            return totalValue * 0.1; // 10% giá trị hợp đồng
         }
 
         function calculateRemainingAmount(totalValue) {
-            return totalValue * 0.7; // 70% giá trị hợp đồng
+            return totalValue * 0.9; // 90% giá trị hợp đồng
         }
 
         function generateVNPAYUrl(amount, orderId, orderInfo) {
@@ -415,7 +415,7 @@
 
             if (contract.status === "draft") {
                 // Chưa đặt cọc
-                amountLabel.textContent = "Số Tiền Đặt Cọc (30%):";
+                amountLabel.textContent = "Số Tiền Đặt Cọc (10%):";
                 amountInput.value = formatCurrency(depositAmount);
                 paymentMethodSection.style.display = "block";
                 paymentButton.style.display = "inline-block";
@@ -451,7 +451,7 @@
                 depositLabel.style.display = "block";
                 depositAmountInput.style.display = "block";
                 depositAmountInput.value = formatCurrency(depositAmount);
-                amountLabel.textContent = "Số Tiền Còn Lại (70%):";
+                amountLabel.textContent = "Số Tiền Còn Lại (90%):";
                 const remainingAmount = calculateRemainingAmount(contract.value);
                 amountInput.value = formatCurrency(remainingAmount);
                 paymentMethodSection.style.display = "block";
