@@ -127,16 +127,16 @@
         }
 
         .chat-message.bot {
-            background: linear-gradient(to right, #e0f7fa, #b2ebf2);
+            background: linear-gradient(to right, #85e77f, #b9e1c2);
         }
 
         .chat-message.user {
-            background: linear-gradient(to right, #c8e6c9, #a5d6a7);
+            background: linear-gradient(to right, #c8e6c9, #7ee482);
         }
 
         .chat-message.bot .sender,
         .chat-message.user .sender {
-            color: #0288d1;
+            color: hsl(131, 20%, 33%);
             font-weight: 600;
             font-size: 14px;
             margin-bottom: 5px;
@@ -175,7 +175,7 @@
         .chat-input textarea {
             width: 100%;
             padding: 12px;
-            border: 1px solid #d1d5db;
+            border: 1px solid #b8c6db;
             border-radius: 8px;
             resize: none;
             font-family: var(--default-font);
@@ -190,7 +190,7 @@
         }
 
         .chat-input button {
-            background: linear-gradient(to right, var(--accent-color), #5a6b43);
+            background: linear-gradient(to right, var(--accent-color), #5f7e65);
             color: var(--contrast-color);
             border: none;
             padding: 12px 24px;
@@ -215,7 +215,7 @@
         }
 
         .chat-input .mic-btn {
-            background: linear-gradient(to right, #0288d1, #0277bd);
+            background: linear-gradient(to right, #517958, #B5C99A);
             padding: 12px;
             border-radius: 50%;
             display: flex;
@@ -270,8 +270,8 @@
         }
 
         .event-type-btn {
-            background: linear-gradient(to right, #4caf50, #388e3c);
-            color: white;
+            background: linear-gradient(to right, #a3d4a4, #9dcfa0);
+            color: rgb(33, 44, 35);
             border: none;
             padding: 10px 20px;
             border-radius: 8px;
@@ -315,36 +315,18 @@
         </div>
     </div>
 
-    <!-- <main class="chat-container" data-aos="fade-up">
-        <h1 class="chat-title">Hỗ Trợ Tổ Chức Sự Kiện</h1>
-        <p class="chat-subtitle">MyEvent - Chuyên nghiệp & Sáng tạo</p>
-        <div class="chat-box" id="chat-box">
-            <div class="chat-message bot">
-                <span class="sender">MyEvent Bot</span>
-                Xin chào! Tôi là trợ lý hỗ trợ tổ chức sự kiện của bạn. Bạn đang cần hỗ trợ về loại sự kiện nào? Ví dụ:
-                hội nghị, đám cưới, khai trương, hoặc sự kiện ngoài trời.
-                <div class="timestamp"></div>
-            </div>
-        </div>
-        <div class="typing-indicator" id="typing-indicator">MyEvent Bot đang trả lời...</div>
-        <div class="chat-input">
-            <textarea rows="2" id="chat-input" placeholder="Nội dung bạn nhập sẽ hiển thị ở đây..."></textarea>
-            <button id="send-btn">Gửi</button>
-            <button class="mic-btn" id="mic-btn"><i class="bi bi-mic-fill"></i></button>
-        </div>
-    </main> -->
     <main class="chat-container" data-aos="fade-up">
         <h1 class="chat-title">Hỗ Trợ Tổ Chức Sự Kiện</h1>
         <p class="chat-subtitle">MyEvent - Chuyên nghiệp & Sáng tạo</p>
         <div class="chat-box" id="chat-box">
             <div class="chat-message bot">
-                <span class="sender">MyEvent Bot</span>
+                <span class="sender">MyEvent AI</span>
                 Xin chào! Tôi là trợ lý hỗ trợ tổ chức sự kiện của bạn. Bạn đang cần hỗ trợ về loại sự kiện nào?
                 Đây là các loại sự kiện mà công ty chúng tôi hỗ trợ. Bạn hãy cho tôi biết nhé!
                 <div class="timestamp"></div>
             </div>
         </div>
-        <div class="typing-indicator" id="typing-indicator">MyEvent Bot đang trả lời...</div>
+        <div class="typing-indicator" id="typing-indicator">MyEvent AI đang trả lời...</div>
         <div class="chat-input">
             <textarea rows="2" id="chat-input" placeholder="Nội dung bạn nhập sẽ hiển thị ở đây..."></textarea>
             <button id="send-btn">Gửi</button>

@@ -1,1116 +1,701 @@
-// Dữ liệu mẫu tĩnh
-const sampleContract = {
-    createdAt: "2025-05-04T00:00:00Z",
-    name: "Sự kiện Công ty ABC",
-    status: "Draft",
-    rental: {
-        rentalStartTime: "2025-05-01T00:00:00Z",
-        rentalEndTime: "2025-05-03T00:00:00Z",
-        totalPrice: 50000000,
-        devices: [
-            { id: 1, name: "Micro", description: "Micro chuyên dụng", hourlyRentalFee: 500000, quantity: 2, img: "device1.jpg" },
-            { id: 2, name: "Loa", description: "Loa công suất lớn", hourlyRentalFee: 1000000, quantity: 1, img: "device2.jpg" }
-        ],
-        humanResources: [
-            { id: 1, name: "MC", description: "MC chuyên nghiệp", hourlySalary: 2000000, quantity: 1, img: "hr1.jpg" }
-        ],
-        locations: [
-            { id: 1, name: "Hội trường A", address: "123 Đường ABC", description: "Hội trường 500 chỗ", hourlyRentalFee: 3000000, img: "location1.jpg" }
-        ],
-        timelines: [
-            { startTime: "2025-05-01T09:00:00Z", description: "Khai mạc sự kiện" },
-            { startTime: "2025-05-01T12:00:00Z", description: "Tiệc trưa" }
-        ],
-        user: { firstName: "Nguyễn", lastName: "Văn A", email: "nguyenvana@example.com" }
-    },
-    customer: { address: "456 Đường XYZ", phoneNumber: "0905123456", name: "Khách Hàng A" }
-};
 
-const contractDiffDate = dayjs(sampleContract.rental.rentalEndTime).diff(dayjs(sampleContract.rental.rentalStartTime), 'day') + 1;
+const BASE_URL = "http://localhost:8080/event-management";
+const CONTRACT_API_URL = `${BASE_URL}/api/contracts`;
+const RENTAL_API_URL = `${BASE_URL}/rentals`;
+const CUSTOMER_API_URL = `${BASE_URL}/customers`;
+const EVENT_API_URL = `${BASE_URL}/event`;
+const DEVICE_API_URL = `${BASE_URL}/devices`;
+const SERVICE_API_URL = `${BASE_URL}/services`;
+const LOCATION_API_URL = `${BASE_URL}/locations`;
+const USER_API_URL = `${BASE_URL}/users`;
+const DEVICE_RENTAL_API_URL = `${BASE_URL}/api/device-rentals`;
+const SERVICE_RENTAL_API_URL = `${BASE_URL}/api/service-rentals`;
+const LOCATION_RENTAL_API_URL = `${BASE_URL}/api/location-rentals`;
+const TIMELINE_API_URL = `${BASE_URL}/timelines`;
+const baseApiUrl = `${BASE_URL}/api/v1/FileUpload/files/`;
+const defaultImagePath = 'assets/img/default.jpg';
 
-// Hiển thị thông tin hợp đồng
-document.getElementById("contractName").textContent = sampleContract.name.toUpperCase();
-document.getElementById("startDate").textContent = dayjs(sampleContract.rental.rentalStartTime).format("DD/MM/YYYY");
-document.getElementById("endDate").textContent = dayjs(sampleContract.rental.rentalEndTime).format("DD/MM/YYYY");
-document.getElementById("totalPrice").textContent = formatCurrency(sampleContract.rental.totalPrice);
-document.getElementById("customerName").textContent = sampleContract.customer.name;
-document.getElementById("customerPhone").textContent = sampleContract.customer.phoneNumber;
-document.getElementById("customerAddress").textContent = sampleContract.customer.address;
+let devices = [];
+let services = [];
+let locations = [];
+let users = [];
+let currentContract = null;
 
-// Hiển thị trạng thái
-const statusTag = document.getElementById("contractStatus");
-statusTag.innerHTML = `<span class="ml-4"><span class="${getStatusClass(sampleContract.status)}">${getStatusText(sampleContract.status)}</span></span>`;
+function getToken() {
+    return localStorage.getItem("token");
+}
 
-// Hiển thị nút hành động dựa trên trạng thái
-const depositBtn = document.getElementById("depositBtn");
-const payBtn = document.getElementById("payBtn");
-const cancelBtn = document.getElementById("cancelBtn");
+function dinhDangTien(giaTri) {
+    return (giaTri || 0).toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+}
 
-if (sampleContract.status === "Draft") depositBtn.classList.remove("hidden");
-if (sampleContract.status === "WaitingPaid") payBtn.classList.remove("hidden");
-if (["DepositPaid", "InProgress"].includes(sampleContract.status)) cancelBtn.classList.remove("hidden");
+function formatDate(dateStr) {
+    if (!dateStr) return 'Chưa xác định';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return 'Chưa xác định';
+    return date.toLocaleDateString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+}
 
-// Tạo bảng thiết bị
-if (sampleContract.rental.devices.length > 0) {
-    const devicesTable = document.getElementById("devicesTable");
-    devicesTable.classList.remove("hidden");
-    devicesTable.innerHTML = `
-        <table>
-            <tr><th>Tên thiết bị</th><th>Hình ảnh</th><th>Mô tả</th><th>Số lượng</th><th>Đơn giá / ngày</th><th>Thành tiền</th></tr>
-            ${sampleContract.rental.devices.map(device => `
-                <tr>
+function formatDateTime(dateTimeStr) {
+    if (!dateTimeStr) return 'Chưa xác định';
+    const date = new Date(dateTimeStr);
+    if (isNaN(date.getTime())) return 'Chưa xác định';
+    return date.toLocaleString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+async function fetchData(url, method = "GET", data = null) {
+    const token = getToken();
+    const options = {
+        method: method,
+        headers: {
+            "Content-Type": "application/json",
+        }
+    };
+    if (token) options.headers["Authorization"] = `Bearer ${token}`;
+    if (data) options.body = JSON.stringify(data);
+
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error(`Lỗi API: ${response.status} - ${response.statusText}`);
+        return await response.json();
+    } catch (error) {
+        console.error(`Lỗi khi gọi API ${url}:`, error);
+        throw error;
+    }
+}
+
+async function loadInitialData() {
+    try {
+        const deviceResponse = await fetchData(`${DEVICE_API_URL}/list`);
+        devices = deviceResponse.data?.items || [];
+        console.log("device: ", devices);
+
+        const serviceResponse = await fetchData(`${SERVICE_API_URL}/list`);
+        services = serviceResponse.data?.items || [];
+
+        const locationResponse = await fetchData(`${LOCATION_API_URL}/list`);
+        locations = locationResponse.data?.items || [];
+    } catch (error) {
+        console.error('Lỗi khi tải dữ liệu ban đầu:', error.message);
+    }
+}
+
+function formatStatus(status) {
+    switch (status) {
+        case "Draft": return 'Bản nháp';
+        case "DepositPaid": return 'Đã đặt cọc';
+        case "InProgress": return 'Đang Thực Hiện';
+        case "WaitingPaid": return 'Chờ Thanh Toán';
+        case "Completed": return 'Đã Hoàn Thành';
+        case "Cancel": return 'Đã hủy';
+        case "AdminCancel": return 'Đã hủy bởi Admin';
+
+        // default: return '<span class="badge bg-secondary">Unknown</span>';
+    }
+}
+async function layChiTietHopDong(contractId) {
+    try {
+        var contract = await fetchData(`${CONTRACT_API_URL}/${contractId}`);
+        contract = contract.result;
+        if (!contract) throw new Error('Hợp đồng không tồn tại');
+
+        const rental = await fetchData(`${RENTAL_API_URL}/${contract.rentalId}`);
+        const event = await fetchData(`${EVENT_API_URL}/${rental.eventId}`);
+
+        var deviceRentals = await fetchData(`${DEVICE_RENTAL_API_URL}/rental/${rental.id}`);
+        deviceRentals = deviceRentals.result;
+        const devicesData = deviceRentals.map(rental => {
+
+            return {
+                quantity: rental.quantity,
+                name: rental?.deviceName || 'Không xác định',
+                hourly_salary: rental?.pricePerDay || 0,
+                image: rental?.image,
+                supplierName: rental.supplierName || 'Không xác định'
+            };
+        });
+
+        var serviceRentals = await fetchData(`${SERVICE_RENTAL_API_URL}/rental/${rental.id}`);
+        serviceRentals = serviceRentals.result;
+        const servicesData = serviceRentals.map(rental => {
+            return {
+                quantity: rental.quantity,
+                name: rental?.serviceName || 'Không xác định',
+                hourly_salary: rental?.pricePerDay || 0,
+                image: rental?.image,
+                supplierName: rental?.supplierName || 'Không xác định'
+            };
+        });
+
+        var locationRentals = await fetchData(`${LOCATION_RENTAL_API_URL}/rental/${rental.id}`);
+        locationRentals = locationRentals.result;
+        const locationsData = locationRentals.map(rental => {
+            return {
+                quantity: rental.quantity,
+                name: rental?.name || 'Không xác định',
+                hourly_rental_fee: rental?.hourly_rental_fee || 0,
+                image: rental?.image,
+                supplierName: rental?.supplierName || 'Không xác định',
+            };
+        });
+
+        var timelines = await fetchData(`${TIMELINE_API_URL}/rental/${rental.id}`);
+        timelines = timelines.data;
+        const timelinesData = timelines.map(timeline => ({
+            time_start: timeline.time_start,
+            description: timeline.description || 'Không có mô tả'
+        }));
+
+        const contractData = {
+            id: contract.id,
+            name: contract.name,
+            status: formatStatus(contract.status),
+            total_price: rental.totalPrice || 0,
+            rental_start_time: rental.rentalStartTime,
+            rental_end_time: rental.rentalEndTime,
+            customerName: contract.customerName || 'Không có thông tin',
+            customerPhone: contract.customerPhone || 'Không có thông tin',
+            customerAddress: contract.address || 'Không có thông tin',
+            eventName: event.name || 'Không xác định',
+            eventDescription: event.description || 'Không có mô tả',
+            devices: devicesData,
+            services: servicesData,
+            locations: locationsData,
+            timelines: timelinesData
+        };
+
+        return contractData;
+    } catch (error) {
+        console.error(`Lỗi khi lấy chi tiết hợp đồng ${contractId}:`, error.message);
+        alert(`Lỗi khi lấy chi tiết hợp đồng: ${error.message}`);
+        return null;
+    }
+}
+
+function hienThiChiTietHopDong(contract) {
+    if (!contract) {
+        document.getElementById("contractName").textContent = "Không tìm thấy hợp đồng";
+        return;
+    }
+    currentContract = contract;
+
+    document.getElementById("contractName").textContent = contract.name || "Không xác định";
+    document.getElementById("startDate").textContent = formatDate(contract.rental_start_time);
+    document.getElementById("endDate").textContent = formatDate(contract.rental_end_time);
+    document.getElementById("totalPrice").textContent = dinhDangTien(contract.total_price);
+    document.getElementById("status").textContent = contract.status || "Draft";
+    document.getElementById("customerName").textContent = contract.customerName;
+    document.getElementById("customerPhone").textContent = contract.customerPhone;
+    document.getElementById("customerAddress").textContent = contract.customerAddress;
+
+    const deviceTableBody = document.getElementById("deviceTableBody");
+    deviceTableBody.innerHTML = "";
+    if (contract.devices.length === 0) {
+        deviceTableBody.innerHTML = `<tr><td colspan="7" class="text-center">Không có thiết bị</td></tr>`;
+    } else {
+        contract.devices.forEach(device => {
+            const total = device.hourly_salary * device.quantity;
+            const imageUrl = device.image ? `${baseApiUrl}${device.image.split('/').pop()}` : defaultImagePath;
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                        <td><img src="${imageUrl}" alt="${device.name}" style="max-width: 50px;" onerror="this.src='${defaultImagePath}'"></td>
+                        <td>${device.name}</td>
+                        <td>${device.supplierName}</td>
+                        <td>${device.quantity}</td>
+                        <td>${dinhDangTien(device.hourly_salary)}</td>
+                        <td>${dinhDangTien(total)}</td>
+                    `;
+            deviceTableBody.appendChild(row);
+        });
+    }
+
+    const serviceTableBody = document.getElementById("serviceTableBody");
+    serviceTableBody.innerHTML = "";
+    if (contract.services.length === 0) {
+        serviceTableBody.innerHTML = `<tr><td colspan="7" class="text-center">Không có dịch vụ</td></tr>`;
+    } else {
+        contract.services.forEach(service => {
+            const total = service.hourly_salary * service.quantity;
+            const imageUrl = service.image ? `${baseApiUrl}${service.image.split('/').pop()}` : defaultImagePath;
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                        <td><img src="${imageUrl}" alt="${service.name}" style="max-width: 50px;" onerror="this.src='${defaultImagePath}'"></td>
+                        <td>${service.name}</td>
+                        <td>${service.supplierName}</td>
+                        <td>${service.quantity}</td>
+                        <td>${dinhDangTien(service.hourly_salary)}</td>
+                        <td>${dinhDangTien(total)}</td>
+                    `;
+            serviceTableBody.appendChild(row);
+        });
+    }
+
+    const locationTableBody = document.getElementById("locationTableBody");
+    locationTableBody.innerHTML = "";
+    if (contract.locations.length === 0) {
+        locationTableBody.innerHTML = `<tr><td colspan="8" class="text-center">Không có địa điểm</td></tr>`;
+    } else {
+        contract.locations.forEach(location => {
+            const startDate = new Date(contract.rental_start_time);
+            const endDate = new Date(contract.rental_end_time);
+            const diffTime = Math.abs(endDate - startDate);
+            const rentalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            const total = location.hourly_rental_fee * rentalDays;
+            const imageUrl = location.image ? `${baseApiUrl}${location.image.split('/').pop()}` : defaultImagePath;
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                        <td><img src="${imageUrl}" alt="${location.name}" style="max-width: 50px;" onerror="this.src='${defaultImagePath}'"></td>
+                        <td>${location.name}</td>
+                        <td>${location.supplierName}</td>
+                        <td>${formatDate(contract.rental_start_time)}</td>
+                        <td>${formatDate(contract.rental_end_time)}</td>
+                        <td>${rentalDays}</td>
+                        <td>${dinhDangTien(location.hourly_rental_fee)}</td>
+                        <td>${dinhDangTien(total)}</td>
+                    `;
+            locationTableBody.appendChild(row);
+        });
+    }
+
+    const timelineTableBody = document.getElementById("timelineTableBody");
+    timelineTableBody.innerHTML = "";
+    if (contract.timelines.length === 0) {
+        timelineTableBody.innerHTML = `<tr><td colspan="2" class="text-center">Không có lịch trình</td></tr>`;
+    } else {
+        contract.timelines.forEach(timeline => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                        <td>${formatDateTime(timeline.time_start)}</td>
+                        <td>${timeline.description}</td>
+                    `;
+            timelineTableBody.appendChild(row);
+        });
+    }
+
+    document.getElementById("draftDate").textContent = new Date().toLocaleDateString("vi-VN");
+    document.getElementById("draftCustomerName").textContent = contract.customerName;
+    document.getElementById("draftCustomerAddress").textContent = contract.customerAddress;
+    document.getElementById("draftCustomerPhone").textContent = contract.customerPhone;
+    document.getElementById("draftContractName").textContent = contract.name;
+    document.getElementById("draftStartDate").textContent = formatDate(contract.rental_start_time);
+    document.getElementById("draftEndDate").textContent = formatDate(contract.rental_end_time);
+    document.getElementById("draftLocation").textContent = contract.locations.length
+        ? contract.locations[0].name
+        : contract.customerAddress || "Không xác định";
+    document.getElementById("draftTotalPrice").textContent = dinhDangTien(contract.total_price);
+
+    const draftDeviceTableBody = document.getElementById("draftDeviceTableBody");
+    draftDeviceTableBody.innerHTML = "";
+    contract.devices.forEach((device, index) => {
+        const total = device.hourly_salary * device.quantity;
+        const row = document.createElement("tr");
+        row.innerHTML = `
+                    <td>${index + 1}</td>
                     <td>${device.name}</td>
-                    <td><img src="${device.img}" alt="device" width="50" height="50"></td>
-                    <td>${device.description}</td>
                     <td>${device.quantity}</td>
-                    <td>${formatCurrency(device.hourlyRentalFee)}</td>
-                    <td>${formatCurrency(device.hourlyRentalFee * device.quantity * contractDiffDate)}</td>
-                </tr>
-            `).join('')}
-            <tr><th colspan="5">Tổng chi phí</th><td>${formatCurrency(sampleContract.rental.devices.reduce((sum, d) => sum + (d.hourlyRentalFee * d.quantity * contractDiffDate), 0))}</td><td></td></tr>
-        </table>`;
-}
+                    <td>${dinhDangTien(device.hourly_salary)}</td>
+                    <td>${dinhDangTien(total)}</td>
+                `;
+        draftDeviceTableBody.appendChild(row);
+    });
 
-// Tạo bảng nhân lực
-if (sampleContract.rental.humanResources.length > 0) {
-    const humanResourcesTable = document.getElementById("humanResourcesTable");
-    humanResourcesTable.classList.remove("hidden");
-    humanResourcesTable.innerHTML = `
-        <table>
-            <tr><th>Tên loại hình</th><th>Hình ảnh</th><th>Mô tả</th><th>Số lượng</th><th>Đơn giá / ngày</th><th>Thành tiền</th></tr>
-            ${sampleContract.rental.humanResources.map(hr => `
-                <tr>
-                    <td>${hr.name}</td>
-                    <td><img src="${hr.img}" alt="hr" width="50" height="50"></td>
-                    <td>${hr.description}</td>
-                    <td>${hr.quantity}</td>
-                    <td>${formatCurrency(hr.hourlySalary)}</td>
-                    <td>${formatCurrency(hr.hourlySalary * hr.quantity * contractDiffDate)}</td>
-                </tr>
-            `).join('')}
-            <tr><th colspan="5">Tổng chi phí</th><td>${formatCurrency(sampleContract.rental.humanResources.reduce((sum, hr) => sum + (hr.hourlySalary * hr.quantity * contractDiffDate), 0))}</td><td></td></tr>
-        </table>`;
-}
+    const draftServiceTableBody = document.getElementById("draftServiceTableBody");
+    draftServiceTableBody.innerHTML = "";
+    contract.services.forEach((service, index) => {
+        const total = service.hourly_salary * service.quantity;
+        const row = document.createElement("tr");
+        row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${service.name}</td>
+                    <td>${service.quantity}</td>
+                    <td>${dinhDangTien(service.hourly_salary)}</td>
+                    <td>${dinhDangTien(total)}</td>
+                `;
+        draftServiceTableBody.appendChild(row);
+    });
 
-// Tạo bảng địa điểm
-if (sampleContract.rental.locations.length > 0) {
-    const locationsTable = document.getElementById("locationsTable");
-    locationsTable.classList.remove("hidden");
-    locationsTable.innerHTML = `
-        <table>
-            <tr><th>Tên địa điểm</th><th>Địa chỉ</th><th>Hình ảnh</th><th>Mô tả</th><th>Đơn giá / ngày</th><th>Thành tiền</th></tr>
-            ${sampleContract.rental.locations.map(location => `
-                <tr>
+    const draftLocationTableBody = document.getElementById("draftLocationTableBody");
+    draftLocationTableBody.innerHTML = "";
+    contract.locations.forEach((location, index) => {
+        const startDate = new Date(contract.rental_start_time);
+        const endDate = new Date(contract.rental_end_time);
+        const diffTime = Math.abs(endDate - startDate);
+        const rentalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        const total = location.hourly_rental_fee * rentalDays;
+        const row = document.createElement("tr");
+        row.innerHTML = `
+                    <td>${index + 1}</td>
                     <td>${location.name}</td>
-                    <td>${location.address}</td>
-                    <td><img src="${location.img}" alt="location" width="50" height="50"></td>
-                    <td>${location.description}</td>
-                    <td>${formatCurrency(location.hourlyRentalFee)}</td>
-                    <td>${formatCurrency(location.hourlyRentalFee * contractDiffDate)}</td>
-                </tr>
-            `).join('')}
-            <tr><th colspan="5">Tổng chi phí</th><td>${formatCurrency(sampleContract.rental.locations.reduce((sum, l) => sum + (l.hourlyRentalFee * contractDiffDate), 0))}</td><td></td></tr>
-        </table>`;
+                    <td>${location.supplierName}</td>
+                    <td>${formatDate(contract.rental_start_time)}</td>
+                    <td>${formatDate(contract.rental_end_time)}</td>
+                    <td>${rentalDays}</td>
+                    <td>${dinhDangTien(location.hourly_rental_fee)}</td>
+                    <td>${dinhDangTien(total)}</td>
+                `;
+        draftLocationTableBody.appendChild(row);
+    });
+
+    const draftTimelineTableBody = document.getElementById("draftTimelineTableBody");
+    draftTimelineTableBody.innerHTML = "";
+    contract.timelines.forEach((timeline, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${formatDateTime(timeline.time_start)}</td>
+                    <td>${timeline.description}</td>
+                `;
+        draftTimelineTableBody.appendChild(row);
+    });
 }
 
-// Hiển thị lịch trình nếu có
-if (sampleContract.rental.timelines.length > 0) {
-    const timelineSection = document.getElementById("timelineSection");
-    const timelineList = document.getElementById("timelineList");
-    timelineSection.style.display = "block";
-    timelineList.innerHTML = `
-        <ul class="list-disc pl-5">
-            ${sampleContract.rental.timelines.map(timeline => `
-                <li><strong>${dayjs(timeline.startTime).format("YYYY-MM-DD HH:mm")}</strong>: ${timeline.description}</li>
-            `).join('')}
-        </ul>`;
-}
-
-// Hàm định dạng tiền tệ
-function formatCurrency(amount) {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-}
-
-// Hàm lấy lớp CSS và văn bản trạng thái
-function getStatusClass(status) {
-    switch (status) {
-        case "Draft": return "bg-black text-white px-2 py-1 rounded";
-        case "Cancel": case "AdminCancel": return "bg-red-500 text-white px-2 py-1 rounded";
-        default: return "bg-green-600 text-white px-2 py-1 rounded";
-    }
-}
-
-function getStatusText(status) {
-    switch (status) {
-        case "Draft": return "Bản nháp";
-        case "Cancel": case "AdminCancel": return "Đã hủy";
-        default: return "Chính thức";
-    }
-}
-
-// Xử lý xem bản thảo hợp đồng và xuất file Word
-document.getElementById("viewContractBtn").addEventListener("click", () => {
-    const contractHtml = document.getElementById("contractHtml");
-    contractHtml.innerHTML = createEventContract(sampleContract);
-    contractHtml.classList.remove("hidden");
-
-    const ribbon = document.createElement("div");
-    ribbon.className = "ribbon relative";
-    const ribbonWrap = document.createElement("div");
-    ribbonWrap.className = "ribbon-wrap";
-    const ribbonText = document.createElement("div");
-    ribbonText.className = `ribbon-text ${getStatusClass(sampleContract.status)}`;
-    ribbonText.textContent = getStatusText(sampleContract.status);
-    ribbonWrap.appendChild(ribbonText);
-    ribbon.appendChild(ribbonWrap);
-    contractHtml.insertBefore(ribbon, contractHtml.firstChild);
-
-    // Thêm nút xuất file Word
-    const exportBtn = document.createElement("button");
-    exportBtn.textContent = "Xuất file Word";
-    exportBtn.className = "bg-blue-500 text-white px-4 py-2 rounded mt-2";
-    exportBtn.addEventListener("click", exportToWord);
-    contractHtml.appendChild(exportBtn);
-});
-
-// Hàm xuất file Word
-function exportToWord() {
-    const contract = sampleContract;
-    const dayDiff = dayjs(contract.rental.rentalEndTime).diff(dayjs(contract.rental.rentalStartTime), 'day') + 1;
-    const serviceDataCollection = contract.rental.services || [];
-
-    const doc = new docx.Document({
+function generateWordDocument() {
+    const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, BorderStyle } = docx;
+    const doc = new Document({
         sections: [
             {
                 properties: {},
                 children: [
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM",
-                                bold: true,
-                                font: "Times New Roman",
-                                size: 24,
-                                alignment: docx.AlignmentType.CENTER
-                            })
-                        ],
-                        spacing: { after: 100 }
+                    new Paragraph({
+                        children: [new TextRun({ text: "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM", bold: true, size: 28 })],
+                        alignment: "center",
                     }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "Độc lập - Tự do - Hạnh phúc",
-                                bold: true,
-                                underline: { type: docx.UnderlineType.SINGLE },
-                                font: "Times New Roman",
-                                size: 24,
-                                alignment: docx.AlignmentType.CENTER
-                            })
-                        ],
-                        spacing: { after: 400 }
+                    new Paragraph({
+                        children: [new TextRun({ text: "Độc lập - Tự do - Hạnh phúc", bold: true, underline: true, size: 24 })],
+                        alignment: "center",
+                        spacing: { after: 200 },
                     }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "HỢP ĐỒNG DỊCH VỤ",
-                                bold: true,
-                                font: "Times New Roman",
-                                size: 24,
-                                alignment: docx.AlignmentType.CENTER
-                            })
-                        ],
-                        spacing: { before: 200, after: 800 }
+                    new Paragraph({
+                        children: [new TextRun({ text: "HỢP ĐỒNG DỊCH VỤ", bold: true, size: 32 })],
+                        alignment: "center",
+                        spacing: { after: 300 },
                     }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "- Căn cứ Bộ luật dân sự 2015;",
-                                italics: true,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ]
+                    new Paragraph({ children: [new TextRun({ text: `- Căn cứ Bộ luật dân sự 2015;`, italics: true })] }),
+                    new Paragraph({ children: [new TextRun({ text: `- Căn cứ sự thỏa thuận của 2 bên;`, italics: true })] }),
+                    new Paragraph({
+                        children: [new TextRun({ text: `Hôm nay, ngày ${document.getElementById("draftDate").textContent}, chúng tôi gồm:` })],
+                        spacing: { after: 200 },
                     }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "- Căn cứ sự thỏa thuận của 2 bên",
-                                italics: true,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { after: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `Hôm nay, ngày ${dayjs(contract.createdAt).format('DD/MM/YYYY')} chúng tôi gồm:`,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { after: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "BÊN THUÊ DỊCH VỤ (sau đây gọi là Bên A)",
-                                bold: true,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { before: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `TÊN: Ông/Bà ${contract.rental.user.firstName} ${contract.rental.user.lastName}`,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ]
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `ĐỊA CHỈ: ${contract.customer.address}`,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ]
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `SỐ ĐIỆN THOẠI: ${contract.customer.phoneNumber}`,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ]
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `EMAIL: ${contract.rental.user.email}`,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { after: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "BÊN CHO THUÊ DỊCH VỤ (sau đây gọi là Bên B)",
-                                bold: true,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { before: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `TÊN CÔNG TY: CÔNG TY TRÁCH NHIỆM HỮU HẠN DỊCH VỤ CAMILLE`,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ]
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `ĐẠI DIỆN: Ông/Bà NGUYỄN VĂN A - Chức danh: GIÁM ĐỐC`,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ]
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `ĐỊA CHỈ: 385 Hải Phòng, Phường Tân Chính, Quận Thanh Khê, Thành phố Đà Nẵng`,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ]
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `SỐ ĐIỆN THOẠI: +8432454783`,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ]
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `EMAIL: camille.event@gmail.com`,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { after: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "Hai bên thỏa thuận ký kết hợp đồng này với các điều khoản sau:",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { before: 200, after: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "ĐIỀU 1: NỘI DUNG DỊCH VỤ THỰC HIỆN",
-                                bold: true,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { before: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "Bên B cam kết lên kế hoạch và tổ chức sự kiện cho bên A theo bảng danh mục bên dưới.",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ]
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `Tên sự kiện: ${contract.name}`,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ]
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `Thời gian thực hiện: Từ ngày ${dayjs(contract.rental.rentalStartTime).format('DD/MM/YYYY')} đến ngày ${dayjs(contract.rental.rentalEndTime).format('DD/MM/YYYY')}`,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ]
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `Địa điểm: ${contract.rental.locations.length ? `${contract.rental.locations[0].name} - ${contract.rental.locations[0].address}` : contract.customer.address}`,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { after: 200 }
-                    }),
-                    // Service Table
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "Bảng danh mục các dịch vụ kèm theo của sự kiện",
-                                bold: true,
-                                font: "Times New Roman",
-                                size: 24,
-                                alignment: docx.AlignmentType.CENTER
-                            })
-                        ],
-                        spacing: { before: 200, after: 100 }
-                    }),
-                    new docx.Table({
-                        width: { size: 100, type: docx.WidthType.PERCENTAGE },
-                        borders: {
-                            top: { style: docx.BorderStyle.SINGLE, size: 1 },
-                            bottom: { style: docx.BorderStyle.SINGLE, size: 1 },
-                            left: { style: docx.BorderStyle.SINGLE, size: 1 },
-                            right: { style: docx.BorderStyle.SINGLE, size: 1 },
-                            insideHorizontal: { style: docx.BorderStyle.SINGLE, size: 1 },
-                            insideVertical: { style: docx.BorderStyle.SINGLE, size: 1 }
-                        },
+                    new Paragraph({ children: [new TextRun({ text: "BÊN THUÊ DỊCH VỤ (sau đây gọi là Bên A)", bold: true })] }),
+                    new Paragraph({ children: [new TextRun({ text: `TÊN: ${document.getElementById("draftCustomerName").textContent}` })] }),
+                    new Paragraph({ children: [new TextRun({ text: `ĐỊA CHỈ: ${document.getElementById("draftCustomerAddress").textContent}` })] }),
+                    new Paragraph({ children: [new TextRun({ text: `SỐ ĐIỆN THOẠI: ${document.getElementById("draftCustomerPhone").textContent}` })] }),
+                    new Paragraph({ children: [new TextRun({ text: "BÊN CHO THUÊ DỊCH VỤ (sau đây gọi là Bên B)", bold: true })] }),
+                    new Paragraph({ children: [new TextRun({ text: "TÊN CÔNG TY: CÔNG TY TNHH DỊCH VỤ MYEVENT" })] }),
+                    new Paragraph({ children: [new TextRun({ text: "ĐẠI DIỆN:  Ông/Bà Huyền Hạnh Minh Trinh Long" })] }),
+                    new Paragraph({ children: [new TextRun({ text: "CHỨC DANH: GIÁM ĐỐC" })] }),
+                    new Paragraph({ children: [new TextRun({ text: "ĐỊA CHỈ: K384 Điện Biên Phủ, Phường Thanh Khê Đông, Quận Thanh Khê, Thành phố Đà Nẵng" })] }),
+                    new Paragraph({ children: [new TextRun({ text: "SỐ ĐIỆN THOẠI: 0819901400" })] }),
+                    new Paragraph({ children: [new TextRun({ text: "Hai bên thỏa thuận ký kết hợp đồng này với các điều khoản sau:" })] }),
+                    new Paragraph({ children: [new TextRun({ text: "Điều 1: Nội dung dịch vụ thực hiện", bold: true, allCaps: true })] }),
+                    new Paragraph({ children: [new TextRun({ text: "Bên B cam kết lên kế hoạch và tổ chức sự kiện cho Bên A theo bảng danh mục bên dưới." })] }),
+                    new Paragraph({ children: [new TextRun({ text: `Tên sự kiện: ${document.getElementById("draftContractName").textContent}` })] }),
+                    new Paragraph({ children: [new TextRun({ text: `Thời gian thực hiện: Từ ngày ${document.getElementById("draftStartDate").textContent} đến ngày ${document.getElementById("draftEndDate").textContent}` })] }),
+                    new Paragraph({ children: [new TextRun({ text: `Địa điểm: ${document.getElementById("draftLocation").textContent}` })] }),
+                    new Paragraph({ children: [new TextRun({ text: "Bảng danh mục thiết bị", bold: true })], alignment: "center" }),
+                    new Table({
                         rows: [
-                            new docx.TableRow({
+                            new TableRow({
                                 children: [
-                                    new docx.TableCell({
-                                        children: [new docx.Paragraph({ text: "STT", alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                        verticalAlign: docx.VerticalAlign.CENTER
-                                    }),
-                                    new docx.TableCell({
-                                        children: [new docx.Paragraph({ text: "Tên dịch vụ", alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                        verticalAlign: docx.VerticalAlign.CENTER
-                                    }),
-                                    new docx.TableCell({
-                                        children: [new docx.Paragraph({ text: "Mô tả", alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                        verticalAlign: docx.VerticalAlign.CENTER
-                                    }),
-                                    new docx.TableCell({
-                                        children: [new docx.Paragraph({ text: "Số lượng", alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                        verticalAlign: docx.VerticalAlign.CENTER
-                                    }),
-                                    new docx.TableCell({
-                                        children: [new docx.Paragraph({ text: "Đơn giá / ngày", alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                        verticalAlign: docx.VerticalAlign.CENTER
-                                    }),
-                                    new docx.TableCell({
-                                        children: [new docx.Paragraph({ text: "Thành tiền", alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                        verticalAlign: docx.VerticalAlign.CENTER
-                                    }),
-                                    new docx.TableCell({
-                                        children: [new docx.Paragraph({ text: "Đơn vị tiền", alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                        verticalAlign: docx.VerticalAlign.CENTER
-                                    })
-                                ]
+                                    new TableCell({ children: [new Paragraph("STT")] }),
+                                    new TableCell({ children: [new Paragraph("Tên thiết bị")] }),
+                                    new TableCell({ children: [new Paragraph("Số lượng")] }),
+                                    new TableCell({ children: [new Paragraph("Đơn giá")] }),
+                                    new TableCell({ children: [new Paragraph("Thành tiền")] }),
+                                ],
                             }),
-                            ...serviceDataCollection.map((item, index) => new docx.TableRow({
-                                children: [
-                                    new docx.TableCell({
-                                        children: [new docx.Paragraph({ text: `${index + 1}`, alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                        verticalAlign: docx.VerticalAlign.CENTER
-                                    }),
-                                    new docx.TableCell({
-                                        children: [new docx.Paragraph({ text: item.name, alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                        verticalAlign: docx.VerticalAlign.CENTER
-                                    }),
-                                    new docx.TableCell({
-                                        children: [new docx.Paragraph({ text: item.description, alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                        verticalAlign: docx.VerticalAlign.CENTER
-                                    }),
-                                    new docx.TableCell({
-                                        children: [new docx.Paragraph({ text: `${item.quantity}`, alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                        verticalAlign: docx.VerticalAlign.CENTER
-                                    }),
-                                    new docx.TableCell({
-                                        children: [new docx.Paragraph({ text: formatCurrency(item.price), alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                        verticalAlign: docx.VerticalAlign.CENTER
-                                    }),
-                                    new docx.TableCell({
-                                        children: [new docx.Paragraph({ text: formatCurrency(item.price * item.quantity * dayDiff), alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                        verticalAlign: docx.VerticalAlign.CENTER
-                                    }),
-                                    new docx.TableCell({
-                                        children: [new docx.Paragraph({ text: "VNĐ", alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                        verticalAlign: docx.VerticalAlign.CENTER
-                                    })
-                                ]
-                            })),
-                            new docx.TableRow({
-                                children: [
-                                    new docx.TableCell({
-                                        children: [new docx.Paragraph({ text: "TỔNG CHI PHÍ", bold: true, alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                        columnSpan: 5,
-                                        verticalAlign: docx.VerticalAlign.CENTER
-                                    }),
-                                    new docx.TableCell({
-                                        children: [new docx.Paragraph({ text: formatCurrency(contract.rental.totalPrice), alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                        verticalAlign: docx.VerticalAlign.CENTER
-                                    }),
-                                    new docx.TableCell({
-                                        children: [new docx.Paragraph({ text: "VNĐ", alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                        verticalAlign: docx.VerticalAlign.CENTER
-                                    })
-                                ]
-                            })
-                        ]
-                    }),
-                    // Timeline Table (if exists)
-                    ...(contract.rental.timelines.length ? [
-                        new docx.Paragraph({
-                            children: [
-                                new docx.TextRun({
-                                    text: "Bảng lịch trình dự kiến sự kiện",
-                                    bold: true,
-                                    font: "Times New Roman",
-                                    size: 24,
-                                    alignment: docx.AlignmentType.CENTER
-                                })
-                            ],
-                            spacing: { before: 400, after: 100 }
-                        }),
-                        new docx.Table({
-                            width: { size: 100, type: docx.WidthType.PERCENTAGE },
-                            borders: {
-                                top: { style: docx.BorderStyle.SINGLE, size: 1 },
-                                bottom: { style: docx.BorderStyle.SINGLE, size: 1 },
-                                left: { style: docx.BorderStyle.SINGLE, size: 1 },
-                                right: { style: docx.BorderStyle.SINGLE, size: 1 },
-                                insideHorizontal: { style: docx.BorderStyle.SINGLE, size: 1 },
-                                insideVertical: { style: docx.BorderStyle.SINGLE, size: 1 }
-                            },
-                            rows: [
-                                new docx.TableRow({
+                            ...Array.from(document.getElementById("draftDeviceTableBody").children).map((row, index) => {
+                                const cells = row.children;
+                                return new TableRow({
                                     children: [
-                                        new docx.TableCell({
-                                            children: [new docx.Paragraph({ text: "STT", alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                            verticalAlign: docx.VerticalAlign.CENTER
-                                        }),
-                                        new docx.TableCell({
-                                            children: [new docx.Paragraph({ text: "Thời gian", alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                            verticalAlign: docx.VerticalAlign.CENTER
-                                        }),
-                                        new docx.TableCell({
-                                            children: [new docx.Paragraph({ text: "Mô tả", alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                            verticalAlign: docx.VerticalAlign.CENTER
-                                        })
-                                    ]
-                                }),
-                                ...contract.rental.timelines.map((item, index) => new docx.TableRow({
+                                        new TableCell({ children: [new Paragraph(`${index + 1}`)] }),
+                                        new TableCell({ children: [new Paragraph(cells[1].textContent)] }),
+                                        new TableCell({ children: [new Paragraph(cells[2].textContent)] }),
+                                        new TableCell({ children: [new Paragraph(cells[3].textContent)] }),
+                                        new TableCell({ children: [new Paragraph(cells[4].textContent)] }),
+                                    ],
+                                });
+                            }),
+                        ],
+                        width: { size: 100, type: WidthType.PERCENTAGE },
+                        borders: {
+                            top: { style: BorderStyle.SINGLE, size: 1 },
+                            bottom: { style: BorderStyle.SINGLE, size: 1 },
+                            left: { style: BorderStyle.SINGLE, size: 1 },
+                            right: { style: BorderStyle.SINGLE, size: 1 },
+                            insideHorizontal: { style: BorderStyle.SINGLE, size: 1 },
+                            insideVertical: { style: BorderStyle.SINGLE, size: 1 },
+                        },
+                    }),
+                    new Paragraph({ children: [new TextRun({ text: "Bảng danh mục dịch vụ", bold: true })], alignment: "center" }),
+                    new Table({
+                        rows: [
+                            new TableRow({
+                                children: [
+                                    new TableCell({ children: [new Paragraph("STT")] }),
+                                    new TableCell({ children: [new Paragraph("Tên dịch vụ")] }),
+                                    new TableCell({ children: [new Paragraph("Số lượng")] }),
+                                    new TableCell({ children: [new Paragraph("Đơn giá")] }),
+                                    new TableCell({ children: [new Paragraph("Thành tiền")] }),
+                                ],
+                            }),
+                            ...Array.from(document.getElementById("draftServiceTableBody").children).map((row, index) => {
+                                const cells = row.children;
+                                return new TableRow({
                                     children: [
-                                        new docx.TableCell({
-                                            children: [new docx.Paragraph({ text: `${index + 1}`, alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                            verticalAlign: docx.VerticalAlign.CENTER
-                                        }),
-                                        new docx.TableCell({
-                                            children: [new docx.Paragraph({ text: dayjs(item.startTime).format('YYYY-MM-DD HH:mm'), alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                            verticalAlign: docx.VerticalAlign.CENTER
-                                        }),
-                                        new docx.TableCell({
-                                            children: [new docx.Paragraph({ text: item.description, alignment: docx.AlignmentType.CENTER, style: { font: "Times New Roman", size: 24 } })],
-                                            verticalAlign: docx.VerticalAlign.CENTER
-                                        })
-                                    ]
-                                }))
-                            ]
-                        })
-                    ] : []),
-                    // Article 2
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "ĐIỀU 2: GIÁ TRỊ DỊCH VỤ – PHƯƠNG THỨC THANH TOÁN",
-                                bold: true,
-                                font: "Times New Roman",
-                                size: 24
-                            })
+                                        new TableCell({ children: [new Paragraph(`${index + 1}`)] }),
+                                        new TableCell({ children: [new Paragraph(cells[1].textContent)] }),
+                                        new TableCell({ children: [new Paragraph(cells[2].textContent)] }),
+                                        new TableCell({ children: [new Paragraph(cells[3].textContent)] }),
+                                        new TableCell({ children: [new Paragraph(cells[4].textContent)] }),
+                                    ],
+                                });
+                            }),
                         ],
-                        spacing: { before: 400 }
+                        width: { size: 100, type: WidthType.PERCENTAGE },
+                        borders: {
+                            top: { style: BorderStyle.SINGLE, size: 1 },
+                            bottom: { style: BorderStyle.SINGLE, size: 1 },
+                            left: { style: BorderStyle.SINGLE, size: 1 },
+                            right: { style: BorderStyle.SINGLE, size: 1 },
+                            insideHorizontal: { style: BorderStyle.SINGLE, size: 1 },
+                            insideVertical: { style: BorderStyle.SINGLE, size: 1 },
+                        },
                     }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `2.1 Giá trị dịch vụ: ${formatCurrency(contract.rental.totalPrice)} VNĐ`,
-                                font: "Times New Roman",
-                                size: 24
-                            })
+                    new Paragraph({ children: [new TextRun({ text: "Bảng danh mục địa điểm", bold: true })], alignment: "center" }),
+                    new Table({
+                        rows: [
+                            new TableRow({
+                                children: [
+                                    new TableCell({ children: [new Paragraph("STT")] }),
+                                    new TableCell({ children: [new Paragraph("Tên địa điểm")] }),
+                                    new TableCell({ children: [new Paragraph("Nhà cung cấp")] }),
+                                    new TableCell({ children: [new Paragraph("Từ ngày")] }),
+                                    new TableCell({ children: [new Paragraph("Đến ngày")] }),
+                                    new TableCell({ children: [new Paragraph("Số ngày thuê")] }),
+                                    new TableCell({ children: [new Paragraph("Đơn giá/Ngày")] }),
+                                    new TableCell({ children: [new Paragraph("Thành tiền")] }),
+                                ],
+                            }),
+                            ...Array.from(document.getElementById("draftLocationTableBody").children).map((row, index) => {
+                                const cells = row.children;
+                                return new TableRow({
+                                    children: [
+                                        new TableCell({ children: [new Paragraph(`${index + 1}`)] }),
+                                        new TableCell({ children: [new Paragraph(cells[1].textContent)] }),
+                                        new TableCell({ children: [new Paragraph(cells[2].textContent)] }),
+                                        new TableCell({ children: [new Paragraph(cells[3].textContent)] }),
+                                        new TableCell({ children: [new Paragraph(cells[4].textContent)] }),
+                                        new TableCell({ children: [new Paragraph(cells[5].textContent)] }),
+                                        new TableCell({ children: [new Paragraph(cells[6].textContent)] }),
+                                        new TableCell({ children: [new Paragraph(cells[7].textContent)] }),
+                                    ],
+                                });
+                            }),
                         ],
-                        spacing: { before: 100 }
+                        width: { size: 100, type: WidthType.PERCENTAGE },
+                        borders: {
+                            top: { style: BorderStyle.SINGLE, size: 1 },
+                            bottom: { style: BorderStyle.SINGLE, size: 1 },
+                            left: { style: BorderStyle.SINGLE, size: 1 },
+                            right: { style: BorderStyle.SINGLE, size: 1 },
+                            insideHorizontal: { style: BorderStyle.SINGLE, size: 1 },
+                            insideVertical: { style: BorderStyle.SINGLE, size: 1 },
+                        },
                     }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "2.2 Ngay khi bên B thực hiện cung cấp dịch vụ theo quy định của Điều 1, hai bên sẽ thống nhất và ký kết biên bản thanh lý hợp đồng trong đó có ghi rõ những hạng mục còn thiếu hoặc phát sinh (nếu có). Việc bỏ bớt hoặc bổ sung hạng mục (nếu có) phải được Bên A chấp thuận trước bằng văn bản, giá trị dịch vụ ghi trong biên bản thanh lý hợp đồng sẽ là giá trị thanh toán cuối cùng",
-                                font: "Times New Roman",
-                                size: 24
-                            })
+                    new Paragraph({ children: [new TextRun({ text: "Bảng lịch trình dự kiến sự kiện", bold: true })], alignment: "center" }),
+                    new Table({
+                        rows: [
+                            new TableRow({
+                                children: [
+                                    new TableCell({ children: [new Paragraph("STT")] }),
+                                    new TableCell({ children: [new Paragraph("Thời gian")] }),
+                                    new TableCell({ children: [new Paragraph("Mô tả")] }),
+                                ],
+                            }),
+                            ...Array.from(document.getElementById("draftTimelineTableBody").children).map((row, index) => {
+                                const cells = row.children;
+                                return new TableRow({
+                                    children: [
+                                        new TableCell({ children: [new Paragraph(`${index + 1}`)] }),
+                                        new TableCell({ children: [new Paragraph(cells[1].textContent)] }),
+                                        new TableCell({ children: [new Paragraph(cells[2].textContent)] }),
+                                    ],
+                                });
+                            }),
                         ],
-                        spacing: { before: 100 }
+                        width: { size: 100, type: WidthType.PERCENTAGE },
+                        borders: {
+                            top: { style: BorderStyle.SINGLE, size: 1 },
+                            bottom: { style: BorderStyle.SINGLE, size: 1 },
+                            left: { style: BorderStyle.SINGLE, size: 1 },
+                            right: { style: BorderStyle.SINGLE, size: 1 },
+                            insideHorizontal: { style: BorderStyle.SINGLE, size: 1 },
+                            insideVertical: { style: BorderStyle.SINGLE, size: 1 },
+                        },
                     }),
-                    new docx.Paragraph({
+                    new Paragraph({ children: [new TextRun({ text: "Điều 2: Giá trị dịch vụ – Phương thức thanh toán", bold: true, allCaps: true })] }),
+                    new Paragraph({ children: [new TextRun({ text: `2.1 Giá trị dịch vụ: ${document.getElementById("draftTotalPrice").textContent}` })] }),
+                    new Paragraph({ children: [new TextRun({ text: "2.2 Phương thức thanh toán: Thanh toán bằng tiền mặt hoặc chuyển khoản." })] }),
+                    new Paragraph({ children: [new TextRun({ text: "- Bên A thực hiện đặt cọc 30% giá trị hợp đồng." })] }),
+                    new Paragraph({ children: [new TextRun({ text: "- Bên A thanh toán 100% giá trị dịch vụ trong 5 ngày làm việc." })] }),
+                    new Paragraph({ children: [new TextRun({ text: "Điều 3: Thời hạn thỏa thuận", bold: true, allCaps: true })] }),
+                    new Paragraph({ children: [new TextRun({ text: "Thời gian hiệu lực hợp đồng: Từ khi ký kết đến khi thanh toán hợp đồng." })] }),
+                    new Paragraph({
                         children: [
-                            new docx.TextRun({
-                                text: "2.3 Phương thức thanh toán: (Thanh toán bằng tiền mặt hoặc chuyển khoản)",
-                                font: "Times New Roman",
-                                size: 24
-                            })
+                            new TextRun({ text: "ĐẠI DIỆN BÊN A", bold: true, allCaps: true }),
+                            new TextRun({ text: "                          " }),
+                            new TextRun({ text: "ĐẠI DIỆN BÊN B", bold: true, allCaps: true }),
                         ],
-                        spacing: { before: 100 }
+                        spacing: { before: 600 },
                     }),
-                    new docx.Paragraph({
+                    new Paragraph({
                         children: [
-                            new docx.TextRun({
-                                text: "- Bên A thực hiện đặt cọc 30% giá trị hợp đồng cho bên B.",
-                                font: "Times New Roman",
-                                size: 24
-                            })
+                            new TextRun({ text: "(Ký tên, đóng dấu)", italics: true }),
+                            new TextRun({ text: "                          " }),
+                            new TextRun({ text: "(Ký tên, đóng dấu)", italics: true }),
                         ],
-                        indent: { left: 200 }
                     }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "- Bên A sẽ thanh toán bằng tiền mặt hoặc chuyển khoản cho bên B 100% phần giá trị dịch vụ kể trên và phát sinh (nếu có) căn cứ trên Biên bản thanh lý hợp đồng trong thời gian 5 ngày làm việc kể từ khi kết thúc thời gian thực hiện chương trình và bên A nhận được biên bản thanh lý hợp đồng và hóa đơn tài chính hợp pháp của bên B.",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        indent: { left: 200 },
-                        spacing: { after: 200 }
-                    }),
-                    // Article 3
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "ĐIỀU 3: THỜI HẠN THỎA THUẬN",
-                                bold: true,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { before: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "3.1 Thời gian hiệu lực hợp đồng: Bắt đầu từ khi bản hợp đồng này được ký kết đến khi thanh toán hợp đồng kèm theo biên bản thanh lý hợp đồng này.",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { before: 100 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "3.2 Trong trường hợp hết thời gian hiệu lực ghi trong hợp đồng mà bên A chưa thanh toán dứt điểm các khoản tiền liên quan đến hợp đồng này thì thời gian hiệu lực của hợp đồng sẽ mặc nhiên được gia hạn cho đến khi các khoản tiền được thanh toán dứt điểm cho bên B và hợp đồng này mặc nhiên được cả hai bên A và B coi như đã được thanh lý.",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { before: 100 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "3.3 Trường hợp một trong hai bên vi phạm bất kỳ điều khoản nào trong bản hợp đồng này hoặc các phụ lục hoặc văn bản bổ sung đính kèm có liên quan đến hợp đồng này thì bên bị vi phạm được quyền chấm dứt trước thời hạn. Bên vi phạm phải bồi thường cho bên bị vi phạm những thiệt hại do việc vi phạm này của mình gây ra.",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { before: 100, after: 200 }
-                    }),
-                    // Article 4
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "ĐIỀU 4: QUYỀN LỢI VÀ NGHĨA VỤ CỦA BÊN A",
-                                bold: true,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { before: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "4.1 Quyền lợi của bên A:",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { before: 100 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "- Nhận được dịch vụ tốt nhất và đầy đủ nhất do bên B cung cấp.",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        indent: { left: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "- Quản lý và giám sát các hoạt động do bên B cung cấp và thực hiện.",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        indent: { left: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "4.2 Nghĩa vụ của bên A:",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { before: 100 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "- Thanh toán cho bên B theo như thỏa thuận tại điều 2.",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        indent: { left: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "- Phối hợp với bên B giải quyết các vấn đề phát sinh xảy ra trong chương trình thuộc về trách nhiệm của bên A.",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        indent: { left: 200 },
-                        spacing: { after: 200 }
-                    }),
-                    // Article 5
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "ĐIỀU 5: QUYỀN LỢI VÀ NGHĨA VỤ CỦA BÊN B",
-                                bold: true,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { before: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "5.1 Quyền lợi của bên B:",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { before: 100 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "- Nhận được đầy đủ thanh toán của bên A như điều 2.",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        indent: { left: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "5.2 Nghĩa vụ của bên B:",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { before: 100 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "- Bảo đảm tuyển dụng, cung cấp cho bên A các hạng mục đã nêu với số lượng, chất lượng như yêu cầu.",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        indent: { left: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "- Trong quá trình diễn ra chương trình, Bên B cam kết sẽ trực tiếp theo dõi, giám sát, ghi chép và chụp hình lại trong biên bản nghiệm thu bàn giao cho Bên A.",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        indent: { left: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "- Cung cấp hóa đơn tài chính hợp pháp đối với dịch vụ cung cấp theo hợp đồng này và các hạng mục phát sinh được bên A chấp thuận (nếu có).",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        indent: { left: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "- Phối hợp với bên A giải quyết các vấn đề phát sinh xảy ra trong chương trình thuộc về trách nhiệm của bên B.",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        indent: { left: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "- Bên B sẽ không chịu trách nhiệm về những dịch vụ nào khác ngoài nội dung và Bảng danh mục dịch vụ.",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        indent: { left: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "- Bên B cam kết không cung cấp và tiết lộ bất kỳ thông tin nào liên quan trực tiếp hay gián tiếp đến sản phẩm của Bên A cũng như các nội dung khác cho bất kỳ bên thứ ba nào mà không có sự đồng ý trước của Bên A bằng văn bản.",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        indent: { left: 200 },
-                        spacing: { after: 200 }
-                    }),
-                    // Article 6
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "ĐIỀU 6: GIẢI QUYẾT TRANH CHẤP",
-                                bold: true,
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { before: 200 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "Mọi tranh chấp liên quan đến Hợp đồng này trước hết sẽ được giải quyết thông qua thương lượng và hòa giải giữa các bên. Nếu tranh chấp không giải quyết được thông qua hòa giải thì các bên nhất trí rằng một trong các bên có quyền đưa ra giải quyết tại Tòa án có thẩm quyền.",
-                                font: "Times New Roman",
-                                size: 24
-                            })
-                        ],
-                        spacing: { before: 100, after: 400 }
-                    }),
-                    // Signatures
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "ĐẠI DIỆN BÊN A                              ĐẠI DIỆN BÊN B",
-                                bold: true,
-                                font: "Times New Roman",
-                                size: 24,
-                                alignment: docx.AlignmentType.CENTER
-                            })
-                        ],
-                        spacing: { before: 800 }
-                    }),
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "(Ký tên, đóng dấu)                          (Ký tên, đóng dấu)",
-                                italics: true,
-                                font: "Times New Roman",
-                                size: 24,
-                                alignment: docx.AlignmentType.CENTER
-                            })
-                        ]
-                    })
-                ]
-            }
-        ]
+                ],
+            },
+        ],
     });
-
-    docx.Packer.toBlob(doc).then(blob => {
-        saveAs(blob, "hop_dong.docx");
-    });
+    Packer.toBlob(doc)
+        .then((blob) => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `HopDongDichVu_${currentContract.id}.docx`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        })
+        .catch((error) => {
+            alert(`Lỗi khi tạo file Word: ${error.message}`);
+        });
 }
 
-// Xử lý tải lên bản hợp đồng đã ký
-document.getElementById("uploadSignedContract").addEventListener("change", (event) => {
-    const file = event.target.files[0];
-    if (file) {
-        const preview = document.getElementById("uploadedContractPreview");
-        preview.innerHTML = '';
+async function uploadFile(file, contractId) {
+    try {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("contractId", contractId);
 
-        if (file.type.startsWith("image/")) {
-            const img = document.createElement("img");
-            img.src = URL.createObjectURL(file);
-            preview.appendChild(img);
-        } else if (file.type === "application/pdf") {
-            const embed = document.createElement("embed");
-            embed.src = URL.createObjectURL(file);
-            embed.width = "100%";
-            embed.height = "500px";
-            preview.appendChild(embed);
-        }
+        const response = await fetch(`${BASE_URL}/api/files/upload`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${getToken()}`,
+            },
+            body: formData,
+        });
+
+        if (!response.ok) throw new Error(`Tải lên thất bại: ${response.statusText}`);
+        const result = await response.json();
+        console.log("Tải lên file thành công:", result);
+        return result;
+    } catch (error) {
+        console.error(`Lỗi khi tải lên file: ${error.message}`);
+        throw error;
     }
-});
-
-// Hàm tạo HTML hợp đồng
-function createEventContract(contract) {
-    const serviceDataCollection = [];
-    const dayDiff = contractDiffDate;
-
-    contract.rental.devices.forEach(device => {
-        serviceDataCollection.push({
-            id: device.id,
-            name: device.name,
-            description: device.description,
-            price: device.hourlyRentalFee,
-            quantity: device.quantity,
-            img: device.img
-        });
-    });
-
-    contract.rental.humanResources.forEach(hr => {
-        serviceDataCollection.push({
-            id: hr.id,
-            name: hr.name,
-            description: hr.description,
-            price: hr.hourlySalary,
-            quantity: hr.quantity,
-            img: hr.img
-        });
-    });
-
-    contract.rental.locations.forEach(location => {
-        serviceDataCollection.push({
-            id: location.id,
-            name: `Địa điểm tổ chức sự kiện`,
-            description: `${location.name} - ${location.address}: ${location.description}`,
-            price: location.hourlyRentalFee,
-            quantity: 1
-        });
-    });
-
-    return `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-            <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
-            <style type="text/css">
-                div, p, b, i, u, li, th, td {
-                    font-family: "Times New Roman";
-                    font-size: 12pt;
-                    margin: 0;
-                    color: #000 !important;
-                }
-                .service-table {
-                    margin-top: 20px;
-                }
-                .service-table table {
-                    width: 100%;
-                    border: solid 1px #ccc;
-                    padding: 10px;
-                }
-                .service-table table tr td {
-                    border: solid 1px #ccc;
-                    padding: 10px;
-                    text-align: center;
-                }
-            </style>
-        </head>
-        <body class="pb-20 contract-detail-body">
-        <div class="mx-auto max-w-container px-4 pt-8 container">
-            <div class="text-center">
-                <div class="my-2"><b>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</b></div>
-                <div class="my-2"><b><u>Độc lập - Tự do - Hạnh phúc</u></b></div>
-                <div class="mt-10 mb-20 font-bold">HỢP ĐỒNG DỊCH VỤ</div>
-            </div>
-            <div class="px-10">
-                <div>
-                    <ul class="my-4">
-                        <li><i>- Căn cứ Bộ luật dân sự 2015;</i></li>
-                        <li><i>- Căn cứ sự thỏa thuận của 2 bên</i></li>
-                    </ul>
-                    <div>Hôm nay, ngày ${dayjs(contract.createdAt).format('DD/MM/YYYY')} chúng tôi gồm:</div>
-                </div>
-                <div class="my-4">
-                    <div><b>BÊN THUÊ DỊCH VỤ</b> (say đây gọi là Bên A)</div>
-                    <table>
-                        <tr><td>TÊN</td><td>: Ông/Bà ${contract.rental.user.firstName} ${contract.rental.user.lastName}</td></tr>
-                        <tr><td>ĐỊA CHỈ</td><td>: ${contract.customer.address}</td></tr>
-                        <tr><td>SỐ ĐIỆN THOẠI</td><td>: ${contract.customer.phoneNumber}</td></tr>
-                        <tr><td>EMAIL</td><td>: ${contract.rental.user.email}</td></tr>
-                    </table>
-                </div>
-                <div class="my-4">
-                    <div><b>BÊN CHO THUÊ DỊCH VỤ</b> (say đây gọi là Bên B)</div>
-                    <table>
-                        <tr><td>TÊN CÔNG TY</td><td>: CÔNG TY TRÁCH NHIỆM HỮU HẠN DỊCH VỤ CAMILLE</td></tr>
-                        <tr><td>ĐẠI DIỆN</td><td class="flex"><li class="flex">: Ông/Bà NGUYỄN VĂN A</li><li class="ml-16 flex">Chức danh: GIÁM ĐỐC</li></td></tr>
-                        <tr><td>ĐỊA CHỈ</td><td>: 385 Hải Phòng, Phường Tân Chính, Quận Thanh Khê, Thành phố Đà Nẵng</td></tr>
-                        <tr><td>SỐ ĐIỆN THOẠI</td><td>: +8432454783</td></tr>
-                        <tr><td>EMAIL</td><td>: camille.event@gmail.com</td></tr>
-                    </table>
-                </div>
-                <div class="my-4">
-                    <div>Hai bên thỏa thuận ký kết hợp đồng này với các điều khoản sau:</div>
-                    <div class="m-4">
-                        <div>
-                            <b class="uppercase">Điều 1: Nội dung dịch vụ thực hiện</b>
-                            <p>Bên B cam kết lên kế hoạch và tổ chức sự kiện cho bên A theo bảng danh mục bên dưới.</p>
-                            <p>Tên sự kiện: ${contract.name}</p>
-                            <p>Thời gian thực hiện: Từ ngày ${dayjs(contract.rental.rentalStartTime).format('DD/MM/YYYY')} đến ngày ${dayjs(contract.rental.rentalEndTime).format('DD/MM/YYYY')}</p>
-                            <p>Địa điểm: ${contract.rental.locations.length ? `${contract.rental.locations[0].name} - ${contract.rental.locations[0].address}` : contract.customer.address}</p>
-                            <div class="service-table">
-                                <b class="block w-full text-center my-2">Bảng danh mục các dịch vụ kèm theo của sự kiện</b>
-                                <table>
-                                    <tr><td>STT</td><td>Tên dịch vụ</td><td>Mô tả</td><td>Số lượng</td><td>Đơn giá / ngày</td><td>Thành tiền</td><td>Đơn vị tiền</td></tr>
-                                    ${serviceDataCollection.map((item, index) => `
-                                        <tr>
-                                            <td>${index + 1}</td>
-                                            <td>${item.name}</td>
-                                            <td>${item.description}</td>
-                                            <td>${item.quantity}</td>
-                                            <td>${formatCurrency(item.price)}</td>
-                                            <td>${formatCurrency(item.price * item.quantity * dayDiff)}</td>
-                                            <td>VNĐ</td>
-                                        </tr>
-                                    `).join('')}
-                                    <tr><th colspan="5">TỔNG CHI PHÍ</th><td>${formatCurrency(contract.rental.totalPrice)}</td><td>VNĐ</td></tr>
-                                </table>
-                            </div>
-                            ${contract.rental.timelines.length ? `
-                                <div class="service-table my-4">
-                                    <b class="block w-full text-center my-2">Bảng lịch trình dự kiến sự kiện</b>
-                                    <table>
-                                        <tr><td>STT</td><td>Thời gian</td><td>Mô tả</td></tr>
-                                        ${contract.rental.timelines.map((item, index) => `
-                                            <tr><td>${index + 1}</td><td>${dayjs(item.startTime).format('YYYY-MM-DD HH:mm')}</td><td>${item.description}</td></tr>
-                                        `).join('')}
-                                    </table>
-                                </div>` : ''}
-                        </div>
-                        <div class="my-4">
-                            <b class="uppercase">ĐIỀU 2: GIÁ TRỊ DỊCH VỤ – PHƯƠNG THỨC THANH TOÁN</b>
-                            <div class="my-2">2.1 Giá trị dịch vụ: ${formatCurrency(contract.rental.totalPrice)} VNĐ</div>
-                            <div class="my-2">2.2 Ngay khi bên B thực hiện cung cấp dịch vụ theo quy định của Điều 1, hai bên sẽ thống nhất và ký kết biên bản thanh lý hợp đồng trong đó có ghi rõ những hạng mục còn thiếu hoặc phát sinh (nếu có). Việc bỏ bớt hoặc bổ sung hạng mục (nếu có) phải được Bên A chấp thuận trước bằng văn bản, giá trị dịch vụ ghi trong biên bản thanh lý hợp đồng sẽ là giá trị thanh toán cuối cùng</div>
-                            <div class="my-2">2.3 Phương thức thanh toán: (Thanh toán bằng tiền mặt hoặc chuyển khoản)<ul class="mx-4"><li>- Bên A thực hiện đặt cọc 30% giá trị hợp đồng cho bên B.</li><li>- Bên A sẽ thanh toán bằng tiền mặt hoặc chuyển khoản cho bên B 100% phần giá trị dịch vụ kể trên và phát sinh (nếu có) căn cứ trên Biên bản thanh lý hợp đồng trong thời gian 5 ngày làm việc kể từ khi kết thúc thời gian thực hiện chương trình và bên A nhận được biên bản thanh lý hợp đồng và hóa đơn tài chính hợp pháp của bên B.</li></ul></div>
-                        </div>
-                        <div class="my-4">
-                            <b class="uppercase">ĐIỀU 3: THỜI HẠN THỎA THUẬN</b>
-                            <div class="my-2">3.1 Thời gian hiệu lực hợp đồng: Bắt đầu từ khi bản hợp đồng này được ký kết đến khi thanh toán hợp đồng kèm theo biên bản thanh lý hợp đồng này.</div>
-                            <div class="my-2">3.2 Trong trường hợp hết thời gian hiệu lực ghi trong hợp đồng mà bên A chưa thanh toán dứt điểm các khoản tiền liên quan đến hợp đồng này thì thời gian hiệu lực của hợp đồng sẽ mặc nhiên được gia hạn cho đến khi các khoản tiền được thanh toán dứt điểm cho bên B và hợp đồng này mặc nhiên được cả hai bên A và B coi như đã được thanh lý.</div>
-                            <div class="my-2">3.3 Trường hợp một trong hai bên vi phạm bất kỳ điều khoản nào trong bản hợp đồng này hoặc các phụ lục hoặc văn bản bổ sung đính kèm có liên quan đến hợp đồng này thì bên bị vi phạm được quyền chấm dứt trước thời hạn. Bên vi phạm phải bồi thường cho bên bị vi phạm những thiệt hại do việc vi phạm này của mình gây ra.</div>
-                        </div>
-                        <div class="my-4">
-                            <b class="uppercase">ĐIỀU 4: QUYỀN LỢI VÀ NGHĨA VỤ CỦA BÊN A</b>
-                            <div class="my-2">4.1 Quyền lợi của bên A:<ul class="mx-4"><li>- Nhận được dịch vụ tốt nhất và đầy đủ nhất do bên B cung cấp.</li><li>- Quản lý và giám sát các hoạt động do bên B cung cấp và thực hiện.</li></ul></div>
-                            <div class="my-2"><div>4.2 Nghĩa vụ của bên A:</div><ul class="mx-4"><li>- Thanh toán cho bên B theo như thỏa thuận tại điều 2.</li><li>- Phối hợp với bên B giải quyết các vấn đề phát sinh xảy ra trong chương trình thuộc về trách nhiệm của bên A.</li></ul></div>
-                        </div>
-                        <div class="my-4">
-                            <b class="uppercase">ĐIỀU 5: QUYỀN LỢI VÀ NGHĨA VỤ CỦA BÊN B</b>
-                            <div class="my-2"><div>5.1 Quyền lợi của bên B:</div><ul class="mx-4"><li>- Nhận được đầy đủ thanh toán của bên A như điều 2.</li></ul></div>
-                            <div class="my-2"><div>5.2 Nghĩa vụ của bên B:</div><ul class="mx-4"><li>- Bảo đảm tuyển dụng, cung cấp cho bên A các hạng mục đã nêu với số lượng, chất lượng như yêu cầu.</li><li>- Trong quá trình diễn ra chương trình, Bên B cam kết sẽ trực tiếp theo dõi, giám sát, ghi chép và chụp hình lại trong biên bản nghiệm thu bàn giao cho Bên A.</li><li>- Cung cấp hóa đơn tài chính hợp pháp đối với dịch vụ cung cấp theo hợp đồng này và các hạng mục phát sinh được bên A chấp thuận (nếu có).</li><li>- Phối hợp với bên A giải quyết các vấn đề phát sinh xảy ra trong chương trình thuộc về trách nhiệm của bên B.</li><li>- Bên B sẽ không chịu trách nhiệm về những dịch vụ nào khác ngoài nội dung và Bảng danh mục dịch vụ.</li><li>- Bên B cam kết không cung cấp và tiết lộ bất kỳ thông tin nào liên quan trực tiếp hay gián tiếp đến sản phẩm của Bên A cũng như các nội dung khác cho bất kỳ bên thứ ba nào mà không có sự đồng ý trước của Bên A bằng văn bản.</li></ul></div>
-                        </div>
-                        <div class="my-4">
-                            <b class="uppercase">ĐIỀU 6: GIẢI QUYẾT TRANH CHẤP</b>
-                            <div class="my-2">Mọi tranh chấp liên quan đến Hợp đồng này trước hết sẽ được giải quyết thông qua thương lượng và hòa giải giữa các bên. Nếu tranh chấp không giải quyết được thông qua hòa giải thì các bên nhất trí rằng một trong các bên có quyền đưa ra giải quyết tại Tòa án có thẩm quyền.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="my-10 flex justify-between px-20 pb-20">
-                    <div><div class="text-center uppercase font-bold">ĐẠI DIỆN BÊN A</div><div><i>(Kí tên, đóng dấu)</i></div></div>
-                    <div><div class="text-center uppercase font-bold">ĐẠI DIỆN BÊN B</div><div><i>(Kí tên, đóng dấu)</i></div></div>
-                </div>
-            </div>
-        </div>
-        </body>
-        </html>`;
 }
+
+window.onload = async function () {
+    // const preloader = document.getElementById("preloader");
+    // preloader.style.display = "flex";
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const contractId = urlParams.get("id");
+
+
+
+    if (!contractId) {
+        document.getElementById("contractName").textContent = "Không tìm thấy hợp đồng";
+        preloader.style.display = "none";
+        return;
+    }
+
+    // contractDraft.style.display = "none";
+
+    await loadInitialData();
+    const contract = await layChiTietHopDong(contractId);
+    if (!contract) return;
+
+    hienThiChiTietHopDong(contract);
+
+    const contractDraft = document.querySelector(".contract-draft");
+    const showDraftButton = document.getElementById("showDraftButton");
+    const exportDraftButton = document.getElementById("exportDraftButton");
+    const uploadSignedDocument = document.getElementById("uploadSignedDocument");
+    const scrollTop = document.getElementById("scroll-top");
+
+    showDraftButton.addEventListener("click", () => {
+        contractDraft.classList.toggle("show");
+        contractDraft.style.display = contractDraft.classList.contains("show") ? "block" : "none";
+        showDraftButton.textContent = contractDraft.classList.contains("show")
+            ? "Ẩn Bản Thảo Hợp Đồng"
+            : "Xem Bản Thảo Hợp Đồng";
+        exportDraftButton.style.display = contractDraft.classList.contains("show")
+            ? "inline-block"
+            : "none";
+    });
+
+    exportDraftButton.addEventListener("click", () => {
+        if (currentContract) {
+            generateWordDocument();
+        } else {
+            alert("Không có dữ liệu hợp đồng để xuất!");
+        }
+    });
+
+    uploadSignedDocument.addEventListener("click", async () => {
+        const fileInput = document.getElementById("signedDocument");
+        const file = fileInput.files[0];
+        if (!file) {
+            alert("Vui lòng chọn file để tải lên!");
+            return;
+        }
+        if (!currentContract) {
+            alert("Không có hợp đồng để liên kết với file!");
+            return;
+        }
+        const allowedTypes = [
+            "application/pdf",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ];
+        if (!allowedTypes.includes(file.type)) {
+            alert("Chỉ hỗ trợ file PDF hoặc Word!");
+            return;
+        }
+        try {
+            preloader.style.display = "flex";
+            await uploadFile(file, currentContract.id);
+            alert("Tải lên hợp đồng đã ký thành công!");
+            fileInput.value = "";
+            preloader.style.display = "none";
+        } catch (error) {
+            preloader.style.display = "none";
+            alert(`Lỗi khi tải lên: ${error.message}`);
+        }
+    });
+
+    window.addEventListener("scroll", () => {
+        scrollTop.classList.toggle("show", window.scrollY > 200);
+    });
+
+    scrollTop.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+};

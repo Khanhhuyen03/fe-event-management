@@ -19,7 +19,7 @@ function addMessage(content, isBot = false) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `chat-message ${isBot ? 'bot' : 'user'}`;
     messageDiv.innerHTML = `
-        <span class="sender">${isBot ? 'MyEvent Bot' : 'Bạn'}</span>
+        <span class="sender">${isBot ? 'MyEvent AI' : 'Bạn'}</span>
         ${content}
         <div class="timestamp">${new Date().toLocaleTimeString('vi-VN')}</div>
     `;
@@ -127,7 +127,7 @@ async function initializeConversation() {
         const lastMessage = chatBox.lastElementChild;
         lastMessage.appendChild(buttonContainer);
     } catch (error) {
-        addMessage('Không thể khởi tạo cuộc trò chuyện. Vui lòng thử lại!', true);
+        // addMessage('Không thể khởi tạo cuộc trò chuyện. Vui lòng thử lại!', true);
         console.error('Error:', error);
     }
 }
@@ -232,10 +232,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         const botMessage = document.createElement("div");
                         botMessage.className = "chat-message bot";
                         botMessage.innerHTML = `
-                            <span class="sender">MyEvent Bot</span>
-                            ${generateData.message || "Danh sách sự kiện cho " + eventType + ":<br>" + formatEventList(generateData.events)}
+                            <span class="sender">MyEvent AI</span>
+                            ${generateData.event || "Danh sách sự kiện cho " + eventType + ":<br>" + formatEventList(generateData.events)}
                             <div class="timestamp">${new Date().toLocaleTimeString()}</div>
                         `;
+                        console.log(generateData.events);
                         chatBox.appendChild(botMessage);
                         chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -248,7 +249,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         const errorMessage = document.createElement("div");
                         errorMessage.className = "chat-message bot";
                         errorMessage.innerHTML = `
-                            <span class="sender">MyEvent Bot</span>
+                            <span class="sender">MyEvent AI</span>
                             Đã có lỗi xảy ra. Vui lòng thử lại!
                             <div class="timestamp">${new Date().toLocaleTimeString()}</div>
                         `;
@@ -262,7 +263,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const errorMessage = document.createElement("div");
             errorMessage.className = "chat-message bot";
             errorMessage.innerHTML = `
-                <span class="sender">MyEvent Bot</span>
+                <span class="sender">MyEvent AI</span>
                 Đã có lỗi xảy ra khi tải loại sự kiện. Vui lòng thử lại!
                 <div class="timestamp">${new Date().toLocaleTimeString()}</div>
             `;
@@ -279,7 +280,15 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!events || events.length === 0) {
             return "Không tìm thấy sự kiện nào cho loại này.";
         }
-        return events.map(event => `• ${event.name} - ${event.description}`).join("<br>");
+        // return events.map(event => `• ${event.name} - ${event.description}
+        //     - ${event.img}`).join("<br>");
+        return events.map(event => `
+            • ${event.name} - ${event.description}<br>
+            <img src="http://localhost:8080/event-management/api/v1/FileUpload/files/${event.img}" 
+                 alt="${event.name}" 
+                 class="img-fluid" 
+                 style="height: 100px; width: 200px; object-fit: fill; display: block;">
+        `).join("<br>");
     }
 });
 

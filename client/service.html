@@ -557,10 +557,7 @@
             const modal = new bootstrap.Modal(modalElement, {});
             modal.show();
 
-            iframe.onload = function () {
-                console.log("Iframe loaded");
-                // Không gửi dữ liệu (mở form trống)
-            };
+
 
             window.addEventListener("message", function closeModal(event) {
                 if (event.data === "closeIframe") {

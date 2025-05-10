@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,7 @@
     <link href="./assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="./assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link href="./assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/fe-event-management/client/assets/css/main.css">
+    <link rel="stylesheet" href="/client/assets/css/main.css">
     <link href="assets/css/main.css" rel="stylesheet">
     <style>
         body {
@@ -174,8 +175,9 @@
         }
     </style>
 </head>
+
 <body>
-    <header id="header"></header>
+    <div id="header"></div>
     <div class="content container">
         <h2>DANH SÁCH HỢP ĐỒNG</h2>
         <div class="toast" id="successToast">Thanh toán thành công!</div>
@@ -222,12 +224,13 @@
     <div id="preloader"></div>
 
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="/fe-event-management/client/assets/vendor/aos/aos.js"></script>
+    <script src="/client/assets/vendor/aos/aos.js"></script>
     <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
     <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/header.js"></script>
-    <script>
+    <script src="assets/js/ListContract.js"></script>
+    <!-- <script>
         const CONTRACT_API_URL = "https://67eabf6734bcedd95f647797.mockapi.io/Contract";
 
         const contractsPerPage = 10;
@@ -406,6 +409,7 @@
                 showToast();
             }
         };
-    </script>
+    </script> -->
 </body>
+
 </html>
