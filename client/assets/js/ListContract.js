@@ -1,8 +1,11 @@
 const CONTRACT_API_URL = "http://localhost:8080/event-management/api/contracts";
+const RENTAL_API_URL = "http://localhost:8080/event-management/rentals";
+
 
 const contractsPerPage = 10;
 let currentPage = 1;
 let contractList = [];
+let rental = [];
 
 function getToken() {
     return localStorage.getItem("token");
@@ -19,11 +22,14 @@ function formatDate(date) {
 
 function formatStatus(status) {
     switch (status) {
-        case "draft": return '<span class="badge bg-success">Bản Nháp</span>';
-        case "deposit_paid": return '<span class="badge bg-info">Đã đặt cọc</span>';
-        case "inprogress": return '<span class="badge bg-warning">Đang Thực Hiện</span>';
-        case "waiting_paid": return '<span class="badge bg-primary">Chờ Thanh Toán</span>';
-        case "completed": return '<span class="badge bg-dark">Đã Hoàn Thành</span>';
+        case "Draft": return '<span class="badge bg-success">Bản Nháp</span>';
+        case "DepositPaid": return '<span class="badge bg-info">Đã đặt cọc</span>';
+        case "InProgress": return '<span class="badge bg-warning">Đang Thực Hiện</span>';
+        case "WaitingPaid": return '<span class="badge bg-primary">Chờ Thanh Toán</span>';
+        case "Completed": return '<span class="badge bg-dark">Đã Hoàn Thành</span>';
+        case "Cancel": return '<span class="badge bg-dark">Đã hủy</span>';
+        case "AdminCancel": return '<span class="badge bg-dark">Đã hủy bởi Admin</span>';
+
         // default: return '<span class="badge bg-secondary">Unknown</span>';
     }
 }
@@ -46,21 +52,67 @@ async function fetchData(url, method = "GET", data = null) {
     return response.json();
 }
 
+
+
+// async function fetchContractList() {
+//     try {
+//         // contractList = await fetchData(CONTRACT_API_URL);
+//         const [contractList, rental] = await Promise.all([
+//             fetchData(CONTRACT_API_URL),
+//             fetchData(RENTAL_API_URL)
+//         ]);
+//         return contractList.map(contract => ({
+//             id: contract.id,
+//             contractName: contract.name,
+//             rental: rental.find(r => r.id === contract.rentalId),
+//             totalPrice: rental ? rental.totalPrice.toLocaleString() + " VND" : "0 VND",
+//             rentalStartTime: rental ? new Date(rental.rentalStartTime).toLocaleDateString() : "N/A",
+//             rentalEndTime: rental ? new Date(rental.rentalEndTime).toLocaleDateString() : "N/A",
+//             // value: contract.total_price || 0,
+//             // validity: {
+//             //     startDate: contract.rental_start_time,
+//             //     endDate: contract.rental_end_time
+//             // },
+//             status: contract.status || 'draft'
+//         }));
+//     } catch (error) {
+//         alert(`Error fetching contract list (GET): ${error.message}`);
+//         return [];
+//     }
+// }
 async function fetchContractList() {
     try {
-        contractList = await fetchData(CONTRACT_API_URL);
-        return contractList.map(contract => ({
-            id: contract.id,
-            contractName: contract.name,
-            value: contract.total_price || 0,
-            validity: {
-                startDate: contract.rental_start_time,
-                endDate: contract.rental_end_time
-            },
-            status: contract.status || 'draft'
-        }));
+        // Lấy dữ liệu song song từ hai API
+        let [contractList, rental] = await Promise.all([
+            fetchData(CONTRACT_API_URL),
+            fetchData(RENTAL_API_URL)
+        ]);
+        contractList = contractList.result;
+        console.log('Dữ liệu contractList:', contractList);
+        console.log('Dữ liệu rental:', rental);
+
+        // Ánh xạ contractList thành định dạng mong muốn
+        return contractList.map(contract => {
+            const rentalMatch = rental.find(r => r.id === contract.rentalId);
+            return {
+                id: contract.id,
+                contractName: contract.name,
+                rental: rentalMatch || null,
+                totalPrice: rentalMatch && rentalMatch.totalPrice ? rentalMatch.totalPrice.toLocaleString() + " VND" : "0 VND",
+                rentalStartTime: rentalMatch && rentalMatch.rentalStartTime
+                    ? new Date(rentalMatch.rentalStartTime).toLocaleDateString() : "N/A",
+                rentalEndTime: rentalMatch && rentalMatch.rentalEndTime
+                    ? new Date(rentalMatch.rentalEndTime).toLocaleDateString() : "N/A",
+                // value: contract.total_price || 0,
+                // validity: {
+                //     startDate: contract.rental_start_time,
+                //     endDate: contract.rental_end_time
+                // },
+                status: contract.status || 'Draft'
+            };
+        });
     } catch (error) {
-        alert(`Error fetching contract list (GET): ${error.message}`);
+        console.error(`Lỗi lấy danh sách hợp đồng: ${error.message}`);
         return [];
     }
 }
@@ -79,8 +131,8 @@ function displayContractList(list, page) {
     <tr>
         <td>${stt}</td>
         <td>${contract.contractName}</td>
-        <td>${formatCurrency(contract.value)}</td>
-        <td>${formatDate(contract.validity.startDate)} - ${formatDate(contract.validity.endDate)}</td>
+        <td>${formatCurrency(contract.totalPrice)}</td>
+        <td>${formatDate(contract.rentalStartTime)} - ${formatDate(contract.rentalEndTime)}</td>
         <td>${formatStatus(contract.status)}</td>
         <td>
             <button class="btn btn-sm" onclick="viewDetails('${contract.id}')"><i class="fas fa-eye"></i>Xem Chi Tiết</button>
@@ -120,11 +172,10 @@ function filterContractList() {
     return contractList.map(contract => ({
         id: contract.id,
         contractName: contract.name,
-        value: contract.total_price || 0,
-        validity: {
-            startDate: contract.rental_start_time,
-            endDate: contract.rental_end_time
-        },
+        rental: rental.find(r => r.id === contract.rentalId),
+        totalPrice: rental ? rental.totalPrice.toLocaleString() + " VND" : "0 VND",
+        rentalStartTime: rental ? new Date(rental.rentalStartTime).toLocaleDateString() : "N/A",
+        rentalEndTime: rental ? new Date(rental.rentalEndTime).toLocaleDateString() : "N/A",
         status: contract.status || 'draft'
     })).filter(contract => {
         const matchesName = contractName === "" || contract.contractName.toLowerCase().includes(contractName);
@@ -149,7 +200,7 @@ function resetFilters() {
 }
 
 function viewDetails(contractId) {
-    window.location.href = `contract_detail.html?id=${contractId}`;
+    window.location.href = `contractDetail.html?id=${contractId}`;
 }
 
 function makeDeposit(contractId) {
