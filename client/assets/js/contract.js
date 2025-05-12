@@ -96,7 +96,6 @@ function initializeContractForm() {
             preloadEvent(event.data);
         }
         if (event.data.type === "preloadItem" && event.data.item) {
-            console.log("Dữ liệu item nhận được:", event.data.item);
             preloadItem(event.data.item);
         }
     });
@@ -1338,22 +1337,32 @@ async function saveContract() {
 
     try {
         // Kiểm tra khách hàng hiện có
-        const existingCustomerResponse = await fetchData(`${CUSTOMER_API_URL}?phone_number=${phoneNumber}`);
-        // const existingCustomer = await fetchData(`${CUSTOMER_API_URL}?phone_number=${phoneNumber}`);
+        // const existingCustomerResponse = await fetchData(`${CUSTOMER_API_URL}?phone_number=${phoneNumber}`);
+        // // const existingCustomer = await fetchData(`${CUSTOMER_API_URL}?phone_number=${phoneNumber}`);
         let customerId;
 
-        if (existingCustomerResponse?.length > 0) {
-            customerId = existingCustomerResponse[0].id;
-        } else {
-            try {
-                const customerResponse = await fetchData(CUSTOMER_API_URL, 'POST', customer);
-                customerId = customerResponse.result.id;
-                console.log('Khách hàng mới đã được lưu:', customerResponse);
-            } catch (customerError) {
-                const errorDetail = customerError.message || 'Không xác định';
-                alert(`Lỗi khi lưu khách hàng: ${errorDetail}`);
-                throw new Error(`Lưu khách hàng thất bại: ${errorDetail}`);
-            }
+        // if (existingCustomerResponse?.length > 0) {
+        //     customerId = existingCustomerResponse[0].id;
+        // } else {
+        //     try {
+        //         const customerResponse = await fetchData(CUSTOMER_API_URL, 'POST', customer);
+        //         customerId = customerResponse.result.id;
+        //         console.log('Khách hàng mới đã được lưu:', customerResponse);
+        //     } catch (customerError) {
+        //         const errorDetail = customerError.message || 'Không xác định';
+        //         alert(`Lỗi khi lưu khách hàng: ${errorDetail}`);
+        //         throw new Error(`Lưu khách hàng thất bại: ${errorDetail}`);
+        //     }
+        // }
+
+        try {
+            const customerResponse = await fetchData(CUSTOMER_API_URL, 'POST', customer);
+            customerId = customerResponse.result.id;
+            console.log('Khách hàng mới đã được lưu:', customerResponse);
+        } catch (customerError) {
+            const errorDetail = customerError.message || 'Không xác định';
+            alert(`Lỗi khi lưu khách hàng: ${errorDetail}`);
+            throw new Error(`Lưu khách hàng thất bại: ${errorDetail}`);
         }
 
         // Gán customerId cho rental

@@ -43,7 +43,6 @@ function renderUsers(users) {
     var listUsersBlock = document.querySelector('#list-user tbody');
     if (!listUsersBlock) return;
 
-    console.log("Users:", users);
     if (!users || users.length === 0) {
         console.warn("Danh sách users rỗng!");
         return;

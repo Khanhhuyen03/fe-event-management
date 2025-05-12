@@ -22,10 +22,6 @@ function start() {
             window.events = events;
             window.eventTypes = eventTypes;
 
-            // Log để kiểm tra dữ liệu
-            console.log("deviceTypes sau khi chuẩn hóa:", deviceTypes);
-            console.log("services sau khi chuẩn hóa:", services);
-
             // Render events
             renderEvents(events, eventTypes, devices, deviceTypes, services, users);
 
@@ -116,10 +112,8 @@ function renderEvents(events, eventTypes) {
     })
         .then(response => response.ok ? response.json() : Promise.reject("Không thể tải roles"))
         .then(roles => {
-            console.log("Dữ liệu roles từ API:", roles);
             const user = JSON.parse(localStorage.getItem("user")) || {};
             const roleName = user.roleName || "";
-            console.log("Role name (renderEvents):", roleName);
 
             if ($.fn.DataTable.isDataTable('#list-event')) {
                 $('#list-event').DataTable().destroy();
@@ -255,11 +249,9 @@ function getData(callback) {
     // Lấy roleName từ localStorage
     const user = JSON.parse(localStorage.getItem("user"));
     const roleName = user?.roleName?.toUpperCase() || "USER";
-    console.log("Role name:", roleName);
 
     // Chọn API dựa trên roleName
     const userApiToFetch = roleName === "MANAGER" ? UserAPI_MRG : UsersAPI;
-    console.log("User API được gọi:", userApiToFetch);
     Promise.all([
         fetch(EventAPI, { headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" } })
             .then(res => { if (!res.ok) throw new Error(`Lỗi EventAPI: ${res.status}`); return res.json(); }),
@@ -280,13 +272,6 @@ function getData(callback) {
             .then(res => { if (!res.ok) throw new Error(`Lỗi UsersAPI: ${res.status}`); return res.json(); }),
     ])
         .then(([events, eventTypes, devices, deviceTypes, services, users]) => {
-            console.log("Dữ liệu từ API:");
-            console.log("Events:", events);
-            console.log("EventTypes:", eventTypes);
-            console.log("Devices:", devices);
-            console.log("DeviceTypes:", deviceTypes);
-            console.log("Services:", services);
-            console.log("Users:", users);
 
             // Chuẩn hóa dữ liệu
             events = Array.isArray(events) ? events : events.data?.items || [];
@@ -1501,8 +1486,6 @@ function populateService(services, row = document) {
         console.warn("Không tìm thấy select[name='servicename'] trong DOM:", row);
         return;
     }
-
-    console.log("Populating services:", services);
 
     // Duyệt qua từng <select> element
     selectElements.forEach(select => {

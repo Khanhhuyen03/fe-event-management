@@ -38,7 +38,6 @@ function updateHeader() {
     }
 
     const currentPath = window.location.pathname;
-    console.log("Current path:", currentPath);
 
 
     homeLink.classList.remove("active");
@@ -59,7 +58,6 @@ function updateHeader() {
     let user;
     try {
         user = JSON.parse(localStorage.getItem("user"));
-        console.log("Dữ liệu user từ localStorage:", user);
     } catch (e) {
         console.error("Dữ liệu user không hợp lệ:", e);
         user = null;
@@ -90,8 +88,6 @@ function updateHeader() {
                 userAvatar.src = defaultAvatarPath;
             }
         }
-        console.log("Đường dẫn ảnh:", userAvatar.src);
-        console.log("User:", user);
         if (user.roleName === "SUPPLIER") {
             dropdownMenu.innerHTML = `
                 <li><a class="dropdown-item d-flex align-items-center" href="account.html"><i class="bi bi-person-circle"></i><span>Thông tin cá nhân</span></a></li>

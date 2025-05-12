@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const headerElement = document.getElementById("header");
       if (headerElement) {
         headerElement.innerHTML = data;
-        console.log("Header loaded thành công!");
+        // console.log("Header loaded thành công!");
         // Cập nhật user info ngay sau khi header được render
         updateUserInfo();
         // Tải lại script chính của trang
@@ -33,7 +33,6 @@ function loadMainScript() {
 }
 function updateUserInfo() {
   const user = JSON.parse(localStorage.getItem("user"));
-  console.log("User từ localStorage:", user);
 
   const loginBtn = document.getElementById("login-btn");
   const userInfo = document.getElementById("user-info");
@@ -84,7 +83,6 @@ function updateUserInfo() {
     else console.error("Không tìm thấy phần tử #role trong DOM");
 
     // Lấy role_name từ API /role
-    console.log("Gọi API /role với role_id:", user.roleName);
     fetch('http://localhost:8080/event-management/roles', {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem("token") || ""}`, // Thêm token nếu có
@@ -92,23 +90,18 @@ function updateUserInfo() {
       }
     })
       .then(res => {
-        console.log("Trạng thái phản hồi API /role:", res.status, res.statusText);
         if (!res.ok) throw new Error(`Lỗi khi lấy dữ liệu vai trò: ${res.status}`);
         return res.json();
       })
       .then(roles => {
-        console.log("Danh sách roles từ API:", roles);
-        console.log("Tìm role với id:", user.roleName);
         const role = roles.find(role => role.id === user.roleName || role.id.toString() === user.roleName);
         const roleName = user.roleName;
-        console.log("Tên vai trò tìm được:", roleName);
         if (roleElement) roleElement.textContent = roleName;
       })
       .catch(error => {
         console.error("Lỗi khi gọi API /role:", error.message);
         if (roleElement) roleElement.textContent = "Vô phận sự";
       });
-    console.log("Tên hiển thị:", displayName);
   } else {
     loginBtn?.classList.remove("d-none");
     userInfo?.classList.add("d-none");

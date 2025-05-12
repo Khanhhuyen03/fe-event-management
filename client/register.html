@@ -43,11 +43,15 @@
                     <div class="mb-3">
                         <label class="form-label">Mật khẩu</label>
                         <div class="input-group">
-                            <input type="password" class="form-control" id="password" required>
+                            <input type="password" class="form-control" id="password" name="password" required
+                                minlength="8" placeholder="Mật khẩu (ít nhất 8 ký tự)"
+                                oninvalid="this.setCustomValidity('Mật khẩu phải có ít nhất 8 ký tự.')"
+                                oninput="this.setCustomValidity('')">
                             <span class="input-group-text" onclick="togglePassword('password', 'eyeIcon1')">
                                 <i class="bi bi-eye-slash" id="eyeIcon1"></i>
                             </span>
                         </div>
+                        <div id="passwordError" class="text-danger" style="display: none;"></div>
                     </div>
                     <button type="submit" class="btn w-100">ĐĂNG KÝ</button>
                 </form>

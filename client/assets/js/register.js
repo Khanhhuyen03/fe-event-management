@@ -14,7 +14,8 @@ document.addEventListener("DOMContentLoaded", function () {
     setupValidation("lastName", "Vui lòng nhập họ!");
     setupValidation("firstName", "Vui lòng nhập tên!");
     setupValidation("email", "Vui lòng nhập email!", /^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Email không hợp lệ!");
-    setupValidation("phone", "Vui lòng nhập số điện thoại!", /^(03|05|07|08|09)\d{8}$/, "Số điện thoại không hợp lệ!");
+    // setupValidation("phone", "Vui lòng nhập số điện thoại!", /^(03|05|07|08|09)\d{8}$/, "Số điện thoại không hợp lệ!");
+    setupValidation("phone", "Vui lòng nhập số điện thoại!");
     setupValidation("password", "Vui lòng nhập mật khẩu!");
 });
 
@@ -93,14 +94,17 @@ async function handleRegister(event) {
     const ten = getValue("firstName");
     const email = getValue("email");
     const phone = getValue("phone");
+    // const passwordInput = getValue("password");
     const password = getValue("password");
 
     if (!ho) return showAlert("Vui lòng nhập họ!", "danger");
     if (!ten) return showAlert("Vui lòng nhập tên!", "danger");
     if (!email) return showAlert("Vui lòng nhập email!", "danger");
     if (!phone) return showAlert("Vui lòng nhập số điện thoại!", "danger");
-    // if (!/^(03|05|07|08|09)\d{8}$/.test(phone)) return showAlert("Số điện thoại không hợp lệ!", "danger");
+    if (!/^(03|05|07|08|09)\d{8}$/.test(phone)) return showAlert("Số điện thoại không hợp lệ!", "danger");
     if (!password) return showAlert("Vui lòng nhập mật khẩu!", "danger");
+    if (password.length < 8) return showAlert("Mật khẩu phải có ít nhất 8 ký tự!", "danger");
+
 
     const formData = {
         first_name: ten,
@@ -147,6 +151,36 @@ async function handleRegister(event) {
         showAlert("Lỗi kết nối đến máy chủ! Vui lòng thử lại.", "danger");
         console.error("Lỗi trong handleRegister:", error);
     }
+}
+// Toggle hiển thị mật khẩu
+function togglePassword(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+    }
+}
+
+// Real-time validation cho mật khẩu
+const passwordInputElement = document.getElementById('password');
+const passwordError = document.getElementById('passwordError');
+
+if (passwordInputElement && passwordError) {
+    passwordInputElement.addEventListener('input', function () {
+        if (passwordInputElement.value.length < 8 && passwordInputElement.value.length > 0) {
+            passwordError.textContent = 'Mật khẩu phải có ít nhất 8 ký tự.';
+            passwordError.style.display = 'block';
+        } else {
+            passwordError.textContent = '';
+            passwordError.style.display = 'none';
+        }
+    });
 }
 // async function handleVerify(event) {
 //     event.preventDefault();

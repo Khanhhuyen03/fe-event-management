@@ -165,14 +165,9 @@ function getData(callback) {
     // Lấy roleName từ localStorage
     const user = JSON.parse(localStorage.getItem("user"));
     const roleName = user?.roleName?.toUpperCase() || "USER";
-    console.log("Role name:", roleName);
 
     // Chọn API dựa trên roleName
     const userApiToFetch = roleName === "MANAGER" ? UserAPI_MRG : UsersAPI;
-
-    console.log("DeviceAPI/list:", `${DeviceAPI}/list`);
-    console.log("DeviceTypeAPI/list:", `${DeviceTypeAPI}/list`);
-    console.log("User API được gọi:", userApiToFetch);
 
     Promise.all([
         // Không gửi token cho DeviceAPI, giữ nguyên như gốc
@@ -214,10 +209,6 @@ function getData(callback) {
             deviceTypes = deviceTypes.data?.items || [];
             users = Array.isArray(users) ? users : users.data || [];
 
-            console.log("Dữ liệu Devices:", devices);
-            console.log("Dữ liệu DeviceTypes:", deviceTypes);
-            console.log("Dữ liệu Users từ API:", users);
-
             callback(devices, deviceTypes, users);
         })
         .catch(error => {
@@ -229,10 +220,6 @@ function getData(callback) {
 function renderDevices(devices, deviceTypes, users) {
     var listDevicesBlock = document.querySelector('#list-device tbody');
     if (!listDevicesBlock) return;
-
-    console.log("Devices:", devices);
-    console.log("Device Types:", deviceTypes);
-    console.log("Users:", users);
 
     if (!devices || devices.length === 0) {
         console.warn("Danh sách devices rỗng!");
@@ -249,7 +236,6 @@ function renderDevices(devices, deviceTypes, users) {
         const supplier = users.find(user => String(user.id) === String(device.userID));
         const supplierName = supplier ? `${supplier.last_name} ${supplier.first_name}` : "Không có nhà cung cấp";
 
-        console.log(`Device ID: ${device.id}, userID: ${device.userID}, Supplier:`, supplier);
 
         return `
             <tr class="list-device-${device.id}">
@@ -421,7 +407,6 @@ function watchDetailDevice(editDevicetId) {
     // Lấy roleName từ localStorage
     const user = JSON.parse(localStorage.getItem("user"));
     const roleName = user?.roleName?.toUpperCase() || "USER";
-    console.log("Role name:", roleName);
 
     // Chọn API dựa trên roleName
     const userApiToFetch = roleName === "MANAGER" ? UserAPI_MRG : UsersAPI;

@@ -36,7 +36,6 @@ function getData(callback) {
         callback(uses);
     })
         .then(data => {
-            console.log("Dữ liệu từ API:", data);
             // Truyền danh sách users vào callback
             callback(data.users); // Chỉ lấy danh sách users từ đối tượng trả về
         })
@@ -48,7 +47,6 @@ function renderUsers(users) {
     var listUsersBlock = document.querySelector('#list-user tbody');
     if (!listUsersBlock) return;
 
-    console.log("Users:", users);
     if (!users || users.length === 0) {
         console.warn("Danh sách users rỗng!");
         return;

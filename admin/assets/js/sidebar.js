@@ -4,8 +4,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const user = JSON.parse(localStorage.getItem("user"));
     const sidebarContainer = document.getElementById("sidebar-container");
 
-    console.log("User từ localStorage (sidebar):", user);
-
     if (!sidebarContainer) {
         console.error("Không tìm thấy #sidebar-container trong DOM");
         return;
@@ -63,7 +61,6 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    console.log("Gọi API /role với role_id:", user.roleName);
     let token = localStorage.getItem("token"); // Lấy token từ localStorage
 
     if (!token) {
@@ -79,12 +76,10 @@ document.addEventListener("DOMContentLoaded", function () {
     })
         .then(response => new Promise(resolve => setTimeout(() => resolve(response), 100))) // Thêm delay 100ms
         .then(response => {
-            console.log("Trạng thái phản hồi API /role (sidebar):", response.status, response.statusText);
             if (!response.ok) throw new Error("Không thể tải roles: " + response.statusText);
             return response.json();
         })
         .then(roles => {
-            console.log("Roles data (sidebar):", roles);
             adjustSidebarLinks(roles);
             adjustSidebar(roles);
             initSidebarToggle();
@@ -103,13 +98,10 @@ function adjustSidebarLinks(roles) {
     const user = JSON.parse(localStorage.getItem("user"));
     let basePath = "../admin/";
 
-    console.log("User data in adjustSidebarLinks:", user);
 
     if (user && user.role_id) {
-        console.log("Tìm role với id:", user.role_id);
         const role = roles.find(r => r.id === user.role_id || r.id.toString() === user.role_id);
         const roleName = user.roleName;
-        console.log("Tên vai trò tìm được (adjustSidebarLinks):", roleName);
 
         if (roleName.toUpperCase() === "MANAGER") {
             basePath = "../admin/";
@@ -136,10 +128,8 @@ function adjustSidebar(roles) {
 
     let roleName = "ADMIN";
     if (user && user.role) {
-        console.log("Tìm role với id:", user.role_id);
         const role = roles.find(r => r.id === user.role_id || r.id.toString() === user.role_id);
         roleName = user.roleName;
-        console.log("Tên vai trò tìm được (adjustSidebar):", roleName);
     }
 
     if (user.roleName === "MANAGER") {

@@ -56,8 +56,6 @@ function handleLogin(data) {
 
         // Hiển thị thông báo thành công
         toastr.success("Đăng nhập thành công!", "Thành công");
-        console.log("Data từ API:", data);
-        console.log("User nhận được:", data.result);
 
 
         // Chuyển hướng sau 2 giây
