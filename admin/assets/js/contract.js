@@ -133,10 +133,6 @@ function getData(callback) {
             }),
     ])
         .then(([contractData, rentalData]) => {
-            // Log phản hồi thô để debug
-            console.log("Phản hồi thô ContractAPI:", contractData);
-            console.log("Phản hồi thô RentalAPI:", rentalData);
-
             // Chuẩn hóa dữ liệu hợp đồng
             let contracts = contractData.result || contractData.data?.items || contractData.data || contractData || [];
             if (!Array.isArray(contracts)) {
@@ -148,9 +144,6 @@ function getData(callback) {
             if (!Array.isArray(rentals)) {
                 rentals = [];
             }
-
-            console.log("Hợp đồng đã xử lý:", contracts);
-            console.log("Rental đã xử lý:", rentals);
             callback(contracts, rentals);
         })
         .catch(error => {
@@ -533,8 +526,6 @@ function watchDetailContract(editContractId) {
         return;
     }
 
-    console.log("Xem chi tiết hợp đồng ID:", editContractId);
-
     const token = localStorage.getItem("token");
     if (!token) {
         console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
@@ -554,7 +545,6 @@ function watchDetailContract(editContractId) {
         })
         .then(data => {
             const contract = data.result || data.data || data || {};
-            console.log("Dữ liệu hợp đồng:", contract);
             if (!contract.id) {
                 throw new Error("Dữ liệu hợp đồng không hợp lệ!");
             }
@@ -1038,13 +1028,40 @@ function generateWordDocument() {
                             insideVertical: { style: BorderStyle.SINGLE, size: 1 },
                         },
                     }),
-                    new Paragraph({ children: [new TextRun({ text: "Điều 2: Giá trị dịch vụ – Phương thức thanh toán", bold: true, allCaps: true })] }),
+                    new Paragraph({ children: [new TextRun({ text: "Điều 2: GIÁ TRỊ DỊCH VỤ – PHƯƠNG THỨC THANH TOÁN", bold: true, allCaps: true })] }),
                     new Paragraph({ children: [new TextRun({ text: `2.1 Giá trị dịch vụ: ${document.getElementById("draftTotalPrice").textContent}` })] }),
-                    new Paragraph({ children: [new TextRun({ text: "2.2 Phương thức thanh toán: Thanh toán bằng tiền mặt hoặc chuyển khoản." })] }),
-                    new Paragraph({ children: [new TextRun({ text: "- Bên A thực hiện đặt cọc 30% giá trị hợp đồng." })] }),
+                    new Paragraph({ children: [new TextRun({ text: "2.2 Ngay khi bên B thực hiện cung cấp dịch vụ theo quy định của Điều 1, hai bên sẽ thống nhất và ký kết biên bản thanh lý hợp đồng trong đó có ghi rõ những hạng mục còn thiếu hoặc phát sinh (nếu có). Việc bỏ bớt hoặc bổ sung hạng mục (nếu có) phải được Bên A chấp thuận trước bằng văn bản, giá trị dịch vụ ghi trong biên bản thanh lý hợp đồng sẽ là giá trị thanh toán cuối cùng." })] }),
+                    new Paragraph({ children: [new TextRun({ text: "2.3 Phương thức thanh toán: (Thanh toán bằng tiền mặt hoặc chuyển khoản)" })] }),
+                    new Paragraph({ children: [new TextRun({ text: "- Bên A thực hiện đặt cọc 10% giá trị hợp đồng." })] }),
                     new Paragraph({ children: [new TextRun({ text: "- Bên A thanh toán 100% giá trị dịch vụ trong 5 ngày làm việc." })] }),
+
                     new Paragraph({ children: [new TextRun({ text: "Điều 3: Thời hạn thỏa thuận", bold: true, allCaps: true })] }),
-                    new Paragraph({ children: [new TextRun({ text: "Thời gian hiệu lực hợp đồng: Từ khi ký kết đến khi thanh toán hợp đồng." })] }),
+                    new Paragraph({ children: [new TextRun({ text: "3.1 Thời gian hiệu lực hợp đồng: Bắt đầu từ khi bản hợp đồng này được ký kết đến khi thanh toán hợp đồng kèm theo biên bản thanh lý hợp đồng này." })] }),
+                    new Paragraph({ children: [new TextRun({ text: "3.2 Trong trường hợp hết thời gian hiệu lực ghi trong hợp đồng mà bên A chưa thanh toán dứt điểm các khoản tiền liên quan đến hợp đồng này thì thời gian hiệu lực của hợp đồng sẽ mặc nhiên được gia hạn cho đến khi các khoản tiền được thanh toán dứt điểm cho bên B và hợp đồng này mặc nhiên được cả hai bên A và B coi như đã được thanh lý." })] }),
+                    new Paragraph({ children: [new TextRun({ text: "3.3 Trường hợp một trong hai bên vi phạm bất kỳ điều khoản nào trong bản hợp đồng này hoặc các phụ lục hoặc văn bản bổ sung đính kèm có liên quan đến hợp đồng này thì bên bị vi phạm được quyền chấm dứt trước thời hạn. Bên vi phạm phải bồi thường cho bên bị vi phạm những thiệt hại do việc vi phạm này của mình gây ra." })] }),
+
+                    new Paragraph({ children: [new TextRun({ text: "Điều 4: Quyền lợi và nghĩa vụ của Bên A", bold: true, allCaps: true })] }),
+                    new Paragraph({ children: [new TextRun({ text: "4.1 Quyền lợi của bên A:" })] }),
+                    new Paragraph({ children: [new TextRun({ text: "- Nhận được dịch vụ tốt nhất và đầy đủ nhất do bên B cung cấp." })] }),
+                    new Paragraph({ children: [new TextRun({ text: "- Quản lý và giám sát các hoạt động do bên B cung cấp và thực hiện." })] }),
+                    new Paragraph({ children: [new TextRun({ text: "4.2 Nghĩa vụ của bên A:" })] }),
+                    new Paragraph({ children: [new TextRun({ text: "- Thanh toán cho bên B theo như thỏa thuận tại điều 2." })] }),
+                    new Paragraph({ children: [new TextRun({ text: "- Phối hợp với bên B giải quyết các vấn đề phát sinh xảy ra trong chương trình thuộc về trách nhiệm của bên A." })] }),
+
+                    new Paragraph({ children: [new TextRun({ text: "Điều 5: Quyền lợi và nghĩa vụ của Bên B", bold: true, allCaps: true })] }),
+                    new Paragraph({ children: [new TextRun({ text: "5.1 Quyền lợi của bên B:" })] }),
+                    new Paragraph({ children: [new TextRun({ text: "- Nhận được đầy đủ thanh toán của bên A như điều 2." })] }),
+                    new Paragraph({ children: [new TextRun({ text: "5.2 Nghĩa vụ của bên B:" })] }),
+                    new Paragraph({ children: [new TextRun({ text: "- Bảo đảm tuyển dụng, cung cấp cho bên A các hạng mục đã nêu với số lượng, chất lượng như yêu cầu." })] }),
+                    new Paragraph({ children: [new TextRun({ text: "- Trong quá trình diễn ra chương trình, Bên B cam kết sẽ trực tiếp theo dõi, giám sát, ghi chép và chụp hình lại trong biên bản nghiệm thu bàn giao cho Bên A." })] }),
+                    new Paragraph({ children: [new TextRun({ text: "- Cung cấp hóa đơn tài chính hợp pháp đối với dịch vụ cung cấp theo hợp đồng này và các hạng mục phát sinh được bên A chấp thuận (nếu có)." })] }),
+                    new Paragraph({ children: [new TextRun({ text: "- Phối hợp với bên A giải quyết các vấn đề phát sinh xảy ra trong chương trình thuộc về trách nhiệm của bên B." })] }),
+                    new Paragraph({ children: [new TextRun({ text: "- Bên B sẽ không chịu trách nhiệm về những dịch vụ nào khác ngoài nội dung và Bảng danh mục dịch vụ." })] }),
+                    new Paragraph({ children: [new TextRun({ text: "- Bên B cam kết không cung cấp và tiết lộ bất kỳ thông tin nào liên quan trực tiếp hay gián tiếp đến sản phẩm của Bên A cũng như các nội dung khác cho bất kỳ bên thứ ba nào mà không có sự đồng ý trước của Bên A bằng văn bản." })] }),
+
+                    new Paragraph({ children: [new TextRun({ text: "Điều 6: Giải quyết tranh chấp", bold: true, allCaps: true })] }),
+                    new Paragraph({ children: [new TextRun({ text: "Mọi tranh chấp liên quan đến Hợp đồng này trước hết sẽ được giải quyết thông qua thương lượng và hòa giải giữa các bên. Nếu tranh chấp không giải quyết được thông qua hòa giải thì các bên nhất trí rằng một trong các bên có quyền đưa ra giải quyết tại Tòa án có thẩm quyền." })] }),
+
                     new Paragraph({
                         children: [
                             new TextRun({ text: "ĐẠI DIỆN BÊN A", bold: true, allCaps: true }),

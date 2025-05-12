@@ -73,7 +73,7 @@
             class="bi bi-arrow-up-short"></i></a>
 
     <!-- Preloader -->
-    <div id="preloader"></div>
+    <!-- <div id="preloader"></div> -->
 
     <!-- Vendor JS Files -->
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -82,17 +82,19 @@
     <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
 
     <!-- Main JS File -->
-    <script src="/assets/js/main.js"></script>
-    <script src="/assets/js/header.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/header.js"></script>
 
     <script>
         let suppliers = [];
         let deviceTypes = [];
+        const baseImageUrl = "http://localhost:8080/event-management/api/v1/FileUpload/files/";
+
 
         // Hàm lấy tên nhà cung cấp
         function getSupplierName(supplierId) {
             const supplier = suppliers.find(s => s.id === supplierId);
-            return supplier ? `${supplier.first_name} ${supplier.last_name}` : "Không xác định";
+            return supplier ? ` ${supplier.last_name} ${supplier.first_name} ` : "Không xác định";
         }
 
         // Hàm lấy tên loại thiết bị
@@ -127,18 +129,18 @@
             }
 
             try {
-                // Lấy danh sách nhà cung cấp
-                // const suppliersResponse = await fetch("http://localhost:8080/event-management/users?role=supplier", {
-                //     method: "GET",
-                //     headers: {
-                //         "Content-Type": "application/json",
-                //         "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
-                //     }
-                // });
-                // if (!suppliersResponse.ok) {
-                //     throw new Error(`Lỗi khi lấy danh sách nhà cung cấp: ${suppliersResponse.statusText}`);
-                // }
-                // suppliers = await suppliersResponse.json();
+                // // Lấy danh sách nhà cung cấp
+                const suppliersResponse = await fetch("http://localhost:8080/event-management/users/manager", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
+                    }
+                });
+                if (!suppliersResponse.ok) {
+                    throw new Error(`Lỗi khi lấy danh sách nhà cung cấp: ${suppliersResponse.statusText}`);
+                }
+                suppliers = await suppliersResponse.json();
 
                 // Lấy danh sách loại thiết bị
                 if (category === "device") {
@@ -153,7 +155,7 @@
                 let endpoint;
                 if (category === "device") {
                     endpoint = `http://localhost:8080/event-management/devices/${id}`;
-                } else if (category === "services") {
+                } else if (category === "service") {
                     endpoint = `http://localhost:8080/event-management/services/${id}`;
                 } else if (category === "location") {
                     endpoint = `http://localhost:8080/event-management/locations/${id}`;
@@ -168,7 +170,7 @@
                 }
                 var b = await itemResponse.json();
                 const item = b.data;
-                
+
 
                 if (!item) {
                     console.warn(`Không tìm thấy ${category} với id = ${id}`);
@@ -182,7 +184,9 @@
                     window.selectedItem = { ...itemData, category };
                     document.getElementById("itemName").textContent = itemData.name || "Không xác định";
                     document.getElementById("itemDescription").textContent = itemData.description || "Không có mô tả";
-                    itemImage.src = itemData.img || itemData.image || "./assets/img/placeholder.jpg";
+                    const imageFileName = itemData.image ? itemData.image.split('/').pop() : null;
+                    const imageUrl = imageFileName ? `${baseImageUrl}${imageFileName}` : "assets/img/default-image.jpg";
+                    itemImage.src = imageUrl;
                     itemImage.style.display = "block";
 
                     const detailsList = document.createElement("ul");
@@ -191,8 +195,8 @@
                         detailsList.innerHTML = `
                             <li class="list-group-item"><strong>Phí thuê/ngày:</strong> ${(item.hourlyRentalFee || 0).toLocaleString()} VND</li>
                             <li class="list-group-item"><strong>Số lượng:</strong> ${item.quantity || "Không xác định"}</li>
-                            <li class="list-group-item"><strong>Loại thiết bị:</strong> ${item.device_type_id}</li>
-                            <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getSupplierName(item.userid)}</li>
+                            <li class="list-group-item"><strong>Loại thiết bị:</strong> ${item.deviceType_name}</li>
+                            <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getSupplierName(item.userID)}</li>
                             <li class="list-group-item"><strong>Thành phố:</strong> ${item.place}</li>
                         `;
                     } else if (category === "service") {
@@ -205,7 +209,8 @@
                     } else if (category === "location") {
                         detailsList.innerHTML = `
                             <li class="list-group-item"><strong>Phí thuê/ngày:</strong> ${(itemData.hourly_rental_fee || 0).toLocaleString()} VND</li>
-                            <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getSupplierName(itemData.user_id)}</li>
+                            <li class="list-group-item"><strong>Địa chỉ:</strong> ${(itemData.address)}</li>
+                            <li class="list-group-item"><strong>Nhà cung cấp:</strong> ${getSupplierName(itemData.userID)}</li>
                         `;
                     }
                     itemDetailsContainer.innerHTML = "";
@@ -225,7 +230,7 @@
                 itemImage.style.display = "none";
                 registerButton.style.display = "none";
             } finally {
-                preloader.style.display = "none";
+                // preloader.style.display = "none";
             }
         });
 

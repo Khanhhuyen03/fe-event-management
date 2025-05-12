@@ -27,7 +27,6 @@ function getData(callback) {
     // Lấy roleName từ localStorage
     const user = JSON.parse(localStorage.getItem("user"));
     const roleName = user?.roleName?.toUpperCase() || "USER";
-    console.log("Role name:", roleName);
 
     // Chọn API dựa trên roleName
     const userApiToFetch = roleName === "MANAGER" ? UserAPI_MRG : UsersAPI;
@@ -62,9 +61,6 @@ function getData(callback) {
             locations = Array.isArray(locations) ? locations : locations.data?.items || [];
             users = Array.isArray(users) ? users : users.data || [];
 
-            console.log("Dữ liệu Locations:", locations);
-            console.log("Dữ liệu Users từ API:", users);
-
             callback(locations, users);
         })
         .catch(error => {
@@ -86,8 +82,6 @@ function renderLocation(locations, users) {
         // Tìm supplier trực tiếp từ users (không cần kiểm tra roleName)
         const supplier = users.find(user => user.id === location.userID);
         const supplierName = supplier ? `${supplier.last_name} ${supplier.first_name}` : "Không có nhà cung cấp";
-
-        console.log(`Location ID: ${location.id}, userID: ${location.user_id}, Supplier:`, supplier);
 
         return `
             <tr class="list-place-${location.id}">
@@ -215,7 +209,6 @@ function watchDetailLocation(editLocationId) {
     // Lấy roleName từ localStorage
     const user = JSON.parse(localStorage.getItem("user"));
     const roleName = user?.roleName?.toUpperCase() || "USER";
-    console.log("Role name:", roleName);
 
     // Chọn API dựa trên roleName
     const userApiToFetch = roleName === "MANAGER" ? UserAPI_MRG : UsersAPI;

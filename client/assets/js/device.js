@@ -6,7 +6,6 @@ const token = localStorage.getItem("token");
 let user;
 try {
     user = JSON.parse(localStorage.getItem("user"));
-    console.log("Dữ liệu user từ localStorage:", user);
 } catch (e) {
     console.error("Dữ liệu user không hợp lệ:", e);
     user = null;

@@ -257,11 +257,9 @@ function getData(callback) {
     // Lấy roleName từ localStorage
     const user = JSON.parse(localStorage.getItem("user"));
     const roleName = user?.roleName?.toUpperCase() || "USER";
-    console.log("Role name:", roleName);
 
     // Chọn API dựa trên roleName
     const userApiToFetch = roleName === "MANAGER" ? UserAPI_MRG : UsersAPI;
-    console.log("User API được gọi:", userApiToFetch);
 
     Promise.all([
         fetch(`${ServiceAPI}/list`, {
@@ -296,9 +294,6 @@ function getData(callback) {
             services = services.data?.items || [];
             users = Array.isArray(users) ? users : users.data || [];
 
-            console.log("Dữ liệu Services:", services);
-            console.log("Dữ liệu Users từ API:", users);
-
             callback(services, users);
         })
         .catch(error => {
@@ -320,8 +315,6 @@ function renderServices(services, users) {
         // Tìm supplier trực tiếp từ users (không cần kiểm tra roleName)
         const supplier = users.find(user => user.id === service.userID);
         const supplierName = supplier ? `${supplier.last_name} ${supplier.first_name}` : "Không có nhà cung cấp";
-
-        console.log(`Service ID: ${service.id}, userID: ${service.user_id}, Supplier:`, supplier);
 
         return `
             <tr class="list-service-${service.id}">
@@ -450,11 +443,9 @@ function watchDetailService(editServicetId) {
     // Lấy roleName từ localStorage
     const user = JSON.parse(localStorage.getItem("user"));
     const roleName = user?.roleName?.toUpperCase() || "USER";
-    console.log("Role name:", roleName);
 
     // Chọn API dựa trên roleName
     const userApiToFetch = roleName === "MANAGER" ? UserAPI_MRG : UsersAPI;
-    console.log("User API được gọi:", userApiToFetch);
 
     Promise.all([
         fetch(userApiToFetch, {
