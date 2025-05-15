@@ -1,3 +1,5 @@
+const BASE_URL = "http://localhost:8080/event-management";
+
 // Thêm sự kiện beforeunload để xóa openContractAfterLogin nếu chưa đăng nhập
 window.addEventListener("beforeunload", function () {
     const token = localStorage.getItem("token");
@@ -31,7 +33,7 @@ function login() {
 }
 
 function getUser(email, password, callback) {
-    fetch(`http://localhost:8080/event-management/auth/login`, {
+    fetch(`${BASE_URL}/auth/login`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -101,11 +103,13 @@ async function handleForgotPassword(event) {
     if (!forgotEmail) return showAlert("Vui lòng nhập email!", "danger");
 
     const submitButton = event.target.querySelector("button[type='submit']");
-    submitButton.disabled = true;
-    submitButton.textContent = "Đang gửi...";
+    toggleButtonState(submitButton, true, "Đang gửi...", "GỬI YÊU CẦU");
+
+    // submitButton.disabled = true;
+    // submitButton.textContent = "Đang gửi...";
 
     try {
-        const response = await fetch("http://localhost:8080/event-management/auth/forgot-password", {
+        const response = await fetch(`${BASE_URL}/auth/forgot-password`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -130,8 +134,10 @@ async function handleForgotPassword(event) {
         showAlert("Lỗi kết nối đến máy chủ! Vui lòng thử lại.", "danger");
         console.error("Lỗi trong handleForgotPassword:", error);
     } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "GỬI YÊU CẦU";
+        toggleButtonState(submitButton, false, "Đang gửi...", "GỬI YÊU CẦU");
+
+        // submitButton.disabled = false;
+        // submitButton.textContent = "GỬI YÊU CẦU";
     }
 }
 async function handleResetPassword(event) {
@@ -141,40 +147,50 @@ async function handleResetPassword(event) {
     const confirmPassword = document.getElementById("confirmPassword").value;
     const token = localStorage.getItem("resetToken");
     const email = localStorage.getItem("resetEmail");
+    console.log("Token:", token);
+    console.log("Email:", email);
 
     const submitButton = event.target.querySelector("button[type='submit']");
-    submitButton.disabled = true;
-    submitButton.textContent = "Đang cập nhật...";
+    toggleButtonState(submitButton, true, "Đang cập nhật...", "GỬI YÊU CẦU");
+
+    // submitButton.disabled = true;
+    // submitButton.textContent = "Đang cập nhật...";
 
     if (!token) {
         showAlert("Mã xác thực không hợp lệ! Vui lòng thử lại.", "danger");
-        submitButton.disabled = false;
-        submitButton.textContent = "CẬP NHẬT MẬT KHẨU";
+        toggleButtonState(submitButton, false, "Đang gửi...", "CẬP NHẬT MẬT KHẨU");
+
+        // submitButton.disabled = false;
+        // submitButton.textContent = "CẬP NHẬT MẬT KHẨU";
         return;
     }
 
     if (!newPassword) {
         showAlert("Vui lòng nhập mật khẩu mới!", "danger");
-        submitButton.disabled = false;
-        submitButton.textContent = "CẬP NHẬT MẬT KHẨU";
+        toggleButtonState(submitButton, false, "Đang gửi...", "CẬP NHẬT MẬT KHẨU");
+
+        // submitButton.disabled = false;
+        // submitButton.textContent = "CẬP NHẬT MẬT KHẨU";
         return;
     }
 
     if (newPassword !== confirmPassword) {
         showAlert("Mật khẩu xác nhận không khớp!", "danger");
-        submitButton.disabled = false;
-        submitButton.textContent = "CẬP NHẬT MẬT KHẨU";
+        toggleButtonState(submitButton, false, "Đang gửi...", "CẬP NHẬT MẬT KHẨU");
+        // submitButton.disabled = false;
+        // submitButton.textContent = "CẬP NHẬT MẬT KHẨU";
         return;
     }
-
+    var code = token;
     try {
-        const response = await fetch("http://localhost:8080/event-management/auth/reset-password", {
+        const response = await fetch(`${BASE_URL}/auth/reset-password`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
                 email,
+                code,
                 newPassword,
             }),
         });
@@ -195,9 +211,14 @@ async function handleResetPassword(event) {
         showAlert("Lỗi kết nối đến máy chủ! Vui lòng thử lại.", "danger");
         console.error("Lỗi trong handleResetPassword:", error);
     } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "CẬP NHẬT MẬT KHẨU";
+        toggleButtonState(submitButton, false, "Đang gửi...", "CẬP NHẬT MẬT KHẨU");
+        // submitButton.disabled = false;
+        // submitButton.textContent = "CẬP NHẬT MẬT KHẨU";
     }
+}
+function toggleButtonState(button, isLoading, loadingText = "Đang xử lý...", normalText = "Xác nhận") {
+    button.disabled = isLoading;
+    button.textContent = isLoading ? loadingText : normalText;
 }
 // Hàm chuyển đổi form
 function switchForm(formType) {
@@ -228,6 +249,45 @@ function switchForm(formType) {
         formTitle.textContent = "ĐĂNG NHẬP";
     }
 }
+async function handleVerifyCode(event) {
+    event.preventDefault();
+    const code = [...document.querySelectorAll(".verification-input")]
+        .map(input => input.value.trim())
+        .join("");
+    const email = localStorage.getItem("resetEmail");
+
+    if (!email || !code) {
+        showAlert("Vui lòng nhập đầy đủ mã xác thực!", "danger");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${BASE_URL}/auth/verify-pass-code`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, code }),
+        });
+
+        const result = await response.json();
+        console.log("Result:", result);
+        if (result.message === "Bạn có thể đặt lại mật khẩu") {
+            localStorage.setItem("resetToken", code);
+            showAlert("Xác thực thành công! Vui lòng đặt lại mật khẩu.", "success");
+            setTimeout(() => {
+                switchForm("resetPassword");
+            }, 1000);
+        } else {
+            showAlert("Mã xác thực không đúng!", "danger");
+        }
+    } catch (error) {
+        showAlert("Lỗi khi xác thực mã! Vui lòng thử lại.", "danger");
+        console.error("Lỗi xác thực:", error);
+    }
+}
+
+
 document.addEventListener("DOMContentLoaded", function () {
     const loginForm = document.getElementById("loginForm");
     const forgotPasswordForm = document.getElementById("forgotPasswordForm");
@@ -300,14 +360,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Validation
-    setupValidation("email", "Vui lòng nhập email!", /^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Email không hợp lệ!");
+    setupValidation("email", "Vui lòng nhập email!", /^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Email có dạng abc@gmail.com!");
     setupValidation("password", "Vui lòng nhập mật khẩu!");
-    setupValidation("forgotEmail", "Vui lòng nhập email!", /^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Email không hợp lệ!");
+    setupValidation("forgotEmail", "Vui lòng nhập email!", /^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Email có dạng abc@gmail.com!");
     setupValidation(
         "newPassword",
         "Vui lòng nhập mật khẩu mới!",
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
-        "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số!"
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/, "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số!"
     );
     setupValidation("confirmPassword", "Vui lòng nhập xác nhận mật khẩu!");
 });

@@ -43,7 +43,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     try {
-        // // 1. Lấy danh sách nhà cung cấp
         rentalId = await fetchData(
             `http://localhost:8080/event-management/rentals/event/${eventId}`,
             "Lỗi khi lấy danh sách rental"

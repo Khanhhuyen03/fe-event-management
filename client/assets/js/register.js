@@ -13,10 +13,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Thiết lập validation cho các trường
     setupValidation("lastName", "Vui lòng nhập họ!");
     setupValidation("firstName", "Vui lòng nhập tên!");
-    setupValidation("email", "Vui lòng nhập email!", /^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Email không hợp lệ!");
-    // setupValidation("phone", "Vui lòng nhập số điện thoại!", /^(03|05|07|08|09)\d{8}$/, "Số điện thoại không hợp lệ!");
-    setupValidation("phone", "Vui lòng nhập số điện thoại!");
-    setupValidation("password", "Vui lòng nhập mật khẩu!");
+    setupValidation("email", "Vui lòng nhập email!", /^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Email có dạng abc@gmail.com!");
+    setupValidation("phone", "Vui lòng nhập số điện thoại!", /^(03|05|07|08|09)\d{8}$/, "Số điện thoại có đủ 10 chữ số!");
+    setupValidation("password", "Vui lòng nhập mật khẩu!", /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/, "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số!");
 });
 
 function setupVerificationInputs() {
@@ -110,7 +109,7 @@ async function handleRegister(event) {
         first_name: ten,
         last_name: ho,
         email,
-        phone_number: phone,
+        phoneNumber: phone,
         password,
         role_id: 2,
         avatar: "https://example.com/default-avatar.jpg",

@@ -1,40 +1,39 @@
-var ContractAPI = 'http://localhost:8080/event-management/api/contracts';
-var UserAPI = 'http://localhost:8080/event-management/users';
-var UserAPI_MRG = `http://localhost:8080/event-management/users/manager`;
-var RentalAPI = 'http://localhost:8080/event-management/rentals';
-// document.addEventListener("DOMContentLoaded", () => {
-//     fetchContractsAndRenderChart();
-// });
-
-// let contractChartInstance = null;
-
-// function fetchContractsAndRenderChart() {
-//     let token = localStorage.getItem("token"); // Lấy token từ localStorage
-
-//     if (!token) {
-//         console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
-//         return;
-//     }
-
-//     fetch(ContractAPI, {
-//         headers: {
-//             "Authorization": `Bearer ${token}`,
-//             "Content-Type": "application/json"
-//         }
-//     })
-//         .then(response => response.json())
-//         .then(contracts => {
-//             const monthlyData = countContractsByMonth(contracts);
-//             renderBarChart(monthlyData);
-//         })
-//         .catch(error => console.error("Lỗi khi lấy dữ liệu hợp đồng:", error));
-// }
+var ContractAPI = 'http://localhost:8080/event-management/api/v1/statistics/contracts/monthly';
+var UserAPI = 'http://localhost:8080/event-management/api/v1/statistics/users/monthly';
+var RentalAPI = 'http://localhost:8080/event-management/api/v1/statistics/revenue/monthly';
+//Dùng chung
 document.addEventListener("DOMContentLoaded", () => {
+    // Kiểm tra Chart.js
+    if (typeof Chart === 'undefined') {
+        console.error("Chart.js không được tải. Đảm bảo script Chart.js được thêm vào HTML.");
+        return;
+    }
+
+    // Kiểm tra canvas tồn tại
+    const userCanvas = document.querySelector('#useChart');
+    if (!userCanvas) {
+        console.error("Không tìm thấy canvas #useChart trong DOM");
+    }
+
+    const contractCanvas = document.querySelector('#contactChart');
+    if (!contractCanvas) {
+        console.error("Không tìm thấy canvas #contactChart trong DOM");
+    }
+
+    const revenueCanvas = document.querySelector('#revenueChart');
+    if (!revenueCanvas) {
+        console.error("Không tìm thấy canvas #revenueChart trong DOM");
+    }
+
     fetchContractsAndRenderChart();
+    fetchUsersAndRenderChart();
+    fetchRentalsAndRenderChart();
 });
 
 let contractChartInstance = null;
-
+let userChartInstance = null;
+let revenueChartInstance = null;
+//Hơp đồng
 function fetchContractsAndRenderChart() {
     let token = localStorage.getItem("token");
 
@@ -56,47 +55,29 @@ function fetchContractsAndRenderChart() {
             return res.json();
         })
         .then(contractData => {
-            // Log phản hồi thô để debug
             console.log("Phản hồi thô ContractAPI:", contractData);
 
-            // Chuẩn hóa dữ liệu hợp đồng
-            let contracts = contractData.result || contractData.data?.items || contractData.data || contractData || [];
-            if (!Array.isArray(contracts)) {
-                console.error("Dữ liệu hợp đồng không phải là mảng:", contracts);
-                contracts = [];
+            let monthlyData = contractData.result || contractData.data?.items || contractData.data || contractData || [];
+            if (!Array.isArray(monthlyData) || monthlyData.length !== 12 || !monthlyData.every(num => typeof num === 'number')) {
+                console.error("Dữ liệu không phải mảng 12 số:", monthlyData);
+                monthlyData = Array(12).fill(0);
             }
 
-            // Log dữ liệu contracts sau khi chuẩn hóa
-            console.log("Dữ liệu contracts sau chuẩn hóa:", contracts);
-
-            // Gọi hàm đếm hợp đồng theo tháng và vẽ biểu đồ
-            const monthlyData = countContractsByMonth(contracts);
+            console.log("Dữ liệu monthlyData sau chuẩn hóa:", monthlyData);
             renderBarChart(monthlyData);
         })
-        .catch(error => console.error("Lỗi khi lấy dữ liệu hợp đồng:", error));
-}
-
-function countContractsByMonth(contracts) {
-    const months = Array(12).fill(0);
-
-    // Kiểm tra xem contracts có phải là mảng không
-    if (!Array.isArray(contracts)) {
-        console.error("Dữ liệu hợp đồng không phải là mảng:", contracts);
-        return months; // Trả về mảng rỗng nếu không phải mảng
-    }
-
-    contracts.forEach(contract => {
-        const date = new Date(contract.createdAt);
-        const month = date.getMonth(); // Lấy tháng từ 0 - 11
-        months[month]++;
-    });
-
-    return months;
+        .catch(error => {
+            console.error("Lỗi khi lấy dữ liệu hợp đồng:", error);
+            alert("Không thể tải dữ liệu hợp đồng. Vui lòng thử lại sau.");
+        });
 }
 
 function renderBarChart(monthlyData) {
     const canvas = document.querySelector('#contactChart');
-    if (!canvas) return;
+    if (!canvas) {
+        console.error("Không tìm thấy canvas #contactChart");
+        return;
+    }
 
     if (contractChartInstance) {
         contractChartInstance.destroy();
@@ -129,78 +110,139 @@ function renderBarChart(monthlyData) {
             }]
         },
         options: {
+            responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Số hợp đồng'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Tháng'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true
                 }
             }
         }
     });
+    console.log("Biểu đồ hợp đồng đã được vẽ thành công.");
 }
-//Thông kê người dùng
-document.addEventListener("DOMContentLoaded", () => {
-    let token = localStorage.getItem("token"); // Lấy token từ localStorage
+//Người dùng
+function fetchUsersAndRenderChart() {
+    let token = localStorage.getItem("token");
 
     if (!token) {
         console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
         return;
     }
-    // Lấy roleName từ localStorage
-    const user = JSON.parse(localStorage.getItem("user"));
-    const roleName = user?.roleName?.toUpperCase() || "USER";
-    console.log("Role name:", roleName);
 
-    // Chọn API dựa trên roleName
-    const userApiToFetch = roleName === "MANAGER" ? UserAPI_MRG : UsersAPI;
-    console.log("User API được gọi:", userApiToFetch);
-    fetch(userApiToFetch, {
+    fetch(UserAPI, {
         headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json"
         }
     })
-        .then(response => response.json())
-        .then(users => {
-            const monthlyData = Array(12).fill(0); // Mảng 12 tháng, khởi tạo 0
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Lỗi UserAPI: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(userData => {
+            console.log("Phản hồi thô UserAPI:", userData);
 
-            users.forEach(user => {
-                const month = new Date(user.created_at).getMonth(); // Lấy tháng từ 0-11
-                monthlyData[month]++; // Tăng số lượng user trong tháng tương ứng
-            });
+            let monthlyData = userData.result || userData.data?.items || userData.data || userData || [];
+            if (!Array.isArray(monthlyData) || monthlyData.length !== 12 || !monthlyData.every(num => typeof num === 'number')) {
+                console.error("Dữ liệu không phải mảng 12 số:", monthlyData);
+                monthlyData = Array(12).fill(0);
+            }
 
-            new Chart(document.querySelector('#useChart'), {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                    datasets: [{
-                        label: 'Số lượng người dùng',
-                        data: monthlyData,
-                        fill: false,
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
+            console.log("Dữ liệu monthlyData user sau chuẩn hóa:", monthlyData);
+            renderUserLineChart(monthlyData);
+        })
+        .catch(error => {
+            console.error("Lỗi khi lấy dữ liệu người dùng:", error);
+            alert("Không thể tải dữ liệu người dùng. Vui lòng thử lại sau.");
+        });
+}
+
+function renderUserLineChart(monthlyData) {
+    const canvas = document.querySelector('#useChart');
+    if (!canvas) {
+        console.error("Không tìm thấy canvas #useChart");
+        return;
+    }
+
+    const container = canvas.parentElement;
+    if (canvas.offsetWidth === 0 || canvas.offsetHeight === 0) {
+        console.warn("Canvas #useChart không có kích thước (width/height = 0). Kiểm tra container và CSS.");
+        console.log("Kích thước container:", container.offsetWidth, container.offsetHeight);
+    }
+
+    if (userChartInstance) {
+        userChartInstance.destroy();
+    }
+
+    try {
+        userChartInstance = new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Số lượng người dùng',
+                    data: monthlyData,
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1,
+                    pointRadius: 5,
+                    pointBackgroundColor: 'rgb(75, 192, 192)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Số lượng người dùng'
+                        },
+                        ticks: {
+                            stepSize: 1
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tháng'
                         }
                     }
+                },
+                plugins: {
+                    legend: {
+                        display: true
+                    }
                 }
-            });
-        })
-        .catch(error => console.error("Lỗi khi lấy dữ liệu người dùng:", error));
-});
-
-
-//Thông kê doanh thu
-document.addEventListener("DOMContentLoaded", () => {
-    fetchRentalsAndRenderChart();
-});
-
-let revenueChartInstance = null;
+            }
+        });
+        console.log("Biểu đồ người dùng đã được vẽ thành công.");
+    } catch (error) {
+        console.error("Lỗi khi vẽ biểu đồ người dùng:", error);
+    }
+}
+//Doanh thu
 function fetchRentalsAndRenderChart() {
-    let token = localStorage.getItem("token"); // Lấy token từ localStorage
+    let token = localStorage.getItem("token");
 
     if (!token) {
         console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
@@ -213,53 +255,89 @@ function fetchRentalsAndRenderChart() {
             "Content-Type": "application/json"
         }
     })
-        .then(response => response.json())
-        .then(rentals => {
-            const monthlyRevenueData = calculateMonthlyRevenue(rentals);
-            renderLineChart(monthlyRevenueData);
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Lỗi RentalAPI: ${response.status}`);
+            }
+            return response.json();
         })
-        .catch(error => console.error("Lỗi khi lấy dữ liệu rental:", error));
+        .then(revenueData => {
+            console.log("Phản hồi thô RentalAPI:", revenueData);
+
+            let monthlyRevenueData = revenueData.result || revenueData.data?.items || revenueData.data || revenueData || [];
+            if (!Array.isArray(monthlyRevenueData) || monthlyRevenueData.length !== 12 || !monthlyRevenueData.every(num => typeof num === 'number')) {
+                console.error("Dữ liệu không phải mảng 12 số:", monthlyRevenueData);
+                monthlyRevenueData = Array(12).fill(0);
+            }
+
+            console.log("Dữ liệu monthlyRevenueData sau chuẩn hóa:", monthlyRevenueData);
+            renderRevenueLineChart(monthlyRevenueData);
+        })
+        .catch(error => {
+            console.error("Lỗi khi lấy dữ liệu doanh thu:", error);
+            alert("Không thể tải dữ liệu doanh thu. Vui lòng thử lại sau.");
+        });
 }
-function calculateMonthlyRevenue(rentals) {
-    const monthlyRevenue = Array(12).fill(0); // Mảng 12 tháng, khởi tạo 0
 
-    rentals.forEach(rental => {
-        const rentalDate = new Date(rental.updatedAt); // Sử dụng updated_at hoặc created_at tùy theo yêu cầu
-        const month = rentalDate.getMonth(); // Lấy tháng từ 0-11
-        monthlyRevenue[month] += rental.totalPrice; // Cộng dồn doanh thu vào tháng tương ứng
-    });
-
-    return monthlyRevenue;
-}
-
-function renderLineChart(monthlyRevenueData) {
+function renderRevenueLineChart(monthlyRevenueData) {
     const canvas = document.querySelector('#revenueChart');
-    if (!canvas) return;
+    if (!canvas) {
+        console.error("Không tìm thấy canvas #revenueChart");
+        return;
+    }
 
-    // Hủy biểu đồ cũ nếu có
+    const container = canvas.parentElement;
+    if (canvas.offsetWidth === 0 || canvas.offsetHeight === 0) {
+        console.warn("Canvas #revenueChart không có kích thước (width/height = 0). Kiểm tra container và CSS.");
+        console.log("Kích thước container:", container.offsetWidth, container.offsetHeight);
+    }
+
     if (revenueChartInstance) {
         revenueChartInstance.destroy();
     }
 
-    // Tạo biểu đồ mới
-    revenueChartInstance = new Chart(canvas, {
-        type: 'line',
-        data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-            datasets: [{
-                label: 'Doanh thu hàng tháng',
-                data: monthlyRevenueData,
-                fill: false,
-                borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
+    try {
+        revenueChartInstance = new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Doanh thu hàng tháng',
+                    data: monthlyRevenueData,
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1,
+                    pointRadius: 5,
+                    pointBackgroundColor: 'rgb(75, 192, 192)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Doanh thu (VND)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tháng'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true
+                    }
                 }
             }
-        }
-    });
+        });
+        console.log("Biểu đồ doanh thu đã được vẽ thành công.");
+    } catch (error) {
+        console.error("Lỗi khi vẽ biểu đồ doanh thu:", error);
+    }
 }

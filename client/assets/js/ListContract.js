@@ -52,34 +52,6 @@ async function fetchData(url, method = "GET", data = null) {
     return response.json();
 }
 
-
-
-// async function fetchContractList() {
-//     try {
-//         // contractList = await fetchData(CONTRACT_API_URL);
-//         const [contractList, rental] = await Promise.all([
-//             fetchData(CONTRACT_API_URL),
-//             fetchData(RENTAL_API_URL)
-//         ]);
-//         return contractList.map(contract => ({
-//             id: contract.id,
-//             contractName: contract.name,
-//             rental: rental.find(r => r.id === contract.rentalId),
-//             totalPrice: rental ? rental.totalPrice.toLocaleString() + " VND" : "0 VND",
-//             rentalStartTime: rental ? new Date(rental.rentalStartTime).toLocaleDateString() : "N/A",
-//             rentalEndTime: rental ? new Date(rental.rentalEndTime).toLocaleDateString() : "N/A",
-//             // value: contract.total_price || 0,
-//             // validity: {
-//             //     startDate: contract.rental_start_time,
-//             //     endDate: contract.rental_end_time
-//             // },
-//             status: contract.status || 'draft'
-//         }));
-//     } catch (error) {
-//         alert(`Error fetching contract list (GET): ${error.message}`);
-//         return [];
-//     }
-// }
 async function fetchContractList() {
     try {
         // Lấy dữ liệu song song từ hai API
@@ -103,11 +75,6 @@ async function fetchContractList() {
                     ? new Date(rentalMatch.rentalStartTime).toLocaleDateString() : "N/A",
                 rentalEndTime: rentalMatch && rentalMatch.rentalEndTime
                     ? new Date(rentalMatch.rentalEndTime).toLocaleDateString() : "N/A",
-                // value: contract.total_price || 0,
-                // validity: {
-                //     startDate: contract.rental_start_time,
-                //     endDate: contract.rental_end_time
-                // },
                 status: contract.status || 'Draft'
             };
         });
@@ -125,21 +92,55 @@ function displayContractList(list, page) {
     const contractTable = document.getElementById("danhSachHopDong");
     contractTable.innerHTML = "";
 
+    //     displayList.forEach((contract, index) => {
+    //         const stt = start + index + 1;
+    //         const row = `
+    //     <tr>
+    //         <td>${stt}</td>
+    //         <td>${contract.contractName}</td>
+    //         <td>${formatCurrency(contract.totalPrice)}</td>
+    //         <td>${formatDate(contract.rentalStartTime)} - ${formatDate(contract.rentalEndTime)}</td>
+    //         <td>${formatStatus(contract.status)}</td>
+    //         <td>
+    //             <button class="btn btn-sm" onclick="viewDetails('${contract.id}')"><i class="fas fa-eye"></i>Xem Chi Tiết</button>
+    //             <button class="btn btn-sm" onclick="makeDeposit('${contract.id}')"><i class="fas fa-money-bill-wave"></i>Đặt Cọc</button>
+    //         </td>
+    //     </tr>
+    // `;
+    //         contractTable.innerHTML += row;
+    //     });
+
+    //     updatePagination(list.length);
     displayList.forEach((contract, index) => {
         const stt = start + index + 1;
+        let actionButtons = `
+                     <button class="btn btn-sm" onclick="viewDetails('${contract.id}')"><i class="fas fa-eye"></i>Xem Chi Tiết</button>
+                `;
+        if (contract.status === "Draft") {
+            actionButtons += `
+                         <button class="btn btn-sm" onclick="makeDeposit('${contract.id}')"><i class="fas fa-money-bill-wave"></i>Đặt Cọc</button>
+         
+                        `;
+        } else if (contract.status === "Completed") {
+            actionButtons += `
+                         <button class="btn btn-sm" onclick="makeDeposit('${contract.id}')"><i class="fas fa-money-bill-wave"></i>Đã Thanh Toán</button>
+                    `;
+        } else {
+            actionButtons += `
+                         <button class="btn btn-sm" onclick="makeDeposit('${contract.id}')"><i class="fas fa-money-bill-wave"></i>Thanh Toán Còn Lại</button>
+                    `;
+        }
+
         const row = `
-    <tr>
-        <td>${stt}</td>
-        <td>${contract.contractName}</td>
-        <td>${formatCurrency(contract.totalPrice)}</td>
-        <td>${formatDate(contract.rentalStartTime)} - ${formatDate(contract.rentalEndTime)}</td>
-        <td>${formatStatus(contract.status)}</td>
-        <td>
-            <button class="btn btn-sm" onclick="viewDetails('${contract.id}')"><i class="fas fa-eye"></i>Xem Chi Tiết</button>
-            <button class="btn btn-sm" onclick="makeDeposit('${contract.id}')"><i class="fas fa-money-bill-wave"></i>Đặt Cọc</button>
-        </td>
-    </tr>
-`;
+                    <tr>
+                        <td>${stt}</td>
+                       <td>${contract.contractName}</td>
+                        <td>${formatCurrency(contract.totalPrice)}</td>
+                        <td>${formatDate(contract.rentalStartTime)} - ${formatDate(contract.rentalEndTime)}</td>
+                        <td>${formatStatus(contract.status)}</td>
+                        <td>${actionButtons}</td>
+                    </tr>
+                `;
         contractTable.innerHTML += row;
     });
 
@@ -204,7 +205,7 @@ function viewDetails(contractId) {
 }
 
 function makeDeposit(contractId) {
-    window.location.href = `deposit.html?id=${contractId}`;
+    window.location.href = `payment.html?id=${contractId}`;
 }
 
 window.onload = async function () {
