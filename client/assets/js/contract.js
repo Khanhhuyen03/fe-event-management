@@ -52,12 +52,20 @@ function toISODate(dateStr) {
 }
 
 function toISODateTime(dateStr, timeStr) {
-    if (!dateStr || !timeStr) return '';
-    const date = parseDate(dateStr);
-    if (!date) return '';
-    const [hours, minutes] = timeStr.split(':').map(Number);
-    date.setHours(hours, minutes);
-    return date.toISOString();
+    if (!dateStr || !timeStr) return null;
+
+    let dateParts;
+    if (dateStr.includes('/')) {
+        dateParts = dateStr.split('/');
+        dateParts = `${dateParts[2]}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}`; // YYYY-MM-DD
+    } else {
+        dateParts = dateStr;
+    }
+
+    const [hours, minutes] = timeStr.split(':').map(part => part.padStart(2, '0'));
+
+    const isoDateTime = `${dateParts}T${hours}:${minutes}:00.000+07:00`;
+    return isoDateTime;
 }
 
 // Lấy thông tin nhà cung cấp
@@ -92,7 +100,6 @@ function initializeContractForm() {
 
     window.addEventListener("message", function (event) {
         if (event.data.type === "preloadEvent" && event.data.event) {
-            console.log("Dữ liệu sự kiện nhận được:", event.data.event.device);
             preloadEvent(event.data);
         }
         if (event.data.type === "preloadItem" && event.data.item) {
@@ -134,122 +141,10 @@ function setupDatePicker(displayId, inputId) {
     });
 }
 
-// async function loadInitialData() {
-//     try {
-//         // Lấy danh sách thiết bị
-//         const deviceResponse = await fetchData(`${DEVICE_API_URL}/list`);
-//         devices = deviceResponse.data?.items || []; // Gán devices trực tiếp từ dữ liệu trả về
-
-//         console.log("Dữ liệu Devices:", devices);
-
-//         // Kiểm tra nếu devices là mảng trước khi lặp
-//         if (Array.isArray(devices)) {
-//             for (const device of devices) {
-//                 const supplier = await fetchSupplier(device.userID);
-//                 device.supplierName = supplier ? `${supplier.last_name} ${supplier.first_name}` : 'Không xác định';
-//             }
-//         } else {
-//             console.warn("Dữ liệu devices không phải là mảng:", devices);
-//             devices = []; // Đặt lại thành mảng rỗng để tránh lỗi sau này
-//         }
-//     } catch (error) {
-//         console.error(`Lỗi khi tải danh sách thiết bị: ${error.message}`);
-//         devices = []; // Đặt lại thành mảng rỗng nếu có lỗi
-//     }
-
-//     try {
-//         // Lấy danh sách dịch vụ
-//         const serviceResponse = await fetchData(`${SERVICE_API_URL}/list`);
-//         services = serviceResponse.data?.items || []; // Sửa để lấy data.items giống devices
-
-//         console.log("Dữ liệu Services:", services);
-
-//         // Kiểm tra nếu services là mảng trước khi lặp
-//         if (Array.isArray(services)) {
-//             for (const service of services) {
-//                 const supplier = await fetchSupplier(service.userID);
-//                 service.supplierName = supplier ? `${supplier.last_name} ${supplier.first_name}` : 'Không xác định';
-//             }
-//         } else {
-//             console.warn("Dữ liệu services không phải là mảng:", services);
-//             services = []; // Đặt lại thành mảng rỗng để tránh lỗi sau này
-//         }
-//     } catch (error) {
-//         console.error(`Lỗi khi tải danh sách dịch vụ: ${error.message}`);
-//         services = []; // Đặt lại thành mảng rỗng nếu có lỗi
-//     }
-
-//     try {
-//         // Lấy danh sách địa điểm
-//         const locationResponse = await fetchData(`${LOCATION_API_URL}/list`);
-//         locations = locationResponse.data?.items || []; // Sửa để lấy data.items giống devices
-
-//         console.log("Dữ liệu Locations:", locations);
-
-//         // Kiểm tra nếu locations là mảng trước khi lặp
-//         if (Array.isArray(locations)) {
-//             for (const location of locations) {
-//                 const supplier = await fetchSupplier(location.userID);
-//                 location.supplierName = supplier ? `${supplier.last_name} ${supplier.first_name}` : 'Không xác định';
-//             }
-//         } else {
-//             console.warn("Dữ liệu locations không phải là mảng:", locations);
-//             locations = []; // Đặt lại thành mảng rỗng để tránh lỗi sau này
-//         }
-//     } catch (error) {
-//         console.error(`Lỗi khi tải danh sách địa điểm: ${error.message}`);
-//         locations = []; // Đặt lại thành mảng rỗng nếu có lỗi
-//     }
-
-//     try {
-//         // Lấy danh sách tỉnh/thành phố
-//         provinces = await fetchData(PROVINCE_API_URL);
-//         const provinceSelect = document.getElementById('province');
-//         provinceSelect.innerHTML = '<option value="">Tỉnh/Thành phố</option>';
-//         if (Array.isArray(provinces)) {
-//             provinces.forEach(prov => {
-//                 const option = document.createElement('option');
-//                 option.value = prov.code;
-//                 option.textContent = prov.name;
-//                 provinceSelect.appendChild(option);
-//             });
-//         } else {
-//             console.warn("Dữ liệu provinces không phải là mảng:", provinces);
-//             provinces = [];
-//         }
-//     } catch (error) {
-//         console.error(`Lỗi khi tải danh sách tỉnh/thành: ${error.message}`);
-//         provinces = [];
-//     }
-
-//     try {
-//         // Lấy danh sách sự kiện
-//         events = await fetchData(EVENT_API_URL);
-//         const contractTypeSelect = document.getElementById('contractType');
-//         contractTypeSelect.innerHTML = '<option value="">Chọn loại sự kiện</option>';
-//         if (Array.isArray(events)) {
-//             events.forEach(event => {
-//                 const option = document.createElement('option');
-//                 option.value = event.id;
-//                 option.textContent = event.name;
-//                 contractTypeSelect.appendChild(option);
-//             });
-//         } else {
-//             console.warn("Dữ liệu events không phải là mảng:", events);
-//             events = [];
-//         }
-//     } catch (error) {
-//         console.error(`Lỗi khi tải danh sách sự kiện: ${error.message}`);
-//         events = [];
-//     }
-// }
-// Hàm loadInitialData
 function fetchJSONP(url, callbackName) {
     return new Promise((resolve, reject) => {
-        // Tạo tên callback duy nhất
         const callbackId = 'jsonp_callback_' + Math.round(100000 * Math.random());
 
-        // Gán callback vào window
         window[callbackId] = function (data) {
             delete window[callbackId]; // Xóa callback sau khi dùng
             document.body.removeChild(script); // Xóa thẻ script
@@ -274,7 +169,6 @@ async function loadInitialData() {
         // Lấy danh sách thiết bị
         const deviceResponse = await fetchData(`${DEVICE_API_URL}/list`);
         devices = deviceResponse.data?.items || [];
-        console.log("Dữ liệu Devices:", devices);
 
         if (Array.isArray(devices)) {
             for (const device of devices) {
@@ -294,7 +188,6 @@ async function loadInitialData() {
         // Lấy danh sách dịch vụ
         const serviceResponse = await fetchData(`${SERVICE_API_URL}/list`);
         services = serviceResponse.data?.items || [];
-        console.log("Dữ liệu Services:", services);
 
         if (Array.isArray(services)) {
             for (const service of services) {
@@ -597,85 +490,6 @@ function confirmItemSelection() {
     }
 }
 
-
-// async function preloadEvent(eventData) {
-//     if (!eventData || !eventData.event) return;
-
-//     const event = eventData.event;
-
-//     document.getElementById("contractType").value = event.id || '';
-//     updateContractName();
-//     document.getElementById("customerName").value = "";
-//     document.getElementById("phoneNumber").value = "";
-
-//     const deviceTableBody = document.getElementById("deviceTableBody");
-//     deviceTableBody.innerHTML = "";
-//     if (event.device && event.device.length > 0) {
-//         for (const item of event.device) {
-//             const supplier = await fetchSupplier(item.userID);
-//             const device = {
-//                 id: item.id || Date.now().toString(),
-//                 name: item.name,
-//                 description: item.description || "Không có mô tả",
-//                 supplierName: supplier ? `${supplier.first_name} ${supplier.last_name}` : "Không xác định",
-//                 hourlyRentalFee: item.hourlyRentalFee || 0,
-//                 img: item.img || item.image || "assets/img/default.jpg",
-//                 place: item.place || "Không xác định"
-//             };
-//             addDeviceToTable(device, item.quantity);
-//         }
-//     }
-
-//     if (event.service && event.service.length > 0) {
-//         for (const item of event.service) {
-//             const supplier = await fetchSupplier(item.userID);
-//             const service = {
-//                 id: item.id || Date.now().toString(),
-//                 name: item.name,
-//                 description: item.description || "Không có mô tả",
-//                 supplierName: supplier ? `${supplier.first_name} ${supplier.last_name}` : "Không xác định",
-//                 hourly_salary: item.hourly_salary || 0,
-//                 image: item.image || item.img || "assets/img/default.jpg",
-//                 place: item.place || "Không xác định"
-//             };
-//             addServiceToTable(service, item.quantity);
-//         }
-//     }
-
-//     if (event.location && event.location.length > 0) {
-//         for (const item of event.location) {
-//             const supplier = await fetchSupplier(item.userID);
-//             const location = {
-//                 id: item.id || Date.now().toString(),
-//                 name: item.name,
-//                 supplierName: supplier ? `${supplier.first_name} ${supplier.last_name}` : "Không xác định",
-//                 hourly_rental_fee: item.hourly_rental_fee || 0,
-//                 img: item.img || item.image || "assets/img/default.jpg",
-//                 place: item.place || "Không xác định"
-//             };
-//             addLocationToTable(location);
-//         }
-//     }
-
-//     if (event.timeline && event.timeline.length > 0) {
-//         const timelineBody = document.getElementById("timelineTableBody");
-//         timelineBody.innerHTML = "";
-//         event.timeline.forEach(item => {
-//             let startTime = "Chưa xác định";
-//             let description = item;
-//             if (typeof item === "string" && item.includes(" - ")) {
-//                 const [timeStr, desc] = item.split(" - ");
-//                 startTime = timeStr.trim();
-//                 description = desc.trim();
-//             }
-//             const row = document.createElement("tr");
-//             row.innerHTML = `<td>${startTime}</td><td>${description}</td>`;
-//             timelineBody.appendChild(row);
-//         });
-//     }
-
-//     updateTotalCost();
-// }
 async function preloadEvent(eventData) {
     if (!eventData || !eventData.event) {
         console.error("Dữ liệu sự kiện không hợp lệ:", eventData);
@@ -726,33 +540,80 @@ async function preloadEvent(eventData) {
                 pricePerDay: item.hourly_salary || item.pricePerDay || 0,
                 totalPrice: item.totalPrice || (item.hourly_salary || item.pricePerDay || 0) * (item.quantity || 1),
                 quantity: item.quantity || 1,
-                image: item.image || item.img || "assets/img/default-service.jpg"
+                image: item.image || item.img || "assets/img/default-service.jpg",
+                rental_id: item.rental_id || event.id
             };
             addServiceToTable(service, service.quantity);
         }
     }
 
     const timelineBody = document.getElementById("timelineTableBody");
-    timelineBody.innerHTML = "";
-    if (event.timeline && event.timeline.length > 0) {
-        console.log("Processing timeline:", event.timeline);
-        event.timeline.forEach(item => {
-            console.log("Timeline item:", item);
-            let startTime = "Chưa xác định";
-            let description = item.description || "Không xác định";
-            if (typeof item === "string" && item.includes(" - ")) {
-                const [timeStr, desc] = item.split(" - ");
-                startTime = timeStr.trim();
-                description = desc.trim();
-            } else if (item.time_start && item.description) {
-                startTime = new Date(item.time_start).toLocaleString('vi-VN', { timeStyle: 'short' });
-                description = item.description;
-            }
-            const row = document.createElement("tr");
-            row.innerHTML = `<td>${startTime}</td><td>${description}</td>`;
-            timelineBody.appendChild(row);
-        });
+    // mới thêm
+    if (!timelineBody) {
+        console.error("Không tìm thấy timelineTableBody. Kiểm tra ID hoặc HTML.");
+        return;
     }
+    timelineBody.innerHTML = "";
+
+    // if (!event?.timeline || event.timeline.length === 0) {
+    //     console.warn("event.timeline rỗng hoặc không tồn tại:", event?.timeline);
+    //     const row = document.createElement("tr");
+    //     row.innerHTML = `<td colspan="2">Chưa có timeline</td>`;
+    //     timelineBody.appendChild(row);
+    //     return;
+    // }
+    // console.log("Processing timeline:", event.timeline);
+    // event.timeline.forEach((item, index) => {
+    //     console.log(`Timeline item ${index}:`, item);
+    //     let startTime = "Chưa xác định";
+    //     let description = item.description || "Không xác định";
+    //     if (typeof item === "string" && item.includes(" - ")) {
+    //         const [timeStr, desc] = item.split(" - ");
+    //         startTime = timeStr.trim(); // Ví dụ: "14:00"
+    //         description = desc.trim();
+    //     } else if (item.time_start && item.description) {
+    //         const date = new Date(item.time_start);
+    //         startTime = isNaN(date.getTime()) ? "Thời gian không hợp lệ" : date.toLocaleString('vi-VN', { timeStyle: 'short' });
+    //         description = item.description;
+    //     }
+    //     // Chỉ thêm hàng nếu startTime hợp lệ
+    //     if (startTime !== "Chưa xác định" && startTime !== "Thời gian không hợp lệ") {
+    //         const row = document.createElement("tr");
+    //         row.innerHTML = `<td>${startTime}</td><td>${description}</td>`;
+    //         timelineBody.appendChild(row);
+    //     }
+    // });
+    if (!event?.timeline || event.timeline.length === 0) {
+        console.warn("event.timeline rỗng hoặc không tồn tại:", event?.timeline);
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>Chưa xác định</td><td>Chưa có timeline</td><td>Chưa xác định</td>`;
+        timelineBody.appendChild(row);
+        return;
+    }
+
+    event.timeline.forEach((item, index) => {
+        console.log(`Timeline item ${index}:`, item);
+        let startTime = "Chưa xác định";
+        let description = item.description || "Không xác định";
+        let dateStr = "Chưa xác định";
+
+        if (typeof item === "string" && item.includes(" - ")) {
+            const [timeStr, desc] = item.split(" - ");
+            startTime = timeStr.trim();
+            description = desc.trim();
+        } else if (item.time_start && item.description) {
+            const date = new Date(item.time_start);
+            startTime = isNaN(date.getTime()) ? "Thời gian không hợp lệ" : date.toLocaleString('vi-VN', { timeStyle: 'short' });
+            description = item.description;
+            dateStr = date.toLocaleDateString('vi-VN');
+        }
+
+        if (startTime !== "Thời gian không hợp lệ") {
+            const row = document.createElement("tr");
+            row.innerHTML = `<td>${startTime}</td><td>${description}</td><td>${dateStr}</td>`;
+            timelineBody.appendChild(row);
+        }
+    });
 
     updateTotalCost();
 }
@@ -1071,24 +932,21 @@ function updateTotalCost() {
     document.getElementById('totalCost').textContent = `${total.toLocaleString()} VNĐ`;
 }
 
-// Thêm timeline
 function addTimeline() {
-    const timelineDate = document.getElementById('timelineDateDisplay').value;
-    const timelineTime = document.getElementById('timelineTime').value;
-    const timelineDescription = document.getElementById('timelineDescription').value;
-    if (!timelineDate || !timelineTime || !timelineDescription) return;
+    const dateStr = document.getElementById('timelineDateDisplay').value;
+    const timeStr = document.getElementById('timelineTime').value;
+    const description = document.getElementById('timelineDescription').value;
+
     const row = document.createElement('tr');
     row.innerHTML = `
-        <td>${timelineDate} ${timelineTime}</td>
-        <td>${timelineDescription}</td>
+        <th>${timeStr}</th>
+        <th>${description}</th>
+        <th>${dateStr}</th>
     `;
     document.getElementById('timelineTableBody').appendChild(row);
-    document.getElementById('timelineDateDisplay').value = '';
-    document.getElementById('timelineDate').value = '';
-    document.getElementById('timelineTime').value = '';
-    document.getElementById('timelineDescription').value = '';
+    console.log("Minh1: ", document.getElementById('timelineTableBody').appendChild(row));
+    console.log("Minh2: ", toISODateTime("21/5/2025", "19:00"));
 }
-
 // Kết hợp địa chỉ
 function getFullAddress() {
     const provinceId = document.getElementById('province').value;
@@ -1102,165 +960,6 @@ function getFullAddress() {
 
     return [addressDetail, ward, district, province].filter(Boolean).join(', ');
 }
-
-// Lưu hợp đồng
-// async function saveContract() {
-//     if (!validateAndUpdateDates()) {
-//         console.error('Vui lòng kiểm tra lại thời gian tổ chức!');
-//         return;
-//     }
-
-//     const customerName = document.getElementById('customerName').value;
-//     const phoneNumber = document.getElementById('phoneNumber').value;
-//     const eventId = document.getElementById('contractType').value;
-//     if (!customerName || !phoneNumber || !eventId) {
-//         console.error('Vui lòng nhập đầy đủ tên khách hàng, số điện thoại và loại sự kiện!');
-//         return;
-//     }
-
-//     const customer = {
-//         name: customerName,
-//         phone_number: phoneNumber,
-//         address: getFullAddress()
-//         // create_at: new Date().toISOString(),
-//         // update_at: new Date().toISOString()
-//     };
-
-//     const rental = {
-//         customLocation: document.getElementById('providerLocation').checked ? null : {
-//             name: document.getElementById('customLocationName').value,
-//             address: document.getElementById('customLocationAddress').value,
-//             startDate: toISODate(document.getElementById('customStartDateDisplay').value),
-//             endDate: toISODate(document.getElementById('customEndDateDisplay').value)
-//         },
-//         rentalStartTime: toISODate(document.getElementById('startDateDisplay').value),
-//         rentalEndTime: toISODate(document.getElementById('endDateDisplay').value),
-//         totalPrice: parseInt(document.getElementById('totalCost').textContent.replace(/[^0-9]/g, '')),
-//         eventId: eventId,
-//         // updated_at: new Date().toISOString()
-//     };
-
-//     const deviceRentals = Array.from(document.getElementById('deviceTableBody').children).map(row => ({
-//         deviceId: row.dataset.deviceId,
-//         quantity: parseInt(row.children[4].querySelector('input').value)
-//     }));
-
-//     const serviceRentals = Array.from(document.getElementById('serviceTableBody').children).map(row => ({
-//         serviceId: row.dataset.serviceId,
-//         quantity: parseInt(row.children[4].querySelector('input').value)
-//     }));
-
-//     const locationRentals = Array.from(document.getElementById('locationTableBody').children).map(row => ({
-//         locationId: row.dataset.locationId,
-//         quantity: 1
-//     }));
-
-//     const timelines = Array.from(document.getElementById('timelineTableBody').children).map(row => ({
-//         description: row.children[1].textContent,
-//         time_start: toISODateTime(row.children[0].textContent.split(' ')[0], row.children[0].textContent.split(' ')[1]),
-
-//     }));
-
-//     try {
-//         const existingCustomer = await fetchData(`${CUSTOMER_API_URL}?phone_number=${phoneNumber}`);
-//         let customerId;
-
-//         if (existingCustomer.length > 0) {
-//             customerId = existingCustomer[0].id;
-//         } else {
-//             const customerResponse = await fetchData(CUSTOMER_API_URL, 'POST', customer);
-//             customerId = customerResponse.id;
-//             console.log('Khách hàng mới đã được lưu:', customerResponse);
-//         }
-
-//         rental.userId = customerId;
-
-//         const rentalResponse = await fetchData(RENTAL_API_URL, 'POST', rental);
-//         console.log('Hợp đồng đã được lưu:', rentalResponse);
-
-//         const contract = {
-//             rentalId: rentalResponse.id,
-//             name: document.getElementById('contractName').value,
-//             paymentIntentId: `b1a2c3d4-e5f6-7890-1234-56789abcdef6`, // Giá trị mặc định vì không có thông tin thanh toán
-//             // customerID: customerId,
-//             address: 'to 3 thon Vinh Xuan, Binh Trung, Thang Binh, Quang Nam',
-//             eventTime: '2025-04-27T11:58:02.6870000',
-//             eventAddress: '04 bau nang 15, Hoa Minh, Lien Chieu, Da Nang',
-//             customerName: 'khanh huyen',
-//             customerPhone: '1111111111',
-//             status: 'Draft', // Trạng thái mặc định là 'draft'
-//         };
-//         const contractResponse = await fetchData(CONTRACT_API_URL, 'POST', contract);
-//         console.log('Hợp đồng đã được lưu vào bảng contract:', contractResponse);
-
-//         for (const deviceRental of deviceRentals) {
-//             await fetchData(DEVICE_RENTAL_API_URL, 'POST', {
-//                 ...deviceRental,
-//                 rentalId: rentalResponse.id
-//             });
-//         }
-
-//         for (const serviceRental of serviceRentals) {
-//             await fetchData(SERVICE_RENTAL_API_URL, 'POST', {
-//                 ...serviceRental,
-//                 rentalId: rentalResponse.id
-//             });
-//         }
-
-//         for (const locationRental of locationRentals) {
-//             await fetchData(LOCATION_RENTAL_API_URL, 'POST', {
-//                 ...locationRental,
-//                 rentalId: rentalResponse.id
-//             });
-//         }
-
-//         for (const timeline of timelines) {
-//             await fetchData(TIMELINE_API_URL, 'POST', {
-//                 ...timeline,
-//                 rental_id: rentalResponse.id
-//             });
-//         }
-
-//         // if (window.parent) {
-//         //     window.parent.postMessage({
-//         //         type: 'newContract',
-//         //         contract: {
-//         //             id: rentalResponse.id,
-//         //             name: document.getElementById('contractName').value,
-//         //             total_price: rentalResponse.total_price,
-//         //             rental_start_time: rentalResponse.rental_start_time,
-//         //             rental_end_time: rentalResponse.rental_end_time,
-//         //             status: 'draft'
-//         //         }
-//         //     }, '*');
-//         // }
-//         if (window.parent) {
-//             window.parent.postMessage({
-//                 type: 'newContract',
-//                 contract: {
-//                     id: contractResponse.id, // Sử dụng id từ contractResponse
-//                     name: contract.name,
-//                     totalPrice: rentalResponse.totalPrice,
-//                     rentalStartTime: rentalResponse.rentalStartTime,
-//                     rentalEndTime: rentalResponse.rentalEndTime,
-//                     status: contract.status
-//                 }
-//             }, '*');
-//         }
-
-//         closeModal();
-//     } catch (error) {
-//         console.error(`Lỗi khi lưu dữ liệu: ${error.message}`);
-//         console.log("contract:", contract);
-
-//     }
-//     console.log("Customer payload:", JSON.stringify(customer));
-//     console.log("Rental payload:", JSON.stringify(rental));
-//     console.log("Device Rentals payload:", JSON.stringify(deviceRentals));
-//     console.log("Service Rentals payload:", JSON.stringify(serviceRentals));
-//     console.log("Location Rentals payload:", JSON.stringify(locationRentals));
-//     console.log("Timelines payload:", JSON.stringify(timelines));
-// }
 
 async function saveContract() {
     // Kiểm tra ngày giờ
@@ -1288,72 +987,84 @@ async function saveContract() {
 
     // Tạo payload cho customer
     const customer = {
-        id: user?.id || null, // ID của người dùng nếu có, nếu không thì null
+        // id: user?.id || null, // ID của người dùng nếu có, nếu không thì null
         name: customerName,
-        phone_number: phoneNumber.replace(/[^0-9]/g, ''), // Đảm bảo chỉ chứa số
+        phoneNumber: phoneNumber.replace(/[^0-9]/g, ''), // Đảm bảo chỉ chứa số
         address: getFullAddress() || 'Chưa cung cấp địa chỉ'
 
     };
 
     // Tạo payload cho rental
     const rental = {
-        // customLocation: document.getElementById('providerLocation').checked ? null : {
-        //     // name: document.getElementById('customLocationName').value?.trim() || 'Địa điểm tùy chỉnh',
-        //     address: document.getElementById('customLocationAddress').value?.trim() || 'Chưa cung cấp'
-        //     // startDate: toISODate(document.getElementById('customStartDateDisplay').value),
-        //     // endDate: toISODate(document.getElementById('customEndDateDisplay').value)
-        // },
         customLocation: document.getElementById('providerLocation').checked ? null : document.getElementById('customLocationAddress').value?.trim() || 'Chưa cung cấp',
         rentalStartTime: toISODate(document.getElementById('startDateDisplay').value),
         rentalEndTime: toISODate(document.getElementById('endDateDisplay').value),
         totalPrice: parseInt(totalCost) || 0,
         eventId: eventId,
-        userId: null, // Sẽ được gán sau khi kiểm tra khách hàng
+        userId: user?.id, // Sẽ được gán sau khi kiểm tra khách hàng
     };
 
     // Lấy danh sách thiết bị, dịch vụ, địa điểm và lịch trình
     const deviceRentals = Array.from(document.getElementById('deviceTableBody')?.children || []).map(row => ({
         deviceId: row.dataset.deviceId,
-        quantity: parseInt(row.children[4]?.querySelector('input')?.value) || 1
-    })).filter(item => item.deviceId && item.quantity > 0);
+        quantity: parseInt(row.children[4]?.querySelector('input')?.value) || 1,
+        // rentalId: row.dataset.rentalId
+    })).filter(item => item.deviceId && item.quantity);
+    console.log('Device Rentals lưu xuống:', JSON.stringify(deviceRentals));
 
     const serviceRentals = Array.from(document.getElementById('serviceTableBody')?.children || []).map(row => ({
         serviceId: row.dataset.serviceId,
-        quantity: parseInt(row.children[4]?.querySelector('input')?.value) || 1
+        quantity: parseInt(row.children[4]?.querySelector('input')?.value) || 1,
+        // rentalId: row.dataset.rentalId
     })).filter(item => item.serviceId && item.quantity > 0);
+    console.log('service Rentals lưu xuống:', JSON.stringify(serviceRentals));
 
     const locationRentals = Array.from(document.getElementById('locationTableBody')?.children || []).map(row => ({
         locationId: row.dataset.locationId,
-        quantity: 1
+        quantity: 1,
+        // rentalId: row.dataset.rentalId
     })).filter(item => item.locationId);
+    console.log('location Rentals lưu xuống:', JSON.stringify(locationRentals));
 
-    const timelines = Array.from(document.getElementById('timelineTableBody')?.children || []).map(row => ({
-        description: row.children[1]?.textContent?.trim() || 'Không có mô tả',
-        time_start: toISODateTime(
-            row.children[0]?.textContent?.split(' ')[0],
-            row.children[0]?.textContent?.split(' ')[1]
-        )
-    })).filter(item => item.description && item.time_start);
+    const eventStartDate = document.getElementById('timelineTableBody').value?.trim(); // Ví dụ: "11/05/2025"
 
+    // const timelines = Array.from(document.getElementById('timelineTableBody').children).map(row => {
+    //     const timeStr = row.children[0].textContent;
+    //     const dateStr = row.children[2].textContent; // Lấy từ cột ẩn
+    //     const description = row.children[1].textContent;
+
+    //     console.log("Minh2: ", toISODateTime(dateStr, timeStr));
+    //     return {
+    //         description: description,
+    //         time_start: toISODateTime(dateStr, timeStr)
+    //     };
+    // }).filter(item => item && item.description && item.time_start);
+    const timelines = Array.from(document.getElementById('timelineTableBody').children).map(row => {
+        if (row.children.length < 3) {
+            console.warn("Hàng timeline không đủ cột:", row);
+            return null;
+        }
+
+        const timeStr = row.children[0].textContent;
+        const dateStr = row.children[2].textContent;
+        const description = row.children[1].textContent;
+
+        if (description === "Chưa có timeline") {
+            return null;
+        }
+
+        console.log("Minh2: ", toISODateTime(dateStr, timeStr));
+        return {
+            description: description,
+            time_start: toISODateTime(dateStr, timeStr)
+        };
+    }).filter(item => item && item.description && item.time_start);
+
+
+
+    console.log('timeline lưu xuống:', JSON.stringify(timelines));
     try {
-        // Kiểm tra khách hàng hiện có
-        // const existingCustomerResponse = await fetchData(`${CUSTOMER_API_URL}?phone_number=${phoneNumber}`);
-        // // const existingCustomer = await fetchData(`${CUSTOMER_API_URL}?phone_number=${phoneNumber}`);
         let customerId;
-
-        // if (existingCustomerResponse?.length > 0) {
-        //     customerId = existingCustomerResponse[0].id;
-        // } else {
-        //     try {
-        //         const customerResponse = await fetchData(CUSTOMER_API_URL, 'POST', customer);
-        //         customerId = customerResponse.result.id;
-        //         console.log('Khách hàng mới đã được lưu:', customerResponse);
-        //     } catch (customerError) {
-        //         const errorDetail = customerError.message || 'Không xác định';
-        //         alert(`Lỗi khi lưu khách hàng: ${errorDetail}`);
-        //         throw new Error(`Lưu khách hàng thất bại: ${errorDetail}`);
-        //     }
-        // }
 
         try {
             const customerResponse = await fetchData(CUSTOMER_API_URL, 'POST', customer);
@@ -1365,8 +1076,6 @@ async function saveContract() {
             throw new Error(`Lưu khách hàng thất bại: ${errorDetail}`);
         }
 
-        // Gán customerId cho rental
-        rental.userId = customerId;
         console.log('customerId:', customerId);
 
         // Lưu hợp đồng (rental)
@@ -1389,18 +1098,6 @@ async function saveContract() {
             customerPhone: phoneNumber,
             status: 'Draft'
         };
-        // const contract = {
-        //     rentalId: 'cc29902a-8f37-4ab7-b98b-20604df7cdd7',
-        //     name: 'Hanh',
-        //     paymentIntentId: 'hanh123', // Giả định giá trị tạm, thay bằng logic thanh toán thực tế
-        //     // address: rental.customLocation?.address || getFullAddress() || 'Chưa cung cấp',
-        //     address: 'to 3 thon Vinh Xuan, Binh Trung, Thang Binh, Quang Nam',
-        //     // eventTime: "2025-05-15T00:00:00.000Z",
-        //     // eventAddress: rental.customLocation?.address || 'Chưa cung cấp',
-        //     customerName: 'Hanh',
-        //     customerPhone: '0111111111',
-        //     status: 'Draft'
-        // };
 
         // Lưu contract
         console.log("contract:", contract);
@@ -1413,6 +1110,10 @@ async function saveContract() {
                 ...deviceRental,
                 rentalId: rentalResponse.id
             });
+        }
+        console.log('Rental Response:', rentalResponse);
+        if (!rentalResponse.id) {
+            throw new Error('Lưu hợp đồng thất bại: Không nhận được ID từ server');
         }
 
         // Lưu danh sách dịch vụ
@@ -1456,10 +1157,9 @@ async function saveContract() {
 
         alert('Hợp đồng đã được lưu thành công!');
         closeModal();
+        window.parent.location.href = "ListContract.html";
     } catch (error) {
-        // alert(`Lỗi khi lưu hợp đồng: ${error.message || 'Không xác định'}`);
         console.error('Lỗi khi lưu dữ liệu:', error);
-        // console.log("rental response:", rentalResponse);
     }
     console.log("Customer payload:", JSON.stringify(customer));
     console.log("Rental payload:", JSON.stringify(rental));
@@ -1468,22 +1168,6 @@ async function saveContract() {
     console.log("Location Rentals payload:", JSON.stringify(locationRentals));
     console.log("Timelines payload:", JSON.stringify(timelines));
 
-
-
-
-    // } catch (error) {
-    //     alert(`Lỗi khi lưu hợp đồng: ${error.message || 'Không xác định'}`);
-    //     console.error('Lỗi khi lưu dữ liệu:', error);
-    //     console.log('Payloads:', {
-    //         customer: JSON.stringify(customer),
-    //         rental: JSON.stringify(rental),
-    //         contract: JSON.stringify(contract),
-    //         deviceRentals: JSON.stringify(deviceRentals),
-    //         serviceRentals: JSON.stringify(serviceRentals),
-    //         locationRentals: JSON.stringify(locationRentals),
-    //         timelines: JSON.stringify(timelines)
-    //     });
-    // }
 }
 
 

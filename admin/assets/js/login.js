@@ -45,7 +45,7 @@ function handleLogin(data) {
                     last_name: body.user?.last_name,
                     first_name: body.user?.first_name,
                     avatar: body.user?.avatar,
-                    phone_number: body.user?.phone_number,
+                    phone_number: body.user?.phoneNumber,
                     roleName: body.user?.roleName // Lưu role_id 
                 })
             );

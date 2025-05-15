@@ -23,19 +23,25 @@ function showAlert(message, type) {
     }, 3000);
 }
 
-function setupValidation(id, emptyMessage, regex = null, invalidMessage = null) {
+function setupValidation(id, emptyMessage, pattern = null, patternMessage = "") {
     const input = document.getElementById(id);
     if (!input) return;
 
-    input.addEventListener("input", () => {
+    input.addEventListener("blur", function () {
         const value = input.value.trim();
+
         if (!value) {
             input.setCustomValidity(emptyMessage);
-        } else if (regex && !regex.test(value)) {
-            input.setCustomValidity(invalidMessage);
+        } else if (pattern && !pattern.test(value)) {
+            input.setCustomValidity(patternMessage);
         } else {
-            input.setCustomValidity("");
+            input.setCustomValidity(""); // clear lỗi nếu đúng
         }
+    });
+    input.reportValidity();
+
+    input.addEventListener("input", function () {
+        input.setCustomValidity(""); // clear lỗi khi đang gõ lại
     });
 }
 
@@ -51,4 +57,19 @@ function togglePassword(inputId, iconId) {
         icon.classList.remove("bi-eye");
         icon.classList.add("bi-eye-slash");
     }
+}
+
+const passwordInputElement = document.getElementById('password');
+const passwordError = document.getElementById('passwordError');
+
+if (passwordInputElement && passwordError) {
+    passwordInputElement.addEventListener('input', function () {
+        if (passwordInputElement.value.length < 8 && passwordInputElement.value.length > 0) {
+            passwordError.textContent = 'Mật khẩu phải có ít nhất 8 ký tự.';
+            passwordError.style.display = 'block';
+        } else {
+            passwordError.textContent = '';
+            passwordError.style.display = 'none';
+        }
+    });
 }

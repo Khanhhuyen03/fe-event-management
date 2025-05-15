@@ -66,32 +66,6 @@
                         <a href="#" id="backToLogin" class="text">Quay lại đăng nhập</a>
                     </p>
                 </div>
-                <!-- Form xác thực mã -->
-                <div id="verifySection" class="auth-form" style="display: none;">
-                    <form id="verifyForm">
-                        <div class="mb-3">
-                            <label class="form-label text-center d-block">Nhập mã xác thực từ email</label>
-                            <div class="verification-inputs d-flex justify-content-center gap-2">
-                                <input type="text" class="form-control verification-input text-center" id="code1"
-                                    maxlength="1" required>
-                                <input type="text" class="form-control verification-input text-center" id="code2"
-                                    maxlength="1" required>
-                                <input type="text" class="form-control verification-input text-center" id="code3"
-                                    maxlength="1" required>
-                                <input type="text" class="form-control verification-input text-center" id="code4"
-                                    maxlength="1" required>
-                                <input type="text" class="form-control verification-input text-center" id="code5"
-                                    maxlength="1" required>
-                                <input type="text" class="form-control verification-input text-center" id="code6"
-                                    maxlength="1" required>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn w-100">XÁC NHẬN</button>
-                    </form>
-                    <p class="text-center mt-3 text-white">
-                        <a href="#" id="backToForgotPassword" class="text">Quay lại nhập email</a>
-                    </p>
-                </div>
 
                 <!-- Form xác thực mã -->
                 <div id="verifySection" class="auth-form" style="display: none;">
@@ -100,17 +74,23 @@
                             <label class="form-label text-center d-block">Nhập mã xác thực từ email</label>
                             <div class="verification-inputs d-flex justify-content-center gap-2">
                                 <input type="text" class="form-control verification-input text-center" id="code1"
-                                    maxlength="1" required>
+                                    maxlength="1" required oninvalid="this.setCustomValidity('Vui lòng nhập mã')"
+                                    oninput="this.setCustomValidity('')">
                                 <input type="text" class="form-control verification-input text-center" id="code2"
-                                    maxlength="1" required>
+                                    maxlength="1" required oninvalid="this.setCustomValidity('Vui lòng nhập mã')"
+                                    oninput="this.setCustomValidity('')">
                                 <input type="text" class="form-control verification-input text-center" id="code3"
-                                    maxlength="1" required>
+                                    maxlength="1" required oninvalid="this.setCustomValidity('Vui lòng nhập mã')"
+                                    oninput="this.setCustomValidity('')">
                                 <input type="text" class="form-control verification-input text-center" id="code4"
-                                    maxlength="1" required>
+                                    maxlength="1" required oninvalid="this.setCustomValidity('Vui lòng nhập mã')"
+                                    oninput="this.setCustomValidity('')">
                                 <input type="text" class="form-control verification-input text-center" id="code5"
-                                    maxlength="1" required>
+                                    maxlength="1" required oninvalid="this.setCustomValidity('Vui lòng nhập mã')"
+                                    oninput="this.setCustomValidity('')">
                                 <input type="text" class="form-control verification-input text-center" id="code6"
-                                    maxlength="1" required>
+                                    maxlength="1" required oninvalid="this.setCustomValidity('Vui lòng nhập mã')"
+                                    oninput="this.setCustomValidity('')">
                             </div>
                         </div>
                         <button type="submit" class="btn w-100">XÁC NHẬN</button>

@@ -64,7 +64,7 @@ function renderUsers(users) {
                 <td>${user.last_name}</td>
                 <td>${user.first_name}</td>
                 <td>${user.roleName}</td>
-                <td>${user.phone_number}</td>
+                <td>${user.phoneNumber}</td>
                  <td>${user.created_at ? new Date(user.created_at).toLocaleDateString("en-US", { year: "2-digit", month: "2-digit", day: "2-digit" }) : "Không xác định"}</td>
                 <td class="text-center">
                     <div class="action-dropdown">
