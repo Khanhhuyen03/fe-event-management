@@ -127,7 +127,7 @@ function displayContractList(list, page) {
                     `;
         } else {
             actionButtons += `
-                         <button class="btn btn-sm" onclick="makeDeposit('${contract.id}')"><i class="fas fa-money-bill-wave"></i>Thanh Toán Còn Lại</button>
+                         <button class="btn btn-sm" onclick="makeDeposit('${contract.id}')"><i class="fas fa-money-bill-wave"></i>Thanh Toán Còn L</button>
                     `;
         }
 
