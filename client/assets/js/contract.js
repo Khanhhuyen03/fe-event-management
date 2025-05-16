@@ -510,7 +510,7 @@ async function preloadEvent(eventData) {
         console.log("Processing device rentals:", event.device);
         for (const item of event.device) {
             const device = {
-                id: item.id || item.deviceId || Date.now().toString(),
+                id: item.deviceID || Date.now().toString(),
                 deviceName: item.deviceName || item.name || "Không xác định",
                 deviceTypeName: item.deviceTypeName || item.description || "Không có mô tả",
                 supplierName: item.supplierName || (item.userID ? (await fetchSupplier(item.userID))?.first_name + " " + (await fetchSupplier(item.userID))?.last_name : "Không xác định"),
@@ -534,7 +534,7 @@ async function preloadEvent(eventData) {
         for (const item of event.service) {
             const supplier = item.userID ? await fetchSupplier(item.userID) : null;
             const service = {
-                id: item.id || Date.now().toString(),
+                id: item.serviceID || Date.now().toString(),
                 serviceName: item.serviceName || item.name || "Không xác định",
                 supplierName: supplier ? `${supplier.first_name} ${supplier.last_name}` : item.supplierName || "Không xác định",
                 pricePerDay: item.hourly_salary || item.pricePerDay || 0,
@@ -543,6 +543,7 @@ async function preloadEvent(eventData) {
                 image: item.image || item.img || "assets/img/default-service.jpg",
                 rental_id: item.rental_id || event.id
             };
+            console.log("Adding service rental:", service);
             addServiceToTable(service, service.quantity);
         }
     }
@@ -972,7 +973,8 @@ async function saveContract() {
     // Lấy dữ liệu từ form
     const customerName = document.getElementById('customerName').value?.trim();
     const phoneNumber = document.getElementById('phoneNumber').value?.trim();
-    const eventId = document.getElementById('contractType').value?.trim();
+    // const eventId = document.getElementById('contractType').value?.trim();
+    const eventId = localStorage.getItem('eventId');
     const contractName = document.getElementById('contractName').value?.trim();
     const totalCost = document.getElementById('totalCost').textContent.replace(/[^0-9]/g, '');
 
@@ -1083,9 +1085,9 @@ async function saveContract() {
         console.log("rental response:", rentalResponse);
 
         if (!rentalResponse.id) {
-            throw new Error('Lưu hợp đồng thất bại: Không nhận được ID từ server');
+            throw new Error('Lưu rental thất bại: Không nhận được ID từ server');
         }
-        console.log('Hợp đồng đã được lưu:', rentalResponse);
+        console.log('rental đã được lưu:', rentalResponse);
 
         // Tạo payload cho contract
         const contract = {
@@ -1106,39 +1108,60 @@ async function saveContract() {
 
         // Lưu danh sách thiết bị
         for (const deviceRental of deviceRentals) {
-            await fetchData(DEVICE_RENTAL_API_URL, 'POST', {
+            const payload = {
                 ...deviceRental,
                 rentalId: rentalResponse.id
-            });
-        }
-        console.log('Rental Response:', rentalResponse);
-        if (!rentalResponse.id) {
-            throw new Error('Lưu hợp đồng thất bại: Không nhận được ID từ server');
+            };
+            console.log("Hạnh : ", payload);
+            try {
+                const response = await fetchData(DEVICE_RENTAL_API_URL, 'POST', payload);
+                console.log('Device rental saved:', response);
+            } catch (error) {
+                console.error('Lỗi khi lưu device rental:', error);
+            }
         }
 
-        // Lưu danh sách dịch vụ
         for (const serviceRental of serviceRentals) {
-            await fetchData(SERVICE_RENTAL_API_URL, 'POST', {
+            const payload = {
                 ...serviceRental,
                 rentalId: rentalResponse.id
-            });
+            };
+            try {
+                const response = await fetchData(SERVICE_RENTAL_API_URL, 'POST', payload);
+                console.log('Service rental saved:', response);
+            } catch (error) {
+                console.error('Lỗi khi lưu service rental:', error);
+            }
         }
 
-        // Lưu danh sách địa điểm
         for (const locationRental of locationRentals) {
-            await fetchData(LOCATION_RENTAL_API_URL, 'POST', {
+            const payload = {
                 ...locationRental,
                 rentalId: rentalResponse.id
-            });
+            };
+            try {
+                const response = await fetchData(LOCATION_RENTAL_API_URL, 'POST', payload);
+                console.log('Location rental saved:', response);
+            } catch (error) {
+                console.error('Lỗi khi lưu location rental:', error);
+            }
         }
+
 
         // Lưu danh sách lịch trình
         for (const timeline of timelines) {
-            await fetchData(`${TIMELINE_API_URL}/new`, 'POST', {
+            const payload = {
                 ...timeline,
                 rental_id: rentalResponse.id
-            });
+            };
+            try {
+                const response = await fetchData(`${TIMELINE_API_URL}/new`, 'POST', payload);
+                console.log('Timeline saved:', response);
+            } catch (error) {
+                console.error('Lỗi khi lưu timeline:', error);
+            }
         }
+
 
         // Gửi thông báo đến parent window (nếu có)
         if (window.parent && typeof window.parent.postMessage === 'function') {

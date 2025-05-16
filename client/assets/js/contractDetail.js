@@ -110,10 +110,12 @@ async function layChiTietHopDong(contractId) {
         if (!contract) throw new Error('Hợp đồng không tồn tại');
 
         const rental = await fetchData(`${RENTAL_API_URL}/${contract.rentalId}`);
+        console.log("Hạnh: ", rental);
         const event = await fetchData(`${EVENT_API_URL}/${rental.eventId}`);
 
         var deviceRentals = await fetchData(`${DEVICE_RENTAL_API_URL}/rental/${rental.id}`);
         deviceRentals = deviceRentals.result;
+        console.log("deviceRentals: ", deviceRentals);
         const devicesData = deviceRentals.map(rental => {
 
             return {
