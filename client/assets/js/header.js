@@ -101,7 +101,6 @@ function updateHeader() {
             dropdownMenu.innerHTML = `
                 <li><a class="dropdown-item d-flex align-items-center" href="account.html"><i class="bi bi-person-circle"></i><span>Thông tin cá nhân</span></a></li>
                 <li><a class="dropdown-item d-flex align-items-center" href="ListContract.html"><i class="bi bi-file-earmark-text"></i><span>Quản lý hợp đồng</span></a></li>
-                <li><a class="dropdown-item d-flex align-items-center" href="invitation.html"><i class="bi bi-envelope"></i><span>Quản lý thư mời</span></a></li>
                 <li><a class="dropdown-item d-flex align-items-center" href="change_password.html"><i class="bi bi-shield-lock"></i><span>Đổi mật khẩu</span></a></li>
                 <li><a class="dropdown-item d-flex align-items-center logout-btn" href="#" id="logout-btn"><i class="bi bi-box-arrow-right"></i><span>Đăng xuất</span></a></li>
             `;
