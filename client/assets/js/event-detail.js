@@ -316,7 +316,7 @@ function openContractModal() {
     // Gửi dữ liệu sự kiện đến contract.html
     iframe.onload = async () => {
         try {
-            const event = await fetchData(
+            let event = await fetchData(
                 `http://localhost:8080/event-management/event/${eventId}`,
                 "Lỗi khi tải chi tiết sự kiện"
             );
@@ -325,7 +325,7 @@ function openContractModal() {
                 `http://localhost:8080/event-management/rentals/event/${eventId}`,
                 "Lỗi khi lấy danh sách rental"
             );
-            console.log("Rentals:", rentals);
+            console.log("Rentals:", rentals, "Event name:", event.name);
             let rentalId;
             if (Array.isArray(rentals) && rentals.length > 0) {
                 rentalId = rentals[0].id;
@@ -350,12 +350,22 @@ function openContractModal() {
             console.log("API Devices:", devices);
             console.log("API Services:", services);
             console.log("API Timeline:", timeline);
+            try {
+                event = await createEvent({
+                    name: event.name,
+                    eventType_id : event.eventTypeID
+                },null);
+                alert("Tạo event thành công! ID: " + event.id + " Name: " + event.name);
+                localStorage.setItem('eventId', event.id);
+            } catch (error) {
+                console.log("Hạnh ơi lỗi rồi :", error);
+            }
 
             if (event) {
                 iframe.contentWindow.postMessage({
                     type: "preloadEvent",
                     event: {
-                        id: eventId,
+                        id: event.id,
                         name: event.name,
                         description: event.description,
                         img: event.img,
@@ -365,7 +375,45 @@ function openContractModal() {
                     }
                 }, "*");
             }
-            console.log("Đã gửi dữ liệu đến iframe", eventId, event.name, devices, services, timeline);
+            // const newEventData = {
+            //     name: event.name + " (Copy)",
+            //     description: event.description,
+            //     img: event.img,
+            //     devices: devices.result || [],
+            //     services: services.result || [],
+            //     timeline: timeline.data || []
+            // };
+
+            // const createResponse = await fetch("http://localhost:8080/event-management/event/create-event", {
+            //     method: "POST",
+            //     headers: {
+            //         "Content-Type": "application/json"
+            //     },
+            //     body: JSON.stringify(rentalData)
+            // });
+
+            // console.log("Response from create event:", createResponse);
+            // if (!createResponse.ok) {
+            //     throw new Error("Tạo sự kiện mới thất bại.");
+            // }
+            // const createdEvent = await createResponse.json();
+            // console.log("Sự kiện mới đã được tạo:", createdEvent);
+
+            // Optional: gửi dữ liệu đến iframe để hiển thị nếu muốn
+            iframe.contentWindow.postMessage({
+                type: "preloadEvent",
+                event: {
+                    id: event.id,
+                    name: event.name,
+                    description: event.description,
+                    img: event.img,
+                    device: devices.result || [], // Truy cập result
+                    service: services.result || [], // Truy cập result
+                    timeline: timeline.data || [] // Truy cập data
+                }
+            }, "*");
+            console.log("Đã gửi dữ liệu đến iframe", event.id, event.name, devices, services, timeline);
+
         } catch (error) {
             console.error("Lỗi khi gửi dữ liệu sự kiện đến iframe:", error);
         }
@@ -379,7 +427,38 @@ function openContractModal() {
         }
     }, { once: true });
 }
+async function createEvent(eventdata,file) {
+    try {
+        const formData = new FormData();
 
+        // Gửi object JSON chỉ có name
+        //const eventData = { name: eventdata.name };
+        formData.append(
+            "event",
+            new Blob([JSON.stringify(eventdata)], { type: "application/json" })
+        );
+
+        if (file) {
+            formData.append("file", file);
+        }
+        const response = await fetch("http://localhost:8080/event-management/event/create-event", {
+            method: "POST",
+            body: formData
+        });
+        console.log("Response from create event:", response);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Tạo sự kiện thất bại: ${errorText}`);
+        }
+
+        const result = await response.json();
+        return result.result;
+    } catch (error) {
+        alert("Lỗi khi tạo event: " + error.message);
+        throw error;
+    }
+}
 async function createRental(rentalData) {
     try {
         const response = await fetch("http://localhost:8080/event-management/rentals", {
@@ -408,7 +487,7 @@ async function createRental(rentalData) {
 async function handleCreateRental() {
     const userId = localStorage.getItem("userId"); // hoặc lấy từ nơi bạn lưu user
     const urlParams = new URLSearchParams(window.location.search);
-    const eventId = urlParams.get("id");
+    const eventid = urlParams.get("id");
 
     // TODO: Lấy các giá trị này từ form hoặc dữ liệu thực tế của bạn
     const totalPrice = 1000000; // hoặc lấy từ input
@@ -416,15 +495,12 @@ async function handleCreateRental() {
     const rentalEndTime = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // hoặc lấy từ input
     const customLocation = "Địa điểm ABC"; // hoặc lấy từ input
 
-    if (!userId || !eventId) {
-        alert("Thiếu userId hoặc eventId!");
-        return;
-    }
+
 
     try {
         const rental = await createRental({
             userId,
-            eventId,
+            event: eventid,
             totalPrice,
             rentalStartTime,
             rentalEndTime,
