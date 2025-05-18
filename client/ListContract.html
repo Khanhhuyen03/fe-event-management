@@ -9,7 +9,6 @@
     <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/main.css">
-    <link href="assets/css/main.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <style>
         body {
@@ -17,46 +16,6 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-        }
-
-        .header {
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 10px 0;
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-        }
-
-        .header .logo h1 {
-            font-size: 24px;
-            margin: 0;
-        }
-
-        .header .logo span {
-            color: #718355;
-        }
-
-        .navmenu ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-        }
-
-        .navmenu ul li {
-            margin-right: 20px;
-        }
-
-        .navmenu ul li a {
-            text-decoration: none;
-            color: #333;
-            font-weight: bold;
-        }
-
-        .navmenu ul li a:hover {
-            color: #718355;
         }
 
         .content {
@@ -146,13 +105,6 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             display: none;
         }
-
-        #footer {
-            background-color: #e6f0e6;
-            padding: 20px 0;
-            text-align: center;
-            width: 100%;
-        }
     </style>
 </head>
 
@@ -161,26 +113,6 @@
     <div class="content container">
         <h2>DANH SÁCH HỢP ĐỒNG</h2>
         <div class="toast" id="successToast">Thanh toán thành công!</div>
-        <!-- <div class="filter-bar">
-            <div>
-                <input type="text" id="tenHopDong" placeholder="Nhập tên hợp đồng" class="form-control d-inline-block"
-                    style="width: 200px;">
-                <select id="trangThai">
-                    <option value="">Tất cả</option>
-                    <option value="Draft">Bản Nháp</option>
-                    <option value="DepositPaid">Đã Đặt Cọc</option>
-                    <option value="InProgress">Đang Thực Hiện</option>
-                    <option value="WaitingPaid">Chờ Thanh Toán</option>
-                    <option value="Completed">Hoàn Thành</option>
-                    <option value="Cancel">Đã Hủy</option>
-                    <option value="AdminCancel">Đã Hủy bởi Admin</option>
-                </select>
-            </div>
-            <div>
-                <button class="search-btn" onclick="searchContracts()">Tìm kiếm</button>
-                <button class="reset-btn" onclick="resetFilters()">Xóa bộ lọc</button>
-            </div>
-        </div> -->
         <table id="contractTable" class="table table-bordered">
             <thead>
                 <tr>

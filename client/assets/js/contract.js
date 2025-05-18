@@ -632,11 +632,12 @@ async function preloadItem(item) {
         name: itemData.name,
         description: itemData.description || "Không có mô tả",
         supplierName: supplierName,
-        hourly_salary: itemData.hourly_salary || itemData.hourly_rental_fee || 0,
+        hourly_salary: itemData.hourly_salary || itemData.hourlyRentalFee || 0,
+        hourlyRentalFee: itemData.hourlyRentalFee || 0,
         hourly_rental_fee: itemData.hourly_rental_fee || 0,
         img: itemData.img || itemData.image || "assets/img/default.jpg",
         place: itemData.place || "Không xác định",
-        quantity: itemData.quantity || 1
+        quantity: 1
     };
 
     if (category === "device") {

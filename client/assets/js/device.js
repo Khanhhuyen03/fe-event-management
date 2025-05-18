@@ -1,6 +1,7 @@
 const API_BASE = 'http://localhost:8080/event-management';
 const DeviceAPI = `${API_BASE}/devices`;
 const DeviceTypeAPI = `${API_BASE}/deviceType`;
+const ProvinceAPI = 'https://provinces.open-api.vn/api/p';
 
 const token = localStorage.getItem("token");
 let user;
@@ -11,10 +12,13 @@ try {
     user = null;
 }
 function start() {
-    getData((devices, deviceTypes) => {
+    getData((devices, deviceTypes, provinces) => {
         renderDevices(devices, deviceTypes);
         if (document.querySelector("#selectDeviceTypes")) {
             populateDeviceTypes(deviceTypes);
+        }
+        if (document.querySelector("#inputLocation")) {
+            populateCities(provinces);
         }
     });
     handleCreateForm();
@@ -49,13 +53,25 @@ function getData(callback) {
             }
             return res.json();
         }),
+        // Lấy danh sách tỉnh/thành phố
+        fetch(ProvinceAPI).then(res => {
+            if (!res.ok) {
+                return res.text().then(text => {
+                    throw new Error(`Lỗi ProvinceAPI: ${res.status} - ${text}`);
+                });
+            }
+            return res.json();
+        }),
     ])
-        .then(([devices, deviceTypes]) => {
+        .then(([devices, deviceTypes, provinces]) => {
             devices = devices.data?.items || [];
             deviceTypes = deviceTypes.data?.items || [];
+            provinces = provinces || [];
+            window.provinces = provinces; // Lưu provinces vào biến toàn cục để sử dụng sau này
             console.log("Dữ liệu Devices:", devices);
             console.log("Dữ liệu DeviceTypes:", deviceTypes);
-            callback(devices, deviceTypes);
+            console.log("Dữ liệu Provinces:", provinces);
+            callback(devices, deviceTypes, provinces);
         })
         .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
 }
@@ -169,6 +185,26 @@ function populateDeviceTypes(deviceTypes) {
         select.appendChild(option);
     });
 }
+function populateCities(provinces) {
+    const citySelect = document.querySelector('select[name="location"]');
+    const currentValue = citySelect.value; // Lưu giá trị hiện tại của dropdown
+
+    // Xóa các tùy chọn cũ
+    citySelect.innerHTML = '<option value="">Chọn tỉnh thành</option>';
+
+    // Thêm các tùy chọn mới
+    provinces.forEach(province => {
+        const option = document.createElement('option');
+        option.value = province.name; // Giả sử province có code
+        option.text = province.name;
+        citySelect.appendChild(option);
+    });
+
+    // Khôi phục giá trị đã chọn nếu có
+    if (currentValue) {
+        citySelect.value = currentValue;
+    }
+}
 
 function handleCreateDeviceType() {
     var createBtn = document.querySelector("#saveDeviceType");
@@ -256,7 +292,7 @@ function handleCreateForm() {
         var deviceTypeID = document.querySelector('select[name="devicetype"]').value;
         var price = document.querySelector('input[name="price"]').value;
         var quantity = document.querySelector('input[name="quantity"]').value;
-        var location = document.querySelector('input[name="location"]').value;
+        var location = document.querySelector('select[name="location"]').value;
 
         // Validation
         if (!name || !deviceTypeID || !price || !quantity) {
@@ -277,7 +313,8 @@ function handleCreateForm() {
             alert("Không tìm thấy thông tin người dùng, vui lòng đăng nhập lại!");
             return;
         }
-
+        const selectedProvince = window.provinces.find(province => province.code === location);
+        const locationName = selectedProvince ? selectedProvince.name : location;
         // Create object containing device info
         const deviceData = {
             name: name,
@@ -285,7 +322,7 @@ function handleCreateForm() {
             deviceType_id: deviceTypeID, // Đổi tên để khớp với schema backend
             hourlyRentalFee: parseFloat(price), // Đổi tên để khớp với schema backend
             quantity: parseInt(quantity),
-            place: location, // Đổi tên để khớp với schema backend
+            place: locationName, // Đổi tên để khớp với schema backend
             userID: userId, // Thêm trường user_id
         };
 
@@ -331,92 +368,6 @@ function createDevice(formData, callback) {
         })
         .catch(error => alert(`Lỗi tạo thiết bị: ${error.message}`));
 }
-
-// thêm thiết bị theo json
-// function handleCreateForm() {
-//     const createBtn = document.querySelector('#create');
-//     if (!createBtn) return;
-
-//     const editDeviceId = localStorage.getItem("editDeviceId");
-
-//     if (editDeviceId) {
-//         loadEditForm(editDeviceId); // Gọi hàm cập nhật nếu đang chỉnh sửa
-//         return;
-//     }
-
-//     createBtn.onclick = function (event) {
-//         event.preventDefault();
-
-//         const pictureInput = document.querySelector('input[name="picture"]');
-//         const name = document.querySelector('input[name="name"]').value;
-//         const description = document.querySelector('input[name="description"]').value;
-//         const deviceTypeID = document.querySelector('select[name="devicetype"]').value;
-//         const price = document.querySelector('input[name="price"]').value;
-//         const quantity = document.querySelector('input[name="quantity"]').value;
-//         const location = document.querySelector('input[name="location"]').value;
-
-//         // Validation (giống Location, nhưng thay địa chỉ bằng place)
-//         if (!name || !deviceTypeID || !price || !quantity) {
-//             alert("Vui lòng nhập đầy đủ tên thiết bị, loại thiết bị, đơn giá và số lượng!");
-//             return;
-//         }
-
-//         if (!pictureInput || !pictureInput.files || pictureInput.files.length === 0) {
-//             alert("Vui lòng chọn ảnh cho thiết bị!");
-//             return;
-//         }
-
-//         // Lấy thông tin người dùng từ localStorage
-//         const user = JSON.parse(localStorage.getItem("user"));
-//         const userId = user ? user.id : null;
-
-//         if (!userId) {
-//             alert("Không tìm thấy thông tin người dùng, vui lòng đăng nhập lại!");
-//             return;
-//         }
-
-//         // Create object containing device info (giống Location, với img là tên file)
-//         const deviceData = {
-//             img: pictureInput.files[0].name, // Lưu tên file ảnh
-//             name: name,
-//             description: description,
-//             deviceType_id: deviceTypeID, // Đổi tên để khớp với schema backend
-//             hourlyRentalFee: parseFloat(price), // Đổi tên để khớp với schema backend
-//             quantity: parseInt(quantity),
-//             place: location, // Đổi tên để khớp với schema backend
-//             userID: userId, // Thêm trường user_id
-//         };
-
-//         createDevice(deviceData, function (deviceResponse) {
-//             console.log("Device vừa tạo có ID:", deviceResponse.id);
-//             console.log("Đã tạo thiết bị thành công:", deviceResponse);
-//             alert("Tạo thiết bị thành công!");
-//             window.location.href = "device_table.html"; // Chuyển hướng
-//         });
-//     };
-// }
-
-// function createDevice(deviceData, callback) {
-//     const token = localStorage.getItem("token");
-//     if (!token) return alert("Vui lòng đăng nhập lại!");
-
-//     fetch(`${DeviceAPI}/new`, {
-//         method: 'POST',
-//         headers: {
-//             'Authorization': `Bearer ${token}`,
-//             'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify(deviceData)
-//     })
-//         .then(response => {
-//             if (!response.ok) throw new Error("Lỗi server");
-//             return response.json();
-//         })
-//         .then(data => {
-//             callback(data.result || data);
-//         })
-//         .catch(error => alert(`Lỗi tạo thiết bị: ${error.message}`));
-// }
 
 //Cập nhật thiết bị
 function handleUpdateDevice(deviceId) {
@@ -482,7 +433,7 @@ function loadEditForm(editDeviceId) {
             document.querySelector('select[name="devicetype"]').value = device.deviceType_name || "";
             document.querySelector('input[name="price"]').value = device.hourlyRentalFee || "";
             document.querySelector('input[name="quantity"]').value = device.quantity || 1;
-            document.querySelector('input[name="location"]').value = device.place || "";
+            document.querySelector('select[name="location"]').value = device.place || "";
 
             // Xử lý hiển thị ảnh
             if (device.image) {
@@ -529,7 +480,7 @@ function loadEditForm(editDeviceId) {
                 const inputDeviceType = document.querySelector('select[name="devicetype"]').value;
                 const inputPrice = document.querySelector('input[name="price"]').value;
                 const inputQuantity = document.querySelector('input[name="quantity"]').value;
-                const inputLocation = document.querySelector('input[name="location"]').value;
+                const inputLocation = document.querySelector('select[name="location"]').value;
 
                 // Kiểm tra dữ liệu bắt buộc
                 if (!inputName || !inputDeviceType) {
@@ -602,3 +553,26 @@ function loadEditForm(editDeviceId) {
             console.error('Lỗi khi tải dữ liệu:', error);
         });
 }
+// function setupEventListeners() {
+//     const selectCity = document.getElementById("selectCity");
+
+//     if (!selectCity) return;
+
+//     selectCity.addEventListener("change", function () {
+//         const provinceId = this.value;
+//         if (provinceId) {
+//             fetch(`${DistrictAPI}${provinceId}?depth=2`)
+//                 .then(res => res.json())
+//                 .then(data => {
+//                     const districts = data.districts || [];
+//                     populateDistricts(districts);
+//                 })
+//                 .catch(error => {
+//                     console.error("Lỗi lấy quận/huyện:", error);
+//                     populateDistricts([]);
+//                 });
+//         } else {
+//             populateDistricts([]);
+//         }
+//     });
+// }
