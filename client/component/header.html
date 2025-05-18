@@ -44,13 +44,75 @@
 
 
         @media (max-width: 1200px) {
-            ư #login-btn {
+            #login-btn {
                 margin-right: 0 !important;
                 padding: 5px 10px;
                 font-size: 14px;
                 border-radius: 50px;
                 white-space: nowrap;
             }
+
+            #navmenu {
+                display: none !important;
+            }
+
+            .offcanvas-toggle {
+                display: block !important;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .offcanvas-toggle {
+                display: none !important;
+            }
+        }
+
+
+        .offcanvas {
+            background-color: #718355 !important;
+            width: 200px !important;
+        }
+
+        .offcanvas-header {
+            background-color: #718355 !important;
+            color: white !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .offcanvas-title {
+            color: white !important;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .offcanvas-body {
+            background-color: #718355 !important;
+        }
+
+        .offcanvas-body .nav-link {
+            color: white !important;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 15px 20px !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .offcanvas-body .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff !important;
+        }
+
+        .btn-close {
+            filter: invert(1) !important;
+        }
+
+        .offcanvas-toggle {
+            color: #718355 !important;
+        }
+
+        .offcanvas-toggle i {
+            margin-left: 200px;
         }
     </style>
 
@@ -65,7 +127,10 @@
                 <li><a href="about.html" id="about-link">GIỚI THIỆU</a></li>
             </ul>
         </nav>
-
+        <button class="btn offcanvas-toggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu"
+            aria-controls="mobileMenu">
+            <i class="bi bi-list fs-2"></i>
+        </button>
         <div class="header-right d-flex justify-content-end">
             <a href="login.html" id="login-btn" class="btn"
                 style="background-color: #718355; color: #fff; white-space: nowrap;">Đăng Nhập</a>
@@ -84,6 +149,19 @@
                     </li>
                 </ul>
             </nav>
+        </div>
+    </div>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="mobileMenuLabel">Menu</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Đóng"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="list-unstyled fw-bold text-uppercase">
+                <li><a href="home.html" class="nav-link">Trang chủ</a></li>
+                <li><a href="service.html" class="nav-link">Dịch vụ sự kiện</a></li>
+                <li><a href="about.html" class="nav-link">Giới thiệu</a></li>
+            </ul>
         </div>
     </div>
     <script src="/fe-event-management/client/assets/js/header.js"></script>

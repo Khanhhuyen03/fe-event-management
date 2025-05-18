@@ -256,18 +256,18 @@ async function loadInitialData() {
         }
 
         // Lấy danh sách sự kiện
-        const eventResponse = await fetchData(EVENT_API_URL);
-        events = Array.isArray(eventResponse) ? eventResponse : [];
-        console.log("Dữ liệu Events:", events);
+        // const eventResponse = await fetchData(EVENT_API_URL);
+        // events = Array.isArray(eventResponse) ? eventResponse : [];
+        // console.log("Dữ liệu Events:", events);
 
-        const contractTypeSelect = document.getElementById('contractType');
-        contractTypeSelect.innerHTML = '<option value="">Chọn loại sự kiện</option>';
-        events.forEach(event => {
-            const option = document.createElement('option');
-            option.value = event.id;
-            option.textContent = event.name;
-            contractTypeSelect.appendChild(option);
-        });
+        // const contractTypeSelect = document.getElementById('contractType');
+        // contractTypeSelect.innerHTML = '<option value="">Chọn loại sự kiện</option>';
+        // events.forEach(event => {
+        //     const option = document.createElement('option');
+        //     option.value = event.id;
+        //     option.textContent = event.name;
+        //     contractTypeSelect.appendChild(option);
+        // });
     } catch (error) {
         console.error(`Lỗi khi tải dữ liệu tỉnh/thành phố hoặc sự kiện: ${error.message}`);
         provinces = [];
@@ -346,8 +346,8 @@ function setupEventListeners() {
     districtSelect.addEventListener('change', updateWards);
 
     // Thêm sự kiện cho contractType
-    const contractTypeSelect = document.getElementById('contractType');
-    contractTypeSelect.addEventListener('change', updateContractName);
+    // const contractTypeSelect = document.getElementById('contractType');
+    // contractTypeSelect.addEventListener('change', updateContractName);
 }
 async function openItemSelectionModal(type) {
     currentSelectionType = type;
@@ -499,8 +499,8 @@ async function preloadEvent(eventData) {
     const event = eventData.event;
     console.log("Dữ liệu sự kiện nhận được:", event);
 
-    document.getElementById("contractType").value = event.id || '';
-    updateContractName();
+    document.getElementById("contractName").value = event.name || "";
+    //updateContractName();
     document.getElementById("customerName").value = "";
     document.getElementById("phoneNumber").value = "";
 
@@ -651,16 +651,16 @@ async function preloadItem(item) {
 }
 
 // Hàm cập nhật quận/huyện
-function updateContractName() {
-    const eventId = document.getElementById('contractType').value;
-    const contractNameInput = document.getElementById('contractName');
-    const event = events.find(e => e.id == eventId);
-    if (event) {
-        contractNameInput.value = `Hợp đồng tổ chức ${event.name}`;
-    } else {
-        contractNameInput.value = '';
-    }
-}
+// function updateContractName() {
+//     const eventId = document.getElementById('contractType').value;
+//     const contractNameInput = document.getElementById('contractName');
+//     const event = events.find(e => e.id == eventId);
+//     if (event) {
+//         contractNameInput.value = `Hợp đồng tổ chức ${event.name}`;
+//     } else {
+//         contractNameInput.value = '';
+//     }
+// }
 
 
 function validateAndUpdateDates() {

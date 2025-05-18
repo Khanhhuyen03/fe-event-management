@@ -36,22 +36,38 @@
 
         body {
             font-family: var(--default-font);
-            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            background: #cfe1b9;
             color: var(--default-color);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden;
+            overflow: hidden;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            margin-top: 0 !important;
+            width: 100%;
+            height: 100vh;
         }
 
-        /* Chat Container Styles */
+        .header {
+            padding: 15px 0;
+            min-height: 50px;
+            width: 100%;
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            z-index: 1001;
+            background-color: var(--background-color);
+        }
+
         .chat-container {
             width: 100%;
-            height: calc(100vh - 70px);
-            margin: 0;
-            background-color: var(--surface-color);
+            height: calc(100vh - 50px - 80px);
+            margin: 60px 0 80px 0;
+            background-color: #cfe1b9;
             border-radius: 0;
-            padding: 30px;
+            padding: 10px;
             box-shadow: none;
             display: flex;
             flex-direction: column;
@@ -61,31 +77,34 @@
         .chat-title {
             font-family: var(--heading-font);
             color: var(--heading-color);
-            font-size: 36px;
-            margin-bottom: 10px;
+            font-size: 24px;
             text-align: center;
             text-transform: uppercase;
             letter-spacing: 1px;
+            padding-top: 20px;
+            font-weight: bold;
         }
 
         .chat-subtitle {
-            font-size: 18px;
+            font-size: 16px;
             color: var(--accent-color);
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
             font-style: italic;
         }
 
         .chat-box {
-            background-color: #f9fafb;
+            background-color: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
             border-radius: 12px;
             padding: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             flex: 1;
             overflow-y: auto;
-            border: 1px solid #e0e0e0;
+            /* border: 1px solid #e0e0e0; */
             scrollbar-width: thin;
             scrollbar-color: var(--accent-color) #e0e0e0;
+            display: flex;
+            flex-direction: column;
         }
 
         .chat-box::-webkit-scrollbar {
@@ -103,15 +122,14 @@
         }
 
         .chat-message {
+            display: inline-block;
             background-color: #f1f3f5;
             border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            max-width: 75%;
+            padding: 10px 15px;
+            margin: 5px 0;
+            max-width: 70%;
             position: relative;
             animation: slideIn 0.3s ease;
-            margin-right: auto;
-            /* Align all messages to the left */
         }
 
         @keyframes slideIn {
@@ -127,16 +145,20 @@
         }
 
         .chat-message.bot {
-            background: linear-gradient(to right, #85e77f, #b9e1c2);
+            background: #fff;
+            margin-right: auto;
+            margin-left: 5px;
         }
 
         .chat-message.user {
-            background: linear-gradient(to right, #c8e6c9, #7ee482);
+            background: #718355;
+            margin-left: auto;
+            margin-right: 5px;
+            color: #fff;
         }
 
-        .chat-message.bot .sender,
-        .chat-message.user .sender {
-            color: hsl(131, 20%, 33%);
+        .chat-message .sender {
+            color: #fff;
             font-weight: 600;
             font-size: 14px;
             margin-bottom: 5px;
@@ -145,16 +167,16 @@
 
         .chat-message .timestamp {
             font-size: 12px;
-            color: #6b7280;
+            color: #fff;
             margin-top: 5px;
             text-align: right;
+            display: block;
         }
 
         .typing-indicator {
             display: none;
             font-size: 14px;
-            color: #6b7280;
-            padding: 10px;
+            color: #fff;
             text-align: center;
         }
 
@@ -163,24 +185,32 @@
         }
 
         .chat-input {
+            position: fixed;
+            bottom: 10px;
+            padding: 5px;
+            left: 10px;
+            right: 10px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            background-color: #f9fafb;
-            padding: 15px;
+            gap: 10px;
+            background-color: #fff;
             border-radius: 12px;
             border: 1px solid #e0e0e0;
+            z-index: 1000;
+            flex-wrap: nowrap;
+            box-sizing: border-box;
         }
 
         .chat-input textarea {
-            width: 100%;
-            padding: 12px;
+            padding: 5px;
+            flex: 1;
+            min-width: 0;
             border: 1px solid #b8c6db;
             border-radius: 8px;
             resize: none;
             font-family: var(--default-font);
-            font-size: 16px;
-            transition: border-color 0.3s;
+            font-size: 14px;
+            rows: 1;
         }
 
         .chat-input textarea:focus {
@@ -190,16 +220,16 @@
         }
 
         .chat-input button {
-            background: linear-gradient(to right, var(--accent-color), #5f7e65);
+            background: #718355;
             color: var(--contrast-color);
             border: none;
-            padding: 12px 24px;
+            padding: 8px 16px;
             border-radius: 8px;
             cursor: pointer;
             font-family: var(--default-font);
             font-weight: 600;
-            font-size: 16px;
-            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 14px;
+            flex-shrink: 0;
         }
 
         .chat-input button:hover {
@@ -208,20 +238,19 @@
         }
 
         .chat-input button:disabled {
-            background: #d1d5db;
+            background: #718355;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
 
         .chat-input .mic-btn {
-            background: linear-gradient(to right, #517958, #B5C99A);
-            padding: 12px;
+            /* padding: 8px; */
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.2s, box-shadow 0.2s;
+            flex-shrink: 0;
         }
 
         .chat-input .mic-btn:hover {
@@ -231,31 +260,44 @@
 
         .chat-input .mic-btn i {
             color: var(--contrast-color);
-            font-size: 20px;
+            font-size: 16px;
         }
 
         @media (max-width: 768px) {
             .chat-container {
-                padding: 20px;
+                padding: 10px;
+                margin-bottom: 90px;
             }
 
             .chat-title {
-                font-size: 28px;
+                font-size: 24px;
             }
 
             .chat-box {
-                min-height: 300px;
+                min-height: 250px;
             }
 
             .chat-input {
-                flex-direction: column;
-                gap: 10px;
+                flex-wrap: nowrap;
+                bottom: 5px;
+                left: 5px;
+                right: 5px;
+                padding: 5px;
+                gap: 5px;
+            }
+
+            .chat-input textarea {
+                font-size: 14px;
             }
 
             .chat-input button,
             .chat-input .mic-btn {
-                width: 100%;
-                padding: 12px;
+                padding: 8px;
+            }
+
+            .chat-input button {
+                padding: 8px 12px;
+                font-size: 14px;
             }
         }
 
@@ -264,13 +306,12 @@
             flex-wrap: wrap;
             gap: 10px;
             justify-content: flex-start;
-            /* Căn trái để phù hợp với tin nhắn */
             margin-top: 10px;
             margin-bottom: 15px;
         }
 
         .event-type-btn {
-            background: linear-gradient(to right, #a3d4a4, #9dcfa0);
+            background: #fff;
             color: rgb(33, 44, 35);
             border: none;
             padding: 10px 20px;
@@ -278,7 +319,6 @@
             cursor: pointer;
             font-family: var(--default-font);
             font-size: 16px;
-            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .event-type-btn:hover {
@@ -295,26 +335,6 @@
 
 <body>
     <div id="header"></div>
-    <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
-        <div class="header-right d-flex justify-content-end">
-            <nav class="header-nav ms-auto" id="user-menu" style="display: none;">
-                <ul class="d-flex align-items-center px-7">
-                    <li class="nav-item dropdown pe-3">
-                        <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
-                            data-bs-toggle="dropdown">
-                            <img id="user-avatar" src="/fe-event-management/client/assets/img/avatar/avt.jpg"
-                                alt="Profile" class="rounded-circle" style="width: 40px; height: 40px;">
-                            <span id="user-name" class="d-none d-md-block dropdown-toggle ps-2"></span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end profile-dropdown" id="profile-dropdown">
-                            <!-- Dropdown items will be populated by JavaScript -->
-                        </ul>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </div>
-
     <main class="chat-container" data-aos="fade-up">
         <h1 class="chat-title">Hỗ Trợ Tổ Chức Sự Kiện</h1>
         <p class="chat-subtitle">MyEvent - Chuyên nghiệp & Sáng tạo</p>

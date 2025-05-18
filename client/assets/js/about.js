@@ -28,7 +28,7 @@ function displayAdmins(admins) {
         const adminCard = `
             <div class="col-custom" data-aos="fade-up">
                 <div class="member">
-                    <div class="pic"><img src="${admin.image}" class="img-fluid" alt="${admin.name}"></div>
+                    <div class="pic"><img src="${admin.image}" class="img-fluid" alt="${admin.name}" style="height: 300px; with: 50px;"></div>
                     <div class="member-info">
                         <h4>${admin.name}</h4>
                         <span>Quản lý sự kiện</span>
@@ -42,7 +42,7 @@ function displayAdmins(admins) {
             </div>
         `;
         eventContainer.innerHTML += adminCard;
-    });    
+    });
 }
 
 // Initialize AOS
