@@ -5,20 +5,51 @@ let suppliers = [];
 let currentTypeId = null;
 let currentCategory = null;
 let provinces = [];
+let currentPage = 1;
+const itemsPerPage = 6;
 const PROVINCE_API_URL = 'https://provinces.open-api.vn/api/p';
 
 document.addEventListener("DOMContentLoaded", async function () {
     const preloader = document.getElementById("preloader");
     const floatingBtn = document.querySelector(".floating-register-btn");
+    const registerEventBtn = document.querySelector(".filter-section .btn-register");
 
-    // Hiển thị/ẩn nút nổi khi cuộn
-    window.addEventListener("scroll", function () {
-        if (window.scrollY > 100) { // Hiển thị sau khi cuộn 100px
-            floatingBtn.classList.add("visible");
-        } else {
-            floatingBtn.classList.remove("visible");
+    // Lấy thông tin người dùng từ localStorage
+    let user = null;
+    try {
+        const userData = localStorage.getItem("user");
+        if (userData) {
+            user = JSON.parse(userData); // Phân tích JSON
         }
-    });
+    } catch (error) {
+        console.error("Lỗi khi phân tích dữ liệu người dùng:", error);
+    }
+
+    // Kiểm tra vai trò và điều chỉnh hiển thị nút
+    if (user && user.roleName === "SUPPLIER") {
+        // Ẩn cả hai nút
+        if (registerEventBtn) {
+            registerEventBtn.style.display = "none";
+        }
+        if (floatingBtn) {
+            floatingBtn.style.display = "none"; // Ẩn hoàn toàn, kể cả khi cuộn
+        }
+    } else {
+        // Hiển thị nút đăng ký tổ chức sự kiện
+        if (registerEventBtn) {
+            registerEventBtn.style.display = "block";
+        }
+        // Thêm sự kiện cuộn để hiển thị nút nổi
+        if (floatingBtn) {
+            window.addEventListener("scroll", function () {
+                if (window.scrollY > 100) {
+                    floatingBtn.classList.add("visible");
+                } else {
+                    floatingBtn.classList.remove("visible");
+                }
+            });
+        }
+    }
 
     try {
         const urlParams = new URLSearchParams(window.location.search);
@@ -86,7 +117,6 @@ function getTypesByCategory(data) {
             }))
             : [{ id: 1, name: data.eventTypeName }];
         return types;
-
     } else if (currentCategory === "device") {
         const types = Array.isArray(data)
             ? [...new Set(data.map(item => item.deviceType_name))].map((name, index) => ({
@@ -100,10 +130,6 @@ function getTypesByCategory(data) {
 }
 
 function getItemsByCategory(data) {
-    // if (!(currentCategory === "")) {
-    //     return Array.isArray(data) ? data : [data];
-    // }
-    // return [];
     if (!(currentCategory === "")) {
         const items = Array.isArray(data) ? data : [data];
         // Lọc hoặc sửa các item không có img/image
@@ -117,9 +143,6 @@ function getItemsByCategory(data) {
 }
 
 async function populateCityFilter(cities) {
-    // const cityFilter = document.getElementById("cityFilter");
-    // cityFilter.innerHTML = '<option value="">Tất cả tỉnh</option>';
-    // Thêm logic nếu có dữ liệu tỉnh thành
     const provinceResponse = await fetch(PROVINCE_API_URL);
     if (!provinceResponse.ok) {
         throw new Error(`HTTP error! status: ${provinceResponse.status}`);
@@ -186,6 +209,7 @@ function populateServicesList(types) {
 
 function selectCategory(typeId) {
     currentTypeId = typeId;
+    currentPage = 1;
     const links = document.querySelectorAll("#services-list a");
     links.forEach(link => {
         link.classList.remove("active");
@@ -207,9 +231,11 @@ function displayItems(items) {
 
     const baseImageUrl = "http://localhost:8080/event-management/api/v1/FileUpload/files/";
 
-    items.forEach((item, index) => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedItems = items.slice(startIndex, endIndex);
+    paginatedItems.forEach((item, index) => {
         let detailPage = currentCategory === "event" ? "./event-detail.html" : "./item-detail.html";
-        let endpoint;
         let buttonText = "Xem Chi Tiết";
         let itemId = item.id;
         let hoverInfo = '';
@@ -217,8 +243,7 @@ function displayItems(items) {
             hoverInfo = `
                     <div class="row"><div class="col">${item.eventTypeName}</div></div>
                 `;
-        }
-        else {
+        } else {
             hoverInfo = `    
                     <div class="row propery-info"><div class="col">Địa điểm</div></div>
                     <div class="row"><div class="col">${item.place || item.address}</div></div>
@@ -253,13 +278,11 @@ function filterItems() {
     let filteredItems = allItems;
 
     if (currentTypeId !== null) {
-
         if (currentCategory === "event") {
             filteredItems = filteredItems.filter(item => item.eventTypeName === allTypes.find(t => t.id === currentTypeId)?.name);
         } else if (currentCategory === "device") {
             filteredItems = filteredItems.filter(item => item.deviceType_name === allTypes.find(t => t.id === currentTypeId)?.name);
         }
-
     }
 
     if (cityId) {
@@ -270,11 +293,55 @@ function filterItems() {
         return item.name.toLowerCase().includes(searchInput);
     });
 
+    const totalItems = filteredItems.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    // Đảm bảo currentPage hợp lệ
+    if (currentPage > totalPages) {
+        currentPage = totalPages || 1;
+    }
     displayItems(filteredItems);
+    renderPagination(totalItems, totalPages);
 }
 
+function renderPagination(totalItems, totalPages) {
+    const pagination = document.getElementById("pagination");
+    pagination.innerHTML = "";
+
+    if (totalPages <= 1) return; // Không hiển thị phân trang nếu chỉ có 1 trang
+
+    // Các nút số trang
+    for (let i = 1; i <= totalPages; i++) {
+        const pageItem = document.createElement("li");
+        pageItem.className = `page-item ${i === currentPage ? "active" : ""}`;
+        pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+        pageItem.addEventListener("click", (e) => {
+            e.preventDefault();
+            currentPage = i;
+            filterItems();
+        });
+        pagination.appendChild(pageItem);
+    }
+}
 function checkLoginAndOpenContract() {
     console.log("Nút Đăng ký được nhấn");
+    let user = null;
+    try {
+        const userData = localStorage.getItem("user");
+        if (userData) {
+            user = JSON.parse(userData);
+        }
+    } catch (error) {
+        console.error("Lỗi khi phân tích dữ liệu người dùng:", error);
+    }
+
+    // Kiểm tra vai trò
+    if (user && user.roleName === "SUPPLIER") {
+        alert("Nhà cung cấp không thể đăng ký tổ chức sự kiện.");
+        return;
+    }
+
+    // Kiểm tra đăng nhập
     const token = localStorage.getItem("token");
     if (!token) {
         localStorage.setItem("openContractAfterLogin", "true");

@@ -302,16 +302,6 @@
                 }
 
                 const paymentType = contractStatus === "Draft" ? "deposit" : "remaining";
-                // const orderId = `${paymentType === "Deposit" ? "DEP" : "REM"}_${contractId}_${Date.now()}`;
-                // const response = await fetchData(PAYMENT_API_URL, "POST", {
-                //     //amount: paymentAmount * 100, // VNPAY yêu cầu nhân 100
-                //     //orderId: orderId,
-                //     contractId: contractId,
-                //     //returnUrl: window.location.origin + "/client/payment.html",
-                //     //paymentType: paymentType
-                // });
-                // const url = `${PAYMENT_API_URL}?contractId=${encodeURIComponent(contractId)}`;
-                // const response = await fetchData(url, "POST");
 
                 // Gửi request POST với contractId và paymentType trong query string
                 const url = `${PAYMENT_API_URL}?contractId=${encodeURIComponent(contractId)}&paymentType=${encodeURIComponent(paymentType)}`;
@@ -330,20 +320,24 @@
 
         function processPaymentResult() {
             const urlParams = new URLSearchParams(window.location.search);
+            const contractId = urlParams.get("contractId");
             const resultMessage = document.getElementById("resultMessage");
             const paymentButton = document.getElementById("paymentButton");
             const vnp_ResponseCode = urlParams.get("vnp_ResponseCode");
+
 
             if (!vnp_ResponseCode) {
                 console.log("Không có vnp_ResponseCode, bỏ qua xử lý.");
                 return;
             }
 
-            const paymentType = localStorage.getItem("contractStatus") === "draft" ? "deposit" : "remaining";
+            const paymentType = localStorage.getItem("contractStatus") === "Draft" ? "deposit" : "remaining";
             const amount = parseInt(urlParams.get("vnp_Amount")) / 100;
 
             resultMessage.style.display = "block";
             paymentButton.style.display = "none";
+            // Lấy contractId từ localStorage
+            // const contractId = localStorage.getItem("id");
 
             if (vnp_ResponseCode === "00") {
                 resultMessage.className = "result-message success";
@@ -353,6 +347,7 @@
                         <div style="color: green; font-size: 24px;">✔</div>
                         <h3>Thông báo</h3>
                         <p>Thanh toán ${paymentType === "deposit" ? "đặt cọc" : "khoản còn lại"} thành công!</p>
+                        <p><strong>Mã tra cứu:</strong> ${urlParams.get("vnp_TransactionNo") || 'Không có'}</p>
                         <p><strong>Số tiền:</strong> ${formatCurrency(amount)}</p>
                         <p><strong>Thời gian giao dịch:</strong> ${formatDateTime(urlParams.get("vnp_PayDate")) || 'Không có'}</p>
                         <hr>
@@ -365,11 +360,6 @@
                     date: urlParams.get("vnp_PayDate"),
                     type: paymentType
                 }));
-
-                // Tự động điều hướng sau khi thành công
-                setTimeout(() => {
-                    window.location.href = `http://127.0.0.1:5500/client/payment.html?contractId=${contractId}`;
-                }, 3000); // Chờ 3 giây để người dùng đọc thông báo
             } else {
                 resultMessage.className = "result-message error";
                 resultMessage.innerHTML = `
@@ -390,6 +380,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             console.log("Trinh: ", urlParams);
             const contractId = urlParams.get('id');
+            console.log("id contract: ", contractId);
             if (!contractId) {
                 alert("Không tìm thấy ID hợp đồng!");
                 window.location.href = "ListContract.html";
@@ -445,16 +436,6 @@
                 amountLabel.textContent = "Số Tiền Còn Lại:";
                 amountInput.value = formatCurrency(0);
                 const lastTransaction = JSON.parse(localStorage.getItem("lastTransaction") || "{}");
-                // if (lastTransaction && lastTransaction.transactionNo) {
-                //     transactionInfo.style.display = "block";
-                //     transactionInfo.innerHTML = `
-                //         <strong>Thông Tin Giao Dịch:</strong><br>
-                //         Mã giao dịch: ${lastTransaction.transactionNo}<br>
-                //         Số tiền: ${formatCurrency(lastTransaction.amount)}<br>
-                //         Thời gian: ${formatDateTime(lastTransaction.date)}<br>
-                //         Loại: ${lastTransaction.type === "deposit" ? "Đặt cọc" : "Thanh toán khoản còn lại"}
-                //     `;
-                // }
             } else {
                 statusMessage.style.display = "block";
                 statusMessage.className = "status-message deposit";
@@ -469,16 +450,6 @@
                 paymentButton.textContent = "Thanh Toán Khoản Còn Lại";
                 localStorage.setItem("paymentAmount", remainingAmount);
                 const lastTransaction = JSON.parse(localStorage.getItem("lastTransaction") || "{}");
-                // if (lastTransaction && lastTransaction.transactionNo) {
-                //     transactionInfo.style.display = "block";
-                //     transactionInfo.innerHTML = `
-                //         <strong>Thông Tin Giao Dịch:</strong><br>
-                //         Mã giao dịch: ${lastTransaction.transactionNo}<br>
-                //         Số tiền: ${formatCurrency(lastTransaction.amount)}<br>
-                //         Thời gian: ${formatDateTime(lastTransaction.date)}<br>
-                //         Loại: ${lastTransaction.type === "deposit" ? "Đặt cọc" : "Thanh toán khoản còn lại"}
-                //     `;
-                // }
             }
         }
 

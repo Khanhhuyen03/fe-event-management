@@ -4,7 +4,7 @@
             "id": 1,
             "name": "Lê Thị Trinh",
             "email": "trinh@gmail.com",
-            "image": "assets/img/avatar/trinh.jpg"
+            "image": "assets/img/avatar/linh3.jpg"
         },
         {
             "id": 2,
@@ -22,13 +22,13 @@
             "id": 4,
             "name": "Ngô Trần Khánh Huyền",
             "email": "huyen@gmail.com",
-            "image": "assets/img/avatar/meo.jpg"
+            "image": "assets/img/avatar/huyen.jpg"
         },
         {
             "id": 5,
             "name": "Phạm Ngọc Hoàng Long",
             "email": "longn@gmail.com",
-            "image": "assets/img/avatar/longg.jpg"
+            "image": "assets/img/avatar/long.jpg"
         }
     ]
 }

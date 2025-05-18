@@ -5,11 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Danh Sách Hợp Đồng</title>
-    <link href="./assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="./assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="./assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/client/assets/css/main.css">
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/main.css">
     <link href="assets/css/main.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <style>
         body {
             margin: 0;
@@ -84,19 +85,7 @@
             border-radius: 5px;
         }
 
-        .filter-bar .search-btn {
-            background-color: #718355;
-            color: #fff;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .filter-bar .search-btn:hover {
-            background-color: #5a6268;
-        }
-
+        .filter-bar .search-btn,
         .filter-bar .reset-btn {
             background-color: #718355;
             color: #fff;
@@ -106,6 +95,7 @@
             cursor: pointer;
         }
 
+        .filter-bar .search-btn:hover,
         .filter-bar .reset-btn:hover {
             background-color: #5a6268;
         }
@@ -143,11 +133,6 @@
             margin-right: 5px;
         }
 
-        .pagination {
-            justify-content: center;
-            margin-top: 20px;
-        }
-
         .toast {
             position: fixed;
             top: 20px;
@@ -168,11 +153,6 @@
             text-align: center;
             width: 100%;
         }
-
-        #footer .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
     </style>
 </head>
 
@@ -181,25 +161,27 @@
     <div class="content container">
         <h2>DANH SÁCH HỢP ĐỒNG</h2>
         <div class="toast" id="successToast">Thanh toán thành công!</div>
-        <div class="filter-bar">
+        <!-- <div class="filter-bar">
             <div>
                 <input type="text" id="tenHopDong" placeholder="Nhập tên hợp đồng" class="form-control d-inline-block"
                     style="width: 200px;">
                 <select id="trangThai">
                     <option value="">Tất cả</option>
-                    <option value="draft">Bản Nháp</option>
-                    <option value="deposit_paid">Đã Đặt Cọc</option>
-                    <option value="inprogress">Đang Thực Hiện</option>
-                    <option value="waiting_paid">Chờ Thanh Toán</option>
-                    <option value="completed">Hoàn Thành</option>
+                    <option value="Draft">Bản Nháp</option>
+                    <option value="DepositPaid">Đã Đặt Cọc</option>
+                    <option value="InProgress">Đang Thực Hiện</option>
+                    <option value="WaitingPaid">Chờ Thanh Toán</option>
+                    <option value="Completed">Hoàn Thành</option>
+                    <option value="Cancel">Đã Hủy</option>
+                    <option value="AdminCancel">Đã Hủy bởi Admin</option>
                 </select>
             </div>
             <div>
                 <button class="search-btn" onclick="searchContracts()">Tìm kiếm</button>
                 <button class="reset-btn" onclick="resetFilters()">Xóa bộ lọc</button>
             </div>
-        </div>
-        <table class="table table-bordered">
+        </div> -->
+        <table id="contractTable" class="table table-bordered">
             <thead>
                 <tr>
                     <th>STT</th>
@@ -210,11 +192,8 @@
                     <th>Hành động</th>
                 </tr>
             </thead>
-            <tbody id="danhSachHopDong"></tbody>
+            <tbody></tbody>
         </table>
-        <nav aria-label="Page navigation">
-            <ul class="pagination" id="phanTrang"></ul>
-        </nav>
     </div>
     <div id="footer"></div>
     <!-- Scroll Top -->
@@ -223,193 +202,15 @@
     <!-- Preloader -->
     <div id="preloader"></div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="/client/assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
     <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
     <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/header.js"></script>
     <script src="assets/js/ListContract.js"></script>
-    <!-- <script>
-        const CONTRACT_API_URL = "https://67eabf6734bcedd95f647797.mockapi.io/Contract";
-
-        const contractsPerPage = 10;
-        let currentPage = 1;
-        let contractList = [];
-
-        function getToken() {
-            return localStorage.getItem("token");
-        }
-
-        function formatCurrency(value) {
-            return value.toLocaleString('vi-VN') + " ₫";
-        }
-
-        function formatDate(date) {
-            return date || '';
-        }
-
-        function formatStatus(status) {
-            switch (status) {
-                case "draft": return '<span class="badge bg-success">Bản Nháp</span>';
-                case "deposit_paid": return '<span class="badge bg-info">Đã Đặt Cọc</span>';
-                case "inprogress": return '<span class="badge bg-warning">Đang Thực Hiện</span>';
-                case "waiting_paid": return '<span class="badge bg-primary">Chờ Thanh Toán</span>';
-                case "completed": return '<span class="badge bg-dark">Hoàn Thành</span>';
-                default: return '<span class="badge bg-secondary">Không Xác Định</span>';
-            }
-        }
-
-        async function fetchData(url, method = "GET", data = null) {
-            const token = getToken();
-            const options = {
-                method: method,
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            };
-            if (token) options.headers["Authorization"] = `Bearer ${token}`;
-            if (data) options.body = JSON.stringify(data);
-
-            const response = await fetch(url, options);
-            if (!response.ok) {
-                throw new Error(`${method} failed! Status: ${response.status}`);
-            }
-            return response.json();
-        }
-
-        async function fetchContractList() {
-            try {
-                contractList = await fetchData(CONTRACT_API_URL);
-                return contractList.map(contract => ({
-                    id: contract.id,
-                    contractName: contract.name,
-                    value: contract.total_price || 0,
-                    validity: {
-                        startDate: contract.rental_start_time,
-                        endDate: contract.rental_end_time
-                    },
-                    status: contract.status || 'draft'
-                }));
-            } catch (error) {
-                alert(`Lỗi khi lấy danh sách hợp đồng: ${error.message}`);
-                return [];
-            }
-        }
-
-        function displayContractList(list, page) {
-            const start = (page - 1) * contractsPerPage;
-            const end = start + contractsPerPage;
-            const displayList = list.slice(start, end);
-
-            const contractTable = document.getElementById("danhSachHopDong");
-            contractTable.innerHTML = "";
-
-            displayList.forEach((contract, index) => {
-                const stt = start + index + 1;
-                let actionButtons = `
-                    <button class="btn btn-sm" onclick="viewDetails('${contract.id}')"><i class="fas fa-eye"></i> Chi Tiết</button>
-                `;
-                if (contract.status === "draft") {
-                    actionButtons += `
-                        <button class="btn btn-sm" onclick="makePayment('${contract.id}')"><i class="fas fa-money-bill-wave"></i> Đặt Cọc</button>
-                    `;
-                } else {
-                    actionButtons += `
-                        <button class="btn btn-sm" onclick="makePayment('${contract.id}')"><i class="fas fa-money-bill-wave"></i> Thanh Toán</button>
-                    `;
-                }
-
-                const row = `
-                    <tr>
-                        <td>${stt}</td>
-                        <td>${contract.contractName}</td>
-                        <td>${formatCurrency(contract.value)}</td>
-                        <td>${formatDate(contract.validity.startDate)} - ${formatDate(contract.validity.endDate)}</td>
-                        <td>${formatStatus(contract.status)}</td>
-                        <td>${actionButtons}</td>
-                    </tr>
-                `;
-                contractTable.innerHTML += row;
-            });
-
-            updatePagination(list.length);
-        }
-
-        function updatePagination(totalContracts) {
-            const totalPages = Math.ceil(totalContracts / contractsPerPage);
-            const pagination = document.getElementById("phanTrang");
-            pagination.innerHTML = "";
-
-            for (let i = 1; i <= totalPages; i++) {
-                const li = document.createElement("li");
-                li.className = "page-item" + (i === currentPage ? " active" : "");
-                li.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i})">${i}</a>`;
-                pagination.appendChild(li);
-            }
-        }
-
-        function changePage(page) {
-            currentPage = page;
-            const filteredList = filterContractList();
-            displayContractList(filteredList, currentPage);
-        }
-
-        function filterContractList() {
-            const contractName = document.getElementById("tenHopDong").value.toLowerCase();
-            const status = document.getElementById("trangThai").value;
-
-            return contractList.filter(contract => {
-                const matchesName = contractName === "" || contract.contractName.toLowerCase().includes(contractName);
-                const matchesStatus = status === "" || contract.status === status;
-                return matchesName && matchesStatus;
-            });
-        }
-
-        function searchContracts() {
-            currentPage = 1;
-            const filteredList = filterContractList();
-            displayContractList(filteredList, currentPage);
-        }
-
-        function resetFilters() {
-            document.getElementById("tenHopDong").value = "";
-            document.getElementById("trangThai").value = "";
-            currentPage = 1;
-            fetchContractList().then(list => {
-                displayContractList(list, currentPage);
-            });
-        }
-
-        function viewDetails(contractId) {
-            window.location.href = `contractDetail.html?id=${contractId}`;
-        }
-
-        function makePayment(contractId) {
-            window.location.href = `payment.html?id=${contractId}`;
-        }
-
-        function showToast() {
-            const toast = document.getElementById("successToast");
-            toast.style.display = "block";
-            setTimeout(() => {
-                toast.style.display = "none";
-            }, 3000);
-        }
-
-        window.onload = async function () {
-            const list = await fetchContractList();
-            displayContractList(list, currentPage);
-
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get("payment") === "success") {
-                // Làm mới danh sách hợp đồng để cập nhật trạng thái
-                contractList = await fetchContractList();
-                displayContractList(contractList, currentPage);
-                showToast();
-            }
-        };
-    </script> -->
 </body>
 
 </html>
