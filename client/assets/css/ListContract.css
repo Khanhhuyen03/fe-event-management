@@ -4,26 +4,6 @@ body {
     flex-direction: column;
     min-height: 100vh;
 }
-
-.header {
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 10px 0;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-}
-
-.header .logo h1 {
-    font-size: 24px;
-    margin: 0;
-}
-
-.header .logo span {
-    color: #718355;
-}
-
 .navmenu ul {
     list-style: none;
     padding: 0;

@@ -1,5 +1,5 @@
 var ServiceAPI = 'http://localhost:8080/event-management/services'; // Có thể thêm ?user_id=${user.id} nếu API hỗ trợ
-
+var ProvinceAPI = 'https://provinces.open-api.vn/api/p';
 // Lấy thông tin user từ localStorage
 const token = localStorage.getItem("token");
 let user;
@@ -12,10 +12,13 @@ try {
 }
 
 function start() {
-    getData((services) => {
+    getData((services, provinces) => {
         renderServices(services);
+        if (document.querySelector("#inputLocation")) {
+            populateCities(provinces);
+        }
     });
-    handleCreateForm()
+    handleCreateForm();
 }
 start();
 function getData(callback) {
@@ -33,10 +36,22 @@ function getData(callback) {
             }
             return res.json();
         }),
+        // Lấy danh sách tỉnh/thành phố
+        fetch(ProvinceAPI).then(res => {
+            if (!res.ok) {
+                return res.text().then(text => {
+                    throw new Error(`Lỗi ProvinceAPI: ${res.status} - ${text}`);
+                });
+            }
+            return res.json();
+        }),
     ])
-        .then(([services]) => {
+        .then(([services, provinces]) => {
             services = services.data?.items || [];
-            callback(services);
+            provinces = provinces || [];
+            window.provinces = provinces;
+            console.log("Dữ liệu Provinces:", provinces);
+            callback(services, provinces);
         })
         .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
 }
@@ -137,7 +152,7 @@ function handleCreateForm() {
         var description = document.querySelector('input[name="description"]').value;
         var price = document.querySelector('input[name="price"]').value;
         var quantity = document.querySelector('input[name="quantity"]').value;
-        var location = document.querySelector('input[name="location"]').value;
+        var location = document.querySelector('select[name="location"]').value;
 
         // Validation
         if (!name || !price || !quantity) {
@@ -158,14 +173,15 @@ function handleCreateForm() {
             alert("Không tìm thấy thông tin người dùng, vui lòng đăng nhập lại!");
             return;
         }
-
+        const selectedProvince = window.provinces.find(province => province.code === location);
+        const locationName = selectedProvince ? selectedProvince.name : location;
         // Create object containing service info
         const serviceData = {
             name: name,
             description: description,
             hourly_salary: parseFloat(price) || 0, // Đổi tên để khớp với schema backend
             quantity: parseInt(quantity) || 1, // Đảm bảo số nguyên
-            place: location,
+            place: locationName,
             userID: userId,
         };
 
@@ -327,7 +343,7 @@ function loadEditForm(editServiceId) {
             document.querySelector('input[name="description"]').value = service.description || "";
             document.querySelector('input[name="price"]').value = service.hourly_salary || "";
             document.querySelector('input[name="quantity"]').value = service.quantity || 1;
-            document.querySelector('input[name="location"]').value = service.place || "";
+            document.querySelector('select[name="location"]').value = service.place || "";
 
             // Xử lý hiển thị ảnh
             if (service.image) {
@@ -372,7 +388,7 @@ function loadEditForm(editServiceId) {
                 const inputDescription = document.querySelector('input[name="description"]').value;
                 const inputPrice = document.querySelector('input[name="price"]').value;
                 const inputQuantity = document.querySelector('input[name="quantity"]').value;
-                const inputLocation = document.querySelector('input[name="location"]').value;
+                const inputLocation = document.querySelector('select[name="location"]').value;
 
                 // Kiểm tra dữ liệu bắt buộc
                 if (!inputName) {
@@ -437,4 +453,28 @@ function loadEditForm(editServiceId) {
         .catch(error => {
             console.error('Lỗi khi tải dữ liệu:', error);
         });
+}
+function populateCities(provinces) {
+    const citySelect = document.querySelector('select[name="location"]');
+    const currentValue = citySelect.value; // Lưu giá trị hiện tại của dropdown
+
+    // Xóa các tùy chọn cũ
+    citySelect.innerHTML = '<option value="">Chọn tỉnh thành</option>';
+
+    // Kiểm tra nếu provinces là mảng và có độ dài
+    if (Array.isArray(provinces) && provinces.length > 0) {
+        provinces.forEach(province => {
+            const option = document.createElement('option');
+            option.value = province.name; // Sử dụng name làm value
+            option.text = province.name;
+            citySelect.appendChild(option);
+        });
+    } else {
+        console.warn("Dữ liệu provinces không hợp lệ hoặc rỗng:", provinces);
+    }
+
+    // Khôi phục giá trị đã chọn nếu có
+    if (currentValue) {
+        citySelect.value = currentValue;
+    }
 }

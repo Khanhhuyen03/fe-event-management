@@ -346,7 +346,6 @@
                         <img src="assets/img/Logo-VNPAY-QR-635x118.jpg" alt="VNPAY Logo" style="width: 100px; margin-bottom: 10px;">
                         <div style="color: green; font-size: 24px;">✔</div>
                         <h3>Thông báo</h3>
-                        <p>Thanh toán ${paymentType === "deposit" ? "đặt cọc" : "khoản còn lại"} thành công!</p>
                         <p><strong>Mã tra cứu:</strong> ${urlParams.get("vnp_TransactionNo") || 'Không có'}</p>
                         <p><strong>Số tiền:</strong> ${formatCurrency(amount)}</p>
                         <p><strong>Thời gian giao dịch:</strong> ${formatDateTime(urlParams.get("vnp_PayDate")) || 'Không có'}</p>

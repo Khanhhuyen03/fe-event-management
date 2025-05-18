@@ -115,7 +115,7 @@
 <body>
     <div id="header"></div>
     <div class="content container">
-        <h2 class="text-center mb-4">CHI TIẾT HỢP ĐỒNG</h2>
+        <h2 class="text-center" style="margin-top: 100px;">CHI TIẾT HỢP ĐỒNG</h2>
         <div class="contract-details bg-white p-4 mb-4">
             <table class="table table-bordered">
                 <tbody>
@@ -137,6 +137,10 @@
                     <tr>
                         <th scope="row" class="fw-bold">Trạng thái</th>
                         <td id="status"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row" class="fw-bold">Thao tác</th>
+                        <td id="updateStatus"></td>
                     </tr>
                     <tr>
                         <th scope="row" colspan="2" class="fw-bold">Thông tin khách hàng</th>
@@ -326,23 +330,102 @@
                         </div>
                     </div>
                     <div class="mt-3">
-                        <p class="fw-bold text-uppercase">Điều 2: Giá trị dịch vụ – Phương thức thanh toán</p>
+                        <b class="fw-bold text-uppercase">Điều 2: GIÁ TRỊ DỊCH VỤ – PHƯƠNG THỨC THANH TOÁN</b>
                         <p>2.1 Giá trị dịch vụ: <span id="draftTotalPrice"></span></p>
                         <p>2.2 Ngay khi Bên B thực hiện cung cấp dịch vụ theo quy định của Điều 1, hai bên sẽ thống nhất
                             và ký kết biên bản thanh lý hợp đồng trong đó có ghi rõ những hạng mục còn thiếu hoặc phát
-                            sinh (nếu có).</p>
+                            sinh (nếu có) Việc bỏ bớt hoặc bổ sung hạng mục (nếu có) phải được Bên A chấp thuận
+                            trước bằng văn bản, giá trị dịch vụ ghi trong biên bản thanh lý hợp đồng sẽ là giá trị thanh
+                            toán cuối cùng.</p>
                         <p>2.3 Phương thức thanh toán: (Thanh toán bằng tiền mặt hoặc chuyển khoản)</p>
-                        <ul class="list-unstyled mx-4">
-                            <li>- Bên A thực hiện đặt cọc 30% giá trị hợp đồng cho Bên B.</li>
-                            <li>- Bên A sẽ thanh toán 100% phần giá trị dịch vụ trong thời gian 5 ngày làm việc kể từ
-                                khi kết thúc chương trình.</li>
+                        <ul class="mx-4">
+                            <li> Bên A thực hiện đặt cọc 10% giá trị hợp đồng cho bên B.</li>
+                            <li> Bên A sẽ thanh toán bằng tiền mặt hoặc chuyển khoản cho bên B 100% phần giá trị
+                                dịch vụ kể trên và phát sinh (nếu có) căn cứ trên Biên bản thanh lý hợp đồng trong thời
+                                gian 5 ngày làm việc kể từ khi kết thúc thời gian thực hiện chương trình và bên A nhận
+                                được biên bản thanh lý hợp đồng và hóa đơn tài chính hợp pháp của bên B.
+                            </li>
                         </ul>
                     </div>
                     <div class="mt-3">
                         <p class="fw-bold text-uppercase">Điều 3: Thời hạn thỏa thuận</p>
-                        <p>3.1 Thời gian hiệu lực hợp đồng: Từ khi bản hợp đồng được ký kết đến khi thanh toán hợp đồng.
-                        </p>
+                        <p>3.1 Thời gian hiệu lực hợp đồng: Từ khi bản hợp đồng được ký kết đến khi thanh
+                            toán hợp đồng.</p>
                     </div>
+                    <div class="my-4">
+                        <b class="uppercase">ĐIỀU 4: QUYỀN LỢI VÀ NGHĨA VỤ CỦA BÊN A</b>
+                        <div class="my-2">
+                            4.1 Quyền lợi của bên A:
+                            <ul class="mx-4">
+                                <li> Nhận được dịch vụ tốt nhất và đầy đủ nhất do bên B cung cấp.</li>
+                                <li> Quản lý và giám sát các hoạt động do bên B cung cấp và thực hiện.</li>
+                            </ul>
+                        </div>
+                        <div class="my-2">
+                            <div>4.2 Nghĩa vụ của bên A:</div>
+                            <ul class="mx-4">
+                                <li> Thanh toán cho bên B theo như thoả thuận tai điều 2.</li>
+                                <li> Phối hợp với bên B giải quyết các vấn đề phát sinh xảy ra trong chương
+                                    trình thuộc
+                                    về trách nhiệm của bên A.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="my-4">
+                        <b class="uppercase">ĐIỀU 5: QUYỀN LỢI VÀ NGHĨA VỤ CỦA BÊN B </b>
+                        <div class="my-2">
+                            <div> 5.1 Quyền lợi của bên B:</div>
+                            <ul class="mx-4">
+                                <li> Nhận được đầy đủ thanh toán của bên A như điều 2.</li>
+                            </ul>
+                        </div>
+                        <div class="my-2">
+                            <div> 5.2 Nghĩa vụ của bên B:</div>
+                            <ul class="mx-4">
+                                <li> Bảo đảm tuyển dụng, cung cấp cho bên A các hạng hạng mục đã nêu với số
+                                    lượng ,
+                                    chất lượng như yêu cầu.
+                                </li>
+                                <li> Trong quá trình diễn ra chương trình, Bên B cam kết sẽ trực tiếp theo
+                                    dõi, giám
+                                    sát, ghi chép và chụp hình lại trong biên bản nghiệm thu bàn giao cho
+                                    Bên A.
+                                </li>
+                                <li> Cung cấp hóa đơn tài chính hợp pháp đối với dịch vụ cung cấp theo hợp
+                                    đồng này và
+                                    các hạng mục phát sinh được bên A chấp thuận (nếu có).
+                                </li>
+                                <li> Phối hợp với bên A giải quyết các vấn đề phát sinh xảy ra trong chương
+                                    trình thuộc
+                                    về trách nhiệm của bên B.
+                                </li>
+                                <li> Bên B sẽ không chịu trách nhiệm về những dịch vụ nào khác ngoài nội
+                                    dung và Bảng
+                                    danh mục dịch vụ.
+                                </li>
+                                <li> Bên B cam kết không cung cấp và tiết lộ bất kỳ thông tin nào liên quan
+                                    trực tiếp
+                                    hay gián tiếp đến sản phẩm của Bên A cũng như các nội dung khác cho bất
+                                    kỳ bên thứ
+                                    ba nào mà không có sự đồng ý trước của Bên A bằng văn bản.
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="my-4">
+                        <b class="uppercase">ĐIỀU 6: GIẢI QUYẾT TRANH CHẤP </b>
+                        <div class="my-2">
+                            Mọi tranh chấp liên quan đến Hợp đồng này trước hết sẽ được giải quyết thông qua
+                            thương
+                            lượng và hoà giải giữa các bên. Nếu tranh chấp không giải quyết được thông qua
+                            hoà giải thì
+                            các bên nhất trí rằng một trong các bên có quyền đưa ra giải quyết tại Tòa án có
+                            thẩm quyền.
+                        </div>
+                    </div>
+
                 </div>
                 <div class="d-flex justify-content-between mt-5">
                     <div class="text-center">
@@ -367,16 +450,16 @@
             class="bi bi-arrow-up-short"></i></a>
 
     <!-- Vendor JS Files -->
-    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/vendor/aos/aos.js"></script>
-    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-    <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+    <!-- <script src="/client/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script> -->
+    <script src="/client/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/client/assets/vendor/aos/aos.js"></script>
+    <script src="/client/assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="/client/assets/vendor/purecounter/purecounter_vanilla.js"></script>
 
     <!-- Main JS File -->
-    <script src="assets/js/main.js"></script>
-    <script src="assets/js/header.js"></script>
-    <script src="assets/js/contractDetail.js"></script>
+    <script src="/client/assets/js/main.js"></script>
+    <script src="/client/assets/js/header.js"></script>
+    <script src="/client/assets/js/contractDetail.js"></script>
 </body>
 
 </html>
