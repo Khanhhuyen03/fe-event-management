@@ -1,0 +1,4 @@
+{
+    "liveServer.settings.wait": 999999,
+    "liveServer.settings.ignoreFiles": ["**/*"] 
+}
